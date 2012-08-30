@@ -14,6 +14,13 @@ To build the parser yourself, clone the git repo then run:
 
 This will generate `lex-parser.js`.
 
+## usage
+
+    var lexParser = require('lex-parser');
+
+    // parse a lexical grammar and return JSON
+    lexParser.parse("%% ... ");
+
 ## example
 
 The parser can parse its own lexical grammar, shown below:
