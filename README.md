@@ -6,6 +6,14 @@ A parser for lexical grammars used by jison.
 
     npm install lex-parser
 
+## build
+
+To build the parser yourself, clone the git repo then run:
+
+    make
+
+This will generate `lex-parser.js`.
+
 ## example
 
 The parser can parse its own lexical grammar, shown below:
