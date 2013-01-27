@@ -1,6 +1,6 @@
 # lex-parser
 
-A parser for lexical grammars used by jison.
+A parser for lexical grammars used by [jison](http://jison.org) and jison-lex.
 
 ## install
 
