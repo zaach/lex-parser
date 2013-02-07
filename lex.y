@@ -204,7 +204,7 @@ range_regex
 
 string
     : STRING_LIT
-        { $$ = prepareString(yytext.substr(1, yytext.length-2)); }
+        { $$ = prepareString(yytext.substr(1, yytext.length - 2)); }
     | CHARACTER_LIT
     ;
 
@@ -220,3 +220,4 @@ function prepareString (s) {
     s = encodeRE(s);
     return s;
 };
+

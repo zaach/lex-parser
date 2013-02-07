@@ -23,6 +23,7 @@ BR                \r\n|\n|\r
 <conditions>"*"                       return '*';
 
 <rules>{BR}+                          /* */
+<rules>\s+{BR}+                       /* */
 <rules>\s+                            this.begin('indented')
 <rules>"%%"                           this.begin('code'); return '%%'
 <rules>[a-zA-Z0-9_]+                  return 'CHARACTER_LIT'

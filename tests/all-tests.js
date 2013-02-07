@@ -356,6 +356,18 @@ exports["test rules with trailing escapes"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test no brace action with surplus whitespace between rules"] = function () {
+    var lexgrammar = '%%\n"a" return true;\n  \n"b" return 1;\n   \n';
+    var expected = {
+        rules: [
+            ["a\\b", "return true;"],
+            ["b\\b", "return 1;"]
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test windows line endings"] = function () {
     var lexgrammar = '%%\r\n"["[^\\]]"]" %{\r\nreturn true;\r\n%}\r\n';
     var expected = {
@@ -366,6 +378,19 @@ exports["test windows line endings"] = function () {
 
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
+
+exports["test braced action with surplus whitespace between rules"] = function () {
+    var lexgrammar = '%%\n"a" %{  \nreturn true;\n%}  \n  \n"b" %{    return 1;\n%}  \n   \n';
+    var expected = {
+        rules: [
+            ["a\\b", "  \nreturn true;\n"],
+            ["b\\b", "    return 1;\n"]
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 
 if (require.main === module)
     require("test").run(exports);
