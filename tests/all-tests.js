@@ -301,5 +301,16 @@ exports["test comments"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test rules with trailing escapes"] = function () {
+    var lexgrammar = '%%\n\\#[^\\n]*\\n {/* ok */}\n';
+    var expected = {
+        rules: [
+            ["#[^\\n]*\\n", "/* ok */"],
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 if (require.main === module)
     require("test").run(exports);
