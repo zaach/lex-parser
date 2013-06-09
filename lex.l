@@ -6,25 +6,25 @@ NAME              [a-zA-Z_][a-zA-Z0-9_-]*
 
 %%
 
-<action>[^{}]+          		return 'ACTION_BODY';
-<action>"{"             		yy.depth++; return '{';
-<action>"}"             		yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}';
+<action>[^{}]+                  return 'ACTION_BODY';
+<action>"{"                     yy.depth++; return '{';
+<action>"}"                     yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}';
 
-<conditions>{NAME}      		return 'NAME';
-<conditions>">"         		this.popState(); return '>';
-<conditions>","         		return ',';
-<conditions>"*"         		return '*';
+<conditions>{NAME}              return 'NAME';
+<conditions>">"                 this.popState(); return '>';
+<conditions>","                 return ',';
+<conditions>"*"                 return '*';
 
-<rules>\n+              		/* */
-<rules>\s+\n+              		/* */
-<rules>\s+              		this.begin('indented');
-<rules>"%%"             		this.begin('code'); return '%%';
-<rules>[a-zA-Z0-9_]+    		return 'CHARACTER_LIT';
+<rules>\n+                      /* */
+<rules>\s+\n+                   /* */
+<rules>\s+                      this.begin('indented');
+<rules>"%%"                     this.begin('code'); return '%%';
+<rules>[a-zA-Z0-9_]+            return 'CHARACTER_LIT';
 
-<options>{NAME}         		yy.options[yytext] = true;
-<options>\n+            		this.begin('INITIAL');
-<options>\s+\n+         		this.begin('INITIAL');
-<options>\s+            		/* empty */
+<options>{NAME}                 yy.options[yytext] = true;
+<options>\n+                    this.begin('INITIAL');
+<options>\s+\n+                 this.begin('INITIAL');
+<options>\s+                    /* empty */
 
 <start_condition>{NAME}         return 'START_COND';
 <start_condition>\n+            this.begin('INITIAL');
