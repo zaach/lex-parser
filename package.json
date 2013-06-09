@@ -6,7 +6,6 @@
   "scripts": {
     "test": "make test"
   },
-  "repository": "",
   "keywords": [
     "lexical",
     "grammar",
@@ -14,9 +13,13 @@
     "jison"
   ],
   "author": "Zach Carter",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/zaach/lex-parser.git"
+  },
   "license": "MIT",
   "devDependencies": {
-    "jison": "0.4.x",
+    "jison": "git://github.com/GerHobbelt/jison.git",
     "test": "*"
   }
 }
