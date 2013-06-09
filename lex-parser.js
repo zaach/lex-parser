@@ -72,7 +72,7 @@
     recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
   }
 */
-var lexParser = (function(){
+var lex = (function(){
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"lex":3,"definitions":4,"%%":5,"rules":6,"epilogue":7,"EOF":8,"CODE":9,"definition":10,"ACTION":11,"NAME":12,"regex":13,"START_INC":14,"names_inclusive":15,"START_EXC":16,"names_exclusive":17,"START_COND":18,"rule":19,"start_conditions":20,"action":21,"{":22,"action_body":23,"}":24,"ACTION_BODY":25,"<":26,"name_list":27,">":28,"*":29,",":30,"regex_list":31,"|":32,"regex_concat":33,"regex_base":34,"(":35,")":36,"SPECIAL_GROUP":37,"+":38,"?":39,"/":40,"/!":41,"name_expansion":42,"range_regex":43,"any_group_regex":44,".":45,"^":46,"$":47,"string":48,"escape_char":49,"NAME_BRACE":50,"ANY_GROUP_REGEX":51,"ESCAPE_CHAR":52,"RANGE_REGEX":53,"STRING_LIT":54,"CHARACTER_LIT":55,"$accept":0,"$end":1},
@@ -813,9 +813,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = lexParser;
-exports.Parser = lexParser.Parser;
-exports.parse = function () { return lexParser.parse.apply(lexParser, arguments); };
+exports.parser = lex;
+exports.Parser = lex.Parser;
+exports.parse = function () { return lex.parse.apply(lex, arguments); };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
