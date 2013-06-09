@@ -20,6 +20,6 @@
   "license": "MIT",
   "devDependencies": {
     "jison": "git://github.com/GerHobbelt/jison.git",
-    "test": "*"
+    "test": ">=0.4.0"
   }
 }
