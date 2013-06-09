@@ -16,7 +16,7 @@ This will generate `lex-parser.js`.
 
 ## usage
 
-    var lexParser = require('lex-parser');
+    var lexParser = require("lex-parser");
 
     // parse a lexical grammar and return JSON
     lexParser.parse("%% ... ");
