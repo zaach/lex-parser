@@ -68,8 +68,8 @@
   }
   while parser (grammar) errors will also provide these members, i.e. parser errors deliver a superset of attributes: {
     loc:         (yylloc)
-    expected:    (string describing the set of expected tokens)
-    recoverable: (boolean: TRUE when the parser has a error recovery rule available for this particular error)
+    expected:    (array describing the set of expected tokens; may be empty when we cannot easily produce such a set)
+    recoverable: (boolean: TRUE when the parser MAY have an error recovery rule available for this particular error)
   }
 */
 var lexParser = (function(){
@@ -84,7 +84,7 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1: 
+case 1:
           this.$ = { rules: $$[$0-1] };
           if ($$[$0-3][0]) this.$.macros = $$[$0-3][0];
           if ($$[$0-3][1]) this.$.startConditions = $$[$0-3][1];
@@ -93,14 +93,14 @@ case 1:
           if (yy.actionInclude) this.$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
-          return this.$; 
-        
+          return this.$;
+
 break;
-case 2: this.$ = null; 
+case 2: this.$ = null;
 break;
-case 3: this.$ = null; 
+case 3: this.$ = null;
 break;
-case 4: this.$ = $$[$0-1]; 
+case 4: this.$ = $$[$0-1];
 break;
 case 5:
           this.$ = $$[$0];
@@ -113,31 +113,31 @@ case 5:
               this.$[1][name] = $$[$0-1][name];
             }
           }
-        
+
 break;
-case 6: yy.actionInclude += $$[$0-1]; this.$ = $$[$0]; 
+case 6: yy.actionInclude += $$[$0-1]; this.$ = $$[$0];
 break;
-case 7: yy.actionInclude = ''; this.$ = [null,null]; 
+case 7: yy.actionInclude = ''; this.$ = [null,null];
 break;
-case 8: this.$ = [$$[$0-1], $$[$0]]; 
+case 8: this.$ = [$$[$0-1], $$[$0]];
 break;
-case 9: this.$ = $$[$0]; 
+case 9: this.$ = $$[$0];
 break;
-case 10: this.$ = $$[$0]; 
+case 10: this.$ = $$[$0];
 break;
-case 11: this.$ = {}; this.$[$$[$0]] = 0; 
+case 11: this.$ = {}; this.$[$$[$0]] = 0;
 break;
-case 12: this.$ = $$[$0-1]; this.$[$$[$0]] = 0; 
+case 12: this.$ = $$[$0-1]; this.$[$$[$0]] = 0;
 break;
-case 13: this.$ = {}; this.$[$$[$0]] = 1; 
+case 13: this.$ = {}; this.$[$$[$0]] = 1;
 break;
-case 14: this.$ = $$[$0-1]; this.$[$$[$0]] = 1; 
+case 14: this.$ = $$[$0-1]; this.$[$$[$0]] = 1;
 break;
-case 15: this.$ = $$[$0-1]; this.$.push($$[$0]); 
+case 15: this.$ = $$[$0-1]; this.$.push($$[$0]);
 break;
-case 16: this.$ = [$$[$0]]; 
+case 16: this.$ = [$$[$0]];
 break;
-case 17: this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1],$$[$0]]; 
+case 17: this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1],$$[$0]];
 break;
 case 18:this.$ = $$[$0-1];
 break;
@@ -151,57 +151,57 @@ case 22:this.$ = $$[$0-4] + $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
 break;
 case 23:this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
 break;
-case 24: this.$ = $$[$0-1]; 
+case 24: this.$ = $$[$0-1];
 break;
-case 25: this.$ = ['*']; 
+case 25: this.$ = ['*'];
 break;
-case 27: this.$ = [$$[$0]]; 
+case 27: this.$ = [$$[$0]];
 break;
-case 28: this.$ = $$[$0-2]; this.$.push($$[$0]); 
+case 28: this.$ = $$[$0-2]; this.$.push($$[$0]);
 break;
-case 29: 
+case 29:
           this.$ = $$[$0];
           if (!(yy.options && yy.options.flex) && this.$.match(/[\w\d]$/) && !this.$.match(/\\(b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/))
               this.$ += "\\b";
-        
+
 break;
-case 30: this.$ = $$[$0-2] + '|' + $$[$0]; 
+case 30: this.$ = $$[$0-2] + '|' + $$[$0];
 break;
-case 31: this.$ = $$[$0-1] + '|'; 
+case 31: this.$ = $$[$0-1] + '|';
 break;
-case 33: this.$ = '' 
+case 33: this.$ = ''
 break;
-case 34: this.$ = $$[$0-1] + $$[$0]; 
+case 34: this.$ = $$[$0-1] + $$[$0];
 break;
-case 36: this.$ = '(' + $$[$0-1] + ')'; 
+case 36: this.$ = '(' + $$[$0-1] + ')';
 break;
-case 37: this.$ = $$[$0-2] + $$[$0-1] + ')'; 
+case 37: this.$ = $$[$0-2] + $$[$0-1] + ')';
 break;
-case 38: this.$ = $$[$0-1] + '+'; 
+case 38: this.$ = $$[$0-1] + '+';
 break;
-case 39: this.$ = $$[$0-1] + '*'; 
+case 39: this.$ = $$[$0-1] + '*';
 break;
-case 40: this.$ = $$[$0-1] + '?'; 
+case 40: this.$ = $$[$0-1] + '?';
 break;
-case 41: this.$ = '(?=' + $$[$0] + ')'; 
+case 41: this.$ = '(?=' + $$[$0] + ')';
 break;
-case 42: this.$ = '(?!' + $$[$0] + ')'; 
+case 42: this.$ = '(?!' + $$[$0] + ')';
 break;
-case 44: this.$ = $$[$0-1] + $$[$0]; 
+case 44: this.$ = $$[$0-1] + $$[$0];
 break;
-case 46: this.$ = '.'; 
+case 46: this.$ = '.';
 break;
-case 47: this.$ = '^'; 
+case 47: this.$ = '^';
 break;
-case 48: this.$ = '$'; 
+case 48: this.$ = '$';
 break;
-case 52: this.$ = yytext; 
+case 52: this.$ = yytext;
 break;
-case 53: this.$ = yytext; 
+case 53: this.$ = yytext;
 break;
-case 54: this.$ = yytext; 
+case 54: this.$ = yytext;
 break;
-case 55: this.$ = prepareString(yytext.substr(1, yytext.length - 2)); 
+case 55: this.$ = prepareString(yytext.substr(1, yytext.length - 2));
 break;
 }
 },
