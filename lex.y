@@ -10,7 +10,7 @@
 
 lex
     : definitions '%%' rules epilogue
-        { 
+        {
           $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
@@ -19,7 +19,7 @@ lex
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
-          return $$; 
+          return $$;
         }
     ;
 
@@ -124,7 +124,7 @@ name_list
 
 regex
     : regex_list
-        { 
+        {
           $$ = $1;
           if (!(yy.options && yy.options.flex) && $$.match(/[\w\d]$/) && !$$.match(/\\(b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/))
               $$ += "\\b";
