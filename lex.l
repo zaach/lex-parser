@@ -1,5 +1,6 @@
 
 NAME              [a-zA-Z_][a-zA-Z0-9_-]*
+BR                \r\n|\n|\r
 
 %s indented trail rules
 %x code start_condition options conditions action
@@ -20,32 +21,32 @@ NAME              [a-zA-Z_][a-zA-Z0-9_-]*
 <conditions>","         return ','
 <conditions>"*"         return '*'
 
-<rules>\n+              /* */
+<rules>{BR}+            /* */
 <rules>\s+              this.begin('indented')
 <rules>"%%"             this.begin('code'); return '%%'
 <rules>[a-zA-Z0-9_]+    return 'CHARACTER_LIT'
 
 <options>{NAME}         yy.options[yytext] = true
-<options>\n+            this.begin('INITIAL')
-<options>\s+\n+         this.begin('INITIAL')
+<options>{BR}+          this.begin('INITIAL')
+<options>\s+{BR}+       this.begin('INITIAL')
 <options>\s+            /* empty */
 
 <start_condition>{NAME}         return 'START_COND'
-<start_condition>\n+            this.begin('INITIAL')
-<start_condition>\s+\n+         this.begin('INITIAL')
+<start_condition>{BR}+          this.begin('INITIAL')
+<start_condition>\s+{BR}+       this.begin('INITIAL')
 <start_condition>\s+            /* empty */
 
-<trail>.*\n+                    this.begin('rules')
+<trail>.*{BR}+                  this.begin('rules')
 
 <indented>"{"                   yy.depth = 0; this.begin('action'); return '{'
-<indented>"%{"(.|\n)*?"%}"      this.begin('trail'); yytext = yytext.substr(2, yytext.length-4);return 'ACTION'
-"%{"(.|\n)*?"%}"                yytext = yytext.substr(2, yytext.length-4); return 'ACTION'
+<indented>"%{"(.|{BR})*?"%}"    this.begin('trail'); yytext = yytext.substr(2, yytext.length-4);return 'ACTION'
+"%{"(.|{BR})*?"%}"              yytext = yytext.substr(2, yytext.length-4); return 'ACTION'
 <indented>.+                    this.begin('rules'); return 'ACTION'
 
 "/*"(.|\n|\r)*?"*/"             /* ignore */
 "//".*                          /* ignore */
 
-\n+                             /* */
+{BR}+                           /* */
 \s+                             /* */
 {NAME}                          return 'NAME'
 \"("\\\\"|'\"'|[^"])*\"         yytext = yytext.replace(/\\"/g,'"');return 'STRING_LIT'
@@ -81,7 +82,7 @@ NAME              [a-zA-Z_][a-zA-Z0-9_-]*
 .                               /* ignore bad characters */
 <*><<EOF>>                      return 'EOF'
 
-<code>(.|\n)+                   return 'CODE'
+<code>(.|{BR})+                 return 'CODE'
 
 %%
 

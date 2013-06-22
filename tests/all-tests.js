@@ -345,5 +345,16 @@ exports["test rules with trailing escapes"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test windows line endings"] = function () {
+    var lexgrammar = '%%\r\n"["[^\\]]"]" %{\r\nreturn true;\r\n%}\r\n';
+    var expected = {
+        rules: [
+            ["\\[[^\\]]\\]", "\r\nreturn true;\r\n"]
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 if (require.main === module)
     require("test").run(exports);
