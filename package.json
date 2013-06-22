@@ -1,6 +1,6 @@
 {
   "name": "lex-parser",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A parser for lexical grammars used by jison",
   "main": "lex-parser.js",
   "scripts": {
