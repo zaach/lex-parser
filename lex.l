@@ -6,9 +6,13 @@ NAME              [a-zA-Z_][a-zA-Z0-9_-]*
 
 %%
 
-<action>[^{}]+          return 'ACTION_BODY'
-<action>"{"             yy.depth++; return '{'
-<action>"}"             yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}'
+
+<action>"/*"(.|\n|\r)*?"*/" return 'ACTION_BODY';
+<action>"//".*              return 'ACTION_BODY';
+<action>"/"[^{}/]+          return 'ACTION_BODY';
+<action>[^{}/]+             return 'ACTION_BODY';
+<action>"{"                 yy.depth++; return '{'
+<action>"}"                 yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}'
 
 <conditions>{NAME}      return 'NAME'
 <conditions>">"         this.popState(); return '>'

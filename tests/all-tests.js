@@ -82,6 +82,28 @@ exports["test multiline action with single braces"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test multiline action with brace in a multi-line-comment"] = function () {
+    var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b={}; /* { */ return true;\n}\n';
+    var expected = {
+        rules: [
+            ["\\[[^\\]]\\]", "\nvar b={}; /* { */ return true;\n"]
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
+exports["test multiline action with brace in a single-line-comment"] = function () {
+    var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b={}; // { \nreturn 2 / 3;\n}\n';
+    var expected = {
+        rules: [
+            ["\\[[^\\]]\\]", "\nvar b={}; // { \nreturn 2 / 3;\n"]
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test include"] = function () {
     var lexgrammar = '\nRULE [0-9]\n\n%{\n hi <stuff> \n%}\n%%\n"["[^\\]]"]" %{\nreturn true;\n%}\n';
     var expected = {
