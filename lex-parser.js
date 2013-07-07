@@ -94,13 +94,13 @@ case 1:
           delete yy.options;
           delete yy.actionInclude;
           return this.$;
-
+        
 break;
-case 2: this.$ = null;
+case 2: this.$ = null; 
 break;
-case 3: this.$ = null;
+case 3: this.$ = null; 
 break;
-case 4: this.$ = $$[$0-1];
+case 4: this.$ = $$[$0-1]; 
 break;
 case 5:
           this.$ = $$[$0];
@@ -113,31 +113,31 @@ case 5:
               this.$[1][name] = $$[$0-1][name];
             }
           }
-
+        
 break;
-case 6: yy.actionInclude += $$[$0-1]; this.$ = $$[$0];
+case 6: yy.actionInclude += $$[$0-1]; this.$ = $$[$0]; 
 break;
-case 7: yy.actionInclude = ''; this.$ = [null,null];
+case 7: yy.actionInclude = ''; this.$ = [null,null]; 
 break;
-case 8: this.$ = [$$[$0-1], $$[$0]];
+case 8: this.$ = [$$[$0-1], $$[$0]]; 
 break;
-case 9: this.$ = $$[$0];
+case 9: this.$ = $$[$0]; 
 break;
-case 10: this.$ = $$[$0];
+case 10: this.$ = $$[$0]; 
 break;
-case 11: this.$ = {}; this.$[$$[$0]] = 0;
+case 11: this.$ = {}; this.$[$$[$0]] = 0; 
 break;
-case 12: this.$ = $$[$0-1]; this.$[$$[$0]] = 0;
+case 12: this.$ = $$[$0-1]; this.$[$$[$0]] = 0; 
 break;
-case 13: this.$ = {}; this.$[$$[$0]] = 1;
+case 13: this.$ = {}; this.$[$$[$0]] = 1; 
 break;
-case 14: this.$ = $$[$0-1]; this.$[$$[$0]] = 1;
+case 14: this.$ = $$[$0-1]; this.$[$$[$0]] = 1; 
 break;
-case 15: this.$ = $$[$0-1]; this.$.push($$[$0]);
+case 15: this.$ = $$[$0-1]; this.$.push($$[$0]); 
 break;
-case 16: this.$ = [$$[$0]];
+case 16: this.$ = [$$[$0]]; 
 break;
-case 17: this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1],$$[$0]];
+case 17: this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1],$$[$0]]; 
 break;
 case 18:this.$ = $$[$0-1];
 break;
@@ -151,57 +151,57 @@ case 22:this.$ = $$[$0-4] + $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
 break;
 case 23:this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
 break;
-case 24: this.$ = $$[$0-1];
+case 24: this.$ = $$[$0-1]; 
 break;
-case 25: this.$ = ['*'];
+case 25: this.$ = ['*']; 
 break;
-case 27: this.$ = [$$[$0]];
+case 27: this.$ = [$$[$0]]; 
 break;
-case 28: this.$ = $$[$0-2]; this.$.push($$[$0]);
+case 28: this.$ = $$[$0-2]; this.$.push($$[$0]); 
 break;
 case 29:
           this.$ = $$[$0];
           if (!(yy.options && yy.options.flex) && this.$.match(/[\w\d]$/) && !this.$.match(/\\(b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/))
               this.$ += "\\b";
-
+        
 break;
-case 30: this.$ = $$[$0-2] + '|' + $$[$0];
+case 30: this.$ = $$[$0-2] + '|' + $$[$0]; 
 break;
-case 31: this.$ = $$[$0-1] + '|';
+case 31: this.$ = $$[$0-1] + '|'; 
 break;
-case 33: this.$ = ''
+case 33: this.$ = '' 
 break;
-case 34: this.$ = $$[$0-1] + $$[$0];
+case 34: this.$ = $$[$0-1] + $$[$0]; 
 break;
-case 36: this.$ = '(' + $$[$0-1] + ')';
+case 36: this.$ = '(' + $$[$0-1] + ')'; 
 break;
-case 37: this.$ = $$[$0-2] + $$[$0-1] + ')';
+case 37: this.$ = $$[$0-2] + $$[$0-1] + ')'; 
 break;
-case 38: this.$ = $$[$0-1] + '+';
+case 38: this.$ = $$[$0-1] + '+'; 
 break;
-case 39: this.$ = $$[$0-1] + '*';
+case 39: this.$ = $$[$0-1] + '*'; 
 break;
-case 40: this.$ = $$[$0-1] + '?';
+case 40: this.$ = $$[$0-1] + '?'; 
 break;
-case 41: this.$ = '(?=' + $$[$0] + ')';
+case 41: this.$ = '(?=' + $$[$0] + ')'; 
 break;
-case 42: this.$ = '(?!' + $$[$0] + ')';
+case 42: this.$ = '(?!' + $$[$0] + ')'; 
 break;
-case 44: this.$ = $$[$0-1] + $$[$0];
+case 44: this.$ = $$[$0-1] + $$[$0]; 
 break;
-case 46: this.$ = '.';
+case 46: this.$ = '.'; 
 break;
-case 47: this.$ = '^';
+case 47: this.$ = '^'; 
 break;
-case 48: this.$ = '$';
+case 48: this.$ = '$'; 
 break;
-case 52: this.$ = yytext;
+case 52: this.$ = yytext; 
 break;
-case 53: this.$ = yytext;
+case 53: this.$ = yytext; 
 break;
-case 54: this.$ = yytext;
+case 54: this.$ = yytext; 
 break;
-case 55: this.$ = prepareString(yytext.substr(1, yytext.length - 2));
+case 55: this.$ = prepareString(yytext.substr(1, yytext.length - 2)); 
 break;
 }
 },
@@ -337,9 +337,9 @@ parse: function parse(input) {
                     expected: expected,
                     recoverable: (error_rule_depth !== false)
                 });
-                if (!p.recoverable) {
-                    return a;
-                }
+				if (!p.recoverable) {
+					return a;
+				}
             } else if (preErrorSymbol !== EOF) {
                 error_rule_depth = locateNearestErrorRecoveryRule(state);
             }
@@ -772,12 +772,19 @@ next:function () {
 
 // return next match that has a token
 lex:function lex() {
-        var r = this.next();
-        if (r) {
-            return r;
-        } else {
-            return this.lex();
+        var r;
+        // allow the PRE/POST handlers set/modify the return token for maximum flexibility of the generated lexer:
+        if (typeof this.options.pre_lex === 'function') {
+            r = this.options.pre_lex.bind(this)();
         }
+        while (!r) {
+            r = this.next();
+        };
+        if (typeof this.options.post_lex === 'function') {
+            // (also account for a userdef function which does not return any value: keep the token as is)
+            r = this.options.post_lex.bind(this)(r) || r;
+        }
+        return r;
     },
 
 // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
