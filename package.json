@@ -15,6 +15,7 @@
   ],
   "author": "Zach Carter",
   "license": "MIT",
+  "repository": { "type": "git", "repository": "https://github.com/zaach/lex-parser.git" },
   "devDependencies": {
     "jison": "0.4.x",
     "test": "*"
