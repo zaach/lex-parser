@@ -7,14 +7,15 @@ BR                \r\n|\n|\r
 
 %%
 
-<action>"/*"(.|\n|\r)*?"*/"       return 'ACTION_BODY';
-<action>"//".*                    return 'ACTION_BODY';
-<action>\"("\\\\"|'\"'|[^"])*\"   return 'ACTION_BODY';
-<action>"'"("\\\\"|"\'"|[^'])*"'" return 'ACTION_BODY';
-<action>[/"'][^{}/"']+            return 'ACTION_BODY';
-<action>[^{}/"']+                 return 'ACTION_BODY';
-<action>"{"                       yy.depth++; return '{'
-<action>"}"                       yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}'
+<action>"/*"(.|\n|\r)*?"*/"           return 'ACTION_BODY';
+<action>"//".*                        return 'ACTION_BODY';
+<action>"/"[^ /]*?['"{}'][^ ]*?"/"    return 'ACTION_BODY'; // regexp with braces or quotes (and no spaces)
+<action>\"("\\\\"|'\"'|[^"])*\"       return 'ACTION_BODY';
+<action>"'"("\\\\"|"\'"|[^'])*"'"     return 'ACTION_BODY';
+<action>[/"'][^{}/"']+                return 'ACTION_BODY';
+<action>[^{}/"']+                     return 'ACTION_BODY';
+<action>"{"                           yy.depth++; return '{'
+<action>"}"                           yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}'
 
 <conditions>{NAME}      return 'NAME'
 <conditions>">"         this.popState(); return '>'
