@@ -10,7 +10,8 @@
 
 lex
     : definitions '%%' rules epilogue
-        { $$ = {rules: $rules};
+        { 
+          $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
           if ($epilogue) $$.moduleInclude = $epilogue;
@@ -18,7 +19,8 @@ lex
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
-          return $$; }
+          return $$; 
+        }
     ;
 
 epilogue
@@ -100,7 +102,7 @@ action_body
     | action_body '{' action_body '}' action_comments_body
         {$$ = $1+$2+$3+$4+$5;}
     | action_body '{' action_body '}'
-        {$$ = $1+$2+$3+$4;}
+        {$$ = $1 + $2 + $3 + $4;}
     ;
 
 action_comments_body
@@ -128,17 +130,19 @@ name_list
 
 regex
     : regex_list
-        { $$ = $1;
-          if (!(yy.options && yy.options.flex) && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/))
+        {
+          $$ = $1;
+          if (!(yy.options && yy.options.flex) && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
               $$ += "\\b";
+          }
         }
     ;
 
 regex_list
     : regex_list '|' regex_concat
-        { $$ = $1+'|'+$3; }
+        { $$ = $1 + '|' + $3; }
     | regex_list '|'
-        { $$ = $1+'|'; }
+        { $$ = $1 + '|'; }
     | regex_concat
     |
         { $$ = '' }
@@ -146,28 +150,28 @@ regex_list
 
 regex_concat
     : regex_concat regex_base
-        { $$ = $1+$2; }
+        { $$ = $1 + $2; }
     | regex_base
     ;
 
 regex_base
     : '(' regex_list ')'
-        { $$ = '('+$2+')'; }
+        { $$ = '(' + $2 + ')'; }
     | SPECIAL_GROUP regex_list ')'
-        { $$ = $1+$2+')'; }
+        { $$ = $1 + $2 + ')'; }
     | regex_base '+'
-        { $$ = $1+'+'; }
+        { $$ = $1 + '+'; }
     | regex_base '*'
-        { $$ = $1+'*'; }
+        { $$ = $1 + '*'; }
     | regex_base '?'
-        { $$ = $1+'?'; }
+        { $$ = $1 + '?'; }
     | '/' regex_base
-        { $$ = '(?='+$2+')'; }
+        { $$ = '(?=' + $2 + ')'; }
     | '/!' regex_base
-        { $$ = '(?!'+$2+')'; }
+        { $$ = '(?!' + $2 + ')'; }
     | name_expansion
     | regex_base range_regex
-        { $$ = $1+$2; }
+        { $$ = $1 + $2; }
     | any_group_regex
     | '.'
         { $$ = '.'; }
