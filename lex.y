@@ -97,14 +97,20 @@ action
 action_body
     :
         {$$ = '';}
-    | ACTION_BODY
-        {$$ = yytext;}
-    | action_body '{' action_body '}' ACTION_BODY
-        {$$ = $1 + $2 + $3 + $4 + $5;}
+    | action_comments_body
+        {$$ = $1;}
+    | action_body '{' action_body '}' action_comments_body
+        {$$ = $1+$2+$3+$4+$5;}
     | action_body '{' action_body '}'
         {$$ = $1 + $2 + $3 + $4;}
     ;
 
+action_comments_body
+    : ACTION_BODY
+        { $$ = yytext; }
+    | action_comments_body ACTION_BODY
+        { $$ = $1+$2; }
+    ;
 
 
 start_conditions
@@ -126,8 +132,9 @@ regex
     : regex_list
         {
           $$ = $1;
-          if (!(yy.options && yy.options.flex) && $$.match(/[\w\d]$/) && !$$.match(/\\(b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/))
+          if (!(yy.options && yy.options.flex) && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
               $$ += "\\b";
+          }
         }
     ;
 
