@@ -12,7 +12,7 @@ exports["test lex grammar with macros"] = function () {
     var expected = {
         macros: {"D": "[0-9]", "ID": "[a-zA-Z][a-zA-Z0-9]+"},
         rules: [
-            ["{D}ohhai\\b", "print(9);"],
+            ["{D}ohhai", "print(9);"],
             ["\\{", "return '{';"]
         ]
     };
@@ -52,8 +52,8 @@ exports["test [^\\]]"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "return true;"],
-            ["f\"oo'bar\\b", "return 'baz2';"],
-            ['fo"obar\\b', "return 'baz';"]
+            ["f\"oo'bar", "return 'baz2';"],
+            ['fo"obar', "return 'baz';"]
         ]
     };
 
@@ -183,10 +183,10 @@ exports["test start conditions"] = function () {
             "EAT": 1,
         },
         rules: [
-            ["enter-test\\b", "this.begin('TEST');" ],
-            [["TEST","EAT"], "x\\b", "return 'T';" ],
-            [["*"], "z\\b", "return 'Z';" ],
-            [["TEST"], "y\\b", "this.begin('INITIAL'); return 'TY';" ]
+            ["enter-test", "this.begin('TEST');" ],
+            [["TEST","EAT"], "x", "return 'T';" ],
+            [["*"], "z", "return 'Z';" ],
+            [["TEST"], "y", "this.begin('INITIAL'); return 'TY';" ]
         ]
     };
 
@@ -198,7 +198,7 @@ exports["test no brace action"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "return true;"],
-            ["x\\b", "return 1;"]
+            ["x", "return 1;"]
         ]
     };
 
@@ -209,7 +209,7 @@ exports["test quote escape"] = function () {
     var lexgrammar = '%%\n\\"\\\'"x" return 1;';
     var expected = {
         rules: [
-            ["\"'x\\b", "return 1;"]
+            ["\"'x", "return 1;"]
         ]
     };
 
@@ -220,7 +220,7 @@ exports["test escape things"] = function () {
     var lexgrammar = '%%\n\\"\\\'\\\\\\*\\i return 1;\n"a"\\b return 2;\n\\cA {}\n\\012 {}\n\\xFF {}';
     var expected = {
         rules: [
-            ["\"'\\\\\\*i\\b", "return 1;"],
+            ["\"'\\\\\\*i", "return 1;"],
             ["a\\b", "return 2;"],
             ["\\cA", ""],
             ["\\012", ""],
@@ -279,7 +279,7 @@ exports["test trailing code include"] = function () {
     var lexgrammar = '%%"foo"  {return bar;}\n%% var bar = 1;';
     var expected = {
         rules: [
-            ['foo\\b', "return bar;"]
+            ['foo', "return bar;"]
         ],
         moduleInclude: " var bar = 1;"
     };
@@ -326,8 +326,8 @@ exports["test [^\\\\]"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\\\]\\]", "return true;"],
-            ["f\"oo'bar\\b", "return 'baz2';"],
-            ['fo"obar\\b', "return 'baz';"]
+            ["f\"oo'bar", "return 'baz2';"],
+            ['fo"obar', "return 'baz';"]
         ]
     };
 
@@ -360,8 +360,8 @@ exports["test no brace action with surplus whitespace between rules"] = function
     var lexgrammar = '%%\n"a" return true;\n  \n"b" return 1;\n   \n';
     var expected = {
         rules: [
-            ["a\\b", "return true;"],
-            ["b\\b", "return 1;"]
+            ["a", "return true;"],
+            ["b", "return 1;"]
         ]
     };
 
@@ -383,8 +383,8 @@ exports["test braced action with surplus whitespace between rules"] = function (
     var lexgrammar = '%%\n"a" %{  \nreturn true;\n%}  \n  \n"b" %{    return 1;\n%}  \n   \n';
     var expected = {
         rules: [
-            ["a\\b", "  \nreturn true;\n"],
-            ["b\\b", "    return 1;\n"]
+            ["a", "  \nreturn true;\n"],
+            ["b", "    return 1;\n"]
         ]
     };
 
