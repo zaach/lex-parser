@@ -14,8 +14,8 @@ BR                \r\n|\n|\r
 <action>"'"("\\\\"|"\'"|[^'])*"'"     return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                return 'ACTION_BODY';
 <action>[^{}/"']+                     return 'ACTION_BODY';
-<action>"{"                           yy.depth++; return '{'
-<action>"}"                           yy.depth == 0 ? this.begin('trail') : yy.depth--; return '}'
+<action>"{"                           yy.depth++; return '{';
+<action>"}"                           if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return '}';
 
 <conditions>{NAME}      		return 'NAME';
 <conditions>">"         		this.popState(); return '>';
@@ -24,26 +24,26 @@ BR                \r\n|\n|\r
 
 <rules>{BR}+                          /* */
 <rules>\s+{BR}+                       /* */
-<rules>\s+                            this.begin('indented')
-<rules>"%%"                           this.begin('code'); return '%%'
-<rules>[a-zA-Z0-9_]+                  return 'CHARACTER_LIT'
+<rules>\s+                            this.begin('indented');
+<rules>"%%"                           this.begin('code'); return '%%';
+<rules>[a-zA-Z0-9_]+                  return 'CHARACTER_LIT';
 
-<options>{NAME}                       yy.options[yytext] = true
-<options>{BR}+                        this.begin('INITIAL')
-<options>\s+{BR}+                     this.begin('INITIAL')
+<options>{NAME}                       yy.options[yytext] = true;
+<options>{BR}+                        this.begin('INITIAL');
+<options>\s+{BR}+                     this.begin('INITIAL');
 <options>\s+            		/* empty */
 
-<start_condition>{NAME}               return 'START_COND'
-<start_condition>{BR}+                this.begin('INITIAL')
-<start_condition>\s+{BR}+             this.begin('INITIAL')
+<start_condition>{NAME}               return 'START_COND';
+<start_condition>{BR}+                this.begin('INITIAL');
+<start_condition>\s+{BR}+             this.begin('INITIAL');
 <start_condition>\s+                  /* empty */
 
-<trail>.*{BR}+                        this.begin('rules')
+<trail>.*{BR}+                        this.begin('rules');
 
-<indented>"{"                         yy.depth = 0; this.begin('action'); return '{'
-<indented>"%{"(.|{BR})*?"%}"          this.begin('trail'); yytext = yytext.substr(2, yytext.length-4);return 'ACTION'
-"%{"(.|{BR})*?"%}"                    yytext = yytext.substr(2, yytext.length-4); return 'ACTION'
-<indented>.+                          this.begin('rules'); return 'ACTION'
+<indented>"{"                         yy.depth = 0; this.begin('action'); return '{';
+<indented>"%{"(.|{BR})*?"%}"          this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
+"%{"(.|{BR})*?"%}"                    yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
+<indented>.+                          this.begin('rules'); return 'ACTION';
 
 "/*"(.|\n|\r)*?"*/"             /* ignore */
 "//".*                          /* ignore */
