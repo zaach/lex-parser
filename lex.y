@@ -100,7 +100,7 @@ action_body
     | action_comments_body
         {$$ = $1;}
     | action_body '{' action_body '}' action_comments_body
-        {$$ = $1+$2+$3+$4+$5;}
+        {$$ = $1 + $2 + $3 + $4 + $5;}
     | action_body '{' action_body '}'
         {$$ = $1 + $2 + $3 + $4;}
     ;
@@ -109,7 +109,7 @@ action_comments_body
     : ACTION_BODY
         { $$ = yytext; }
     | action_comments_body ACTION_BODY
-        { $$ = $1+$2; }
+        { $$ = $1 + $2; }
     ;
 
 
@@ -142,7 +142,7 @@ regex_list
         { $$ = $1 + '|'; }
     | regex_concat
     |
-        { $$ = '' }
+        { $$ = ''; }
     ;
 
 regex_concat
@@ -207,11 +207,11 @@ string
 
 %%
 
-function encodeRE (s) {
-    return s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g,'\\u$1');
+function encodeRE(s) {
+    return s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
 }
 
-function prepareString (s) {
+function prepareString(s) {
     // unescape slashes
     s = s.replace(/\\\\/g, "\\");
     s = encodeRE(s);
