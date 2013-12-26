@@ -22,8 +22,8 @@ BR                \r\n|\n|\r
 <conditions>","         		return ',';
 <conditions>"*"         		return '*';
 
-<rules>{BR}+                          /* */
-<rules>\s+{BR}+                       /* */
+<rules>{BR}+                          /* empty */
+<rules>\s+{BR}+                       /* empty */
 <rules>\s+                            this.begin('indented');
 <rules>"%%"                           this.begin('code'); return '%%';
 <rules>[a-zA-Z0-9_]+                  return 'CHARACTER_LIT';
@@ -38,18 +38,18 @@ BR                \r\n|\n|\r
 <start_condition>\s+{BR}+             this.begin('INITIAL');
 <start_condition>\s+                  /* empty */
 
-<trail>.*{BR}+                        this.begin('rules');
+<trail>\s*{BR}+                        this.begin('rules');
 
 <indented>"{"                         yy.depth = 0; this.begin('action'); return '{';
 <indented>"%{"(.|{BR})*?"%}"          this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 "%{"(.|{BR})*?"%}"                    yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 <indented>.+                          this.begin('rules'); return 'ACTION';
 
-"/*"(.|\n|\r)*?"*/"             /* ignore */
-"//".*                          /* ignore */
+"/*"(.|\n|\r)*?"*/"             /* empty */
+"//".*                          /* empty */
 
-{BR}+                           /* */
-\s+                             /* */
+{BR}+                           /* ignore */
+\s+                             /* ignore */
 {NAME}                          return 'NAME';
 \"("\\\\"|'\"'|[^"])*\"         yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"       yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
@@ -81,7 +81,7 @@ BR                \r\n|\n|\r
 "{"{NAME}"}"                    return 'NAME_BRACE';
 "{"                             return '{';
 "}"                             return '}';
-.                               /* ignore bad characters */
+.                               throw new Error("unsupported input character: " + yytext); /* b0rk on bad characters */
 <*><<EOF>>                      return 'EOF';
 
 <code>(.|{BR})+                 return 'CODE';
