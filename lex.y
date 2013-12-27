@@ -84,7 +84,7 @@ rules
 
 rule
     : start_conditions regex action
-        { $$ = $1 ? [$1, $2, $3] : [$2,$3]; }
+        { $$ = $1 ? [$1, $2, $3] : [$2, $3]; }
     ;
 
 action
@@ -207,11 +207,11 @@ string
 
 %%
 
-function encodeRE(s) {
+function encodeRE (s) {
     return s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
 }
 
-function prepareString(s) {
+function prepareString (s) {
     // unescape slashes
     s = s.replace(/\\\\/g, "\\");
     s = encodeRE(s);

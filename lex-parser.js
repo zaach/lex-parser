@@ -120,7 +120,9 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1:
+case 1 : 
+/*! Production::     lex : definitions %% rules epilogue */
+ 
           this.$ = { rules: $$[$0-1] };
           if ($$[$0-3][0]) this.$.macros = $$[$0-3][0];
           if ($$[$0-3][1]) this.$.startConditions = $$[$0-3][1];
@@ -130,15 +132,23 @@ case 1:
           delete yy.options;
           delete yy.actionInclude;
           return this.$;
-        
+         
 break;
-case 2: this.$ = null; 
+case 2 : 
+/*! Production::     epilogue : EOF */
+  this.$ = null;  
 break;
-case 3: this.$ = null; 
+case 3 : 
+/*! Production::     epilogue : %% EOF */
+  this.$ = null;  
 break;
-case 4: this.$ = $$[$0-1]; 
+case 4 : 
+/*! Production::     epilogue : %% CODE EOF */
+  this.$ = $$[$0-1];  
 break;
-case 5:
+case 5 : 
+/*! Production::     definitions : definition definitions */
+ 
           this.$ = $$[$0];
           if ('length' in $$[$0-1]) {
             this.$[0] = this.$[0] || {};
@@ -149,97 +159,185 @@ case 5:
               this.$[1][name] = $$[$0-1][name];
             }
           }
-        
+         
 break;
-case 6: yy.actionInclude += $$[$0-1]; this.$ = $$[$0]; 
+case 6 : 
+/*! Production::     definitions : ACTION definitions */
+  yy.actionInclude += $$[$0-1]; this.$ = $$[$0];  
 break;
-case 7: yy.actionInclude = ''; this.$ = [null,null]; 
+case 7 : 
+/*! Production::     definitions :  */
+  yy.actionInclude = ''; this.$ = [null,null];  
 break;
-case 8: this.$ = [$$[$0-1], $$[$0]]; 
+case 8 : 
+/*! Production::     definition : NAME regex */
+  this.$ = [$$[$0-1], $$[$0]];  
 break;
-case 9: this.$ = $$[$0]; 
+case 9 : 
+/*! Production::     definition : START_INC names_inclusive */
+  this.$ = $$[$0];  
 break;
-case 10: this.$ = $$[$0]; 
+case 10 : 
+/*! Production::     definition : START_EXC names_exclusive */
+  this.$ = $$[$0];  
 break;
-case 11: this.$ = {}; this.$[$$[$0]] = 0; 
+case 11 : 
+/*! Production::     names_inclusive : START_COND */
+  this.$ = {}; this.$[$$[$0]] = 0;  
 break;
-case 12: this.$ = $$[$0-1]; this.$[$$[$0]] = 0; 
+case 12 : 
+/*! Production::     names_inclusive : names_inclusive START_COND */
+  this.$ = $$[$0-1]; this.$[$$[$0]] = 0;  
 break;
-case 13: this.$ = {}; this.$[$$[$0]] = 1; 
+case 13 : 
+/*! Production::     names_exclusive : START_COND */
+  this.$ = {}; this.$[$$[$0]] = 1;  
 break;
-case 14: this.$ = $$[$0-1]; this.$[$$[$0]] = 1; 
+case 14 : 
+/*! Production::     names_exclusive : names_exclusive START_COND */
+  this.$ = $$[$0-1]; this.$[$$[$0]] = 1;  
 break;
-case 15: this.$ = $$[$0-1]; this.$.push($$[$0]); 
+case 15 : 
+/*! Production::     rules : rules rule */
+  this.$ = $$[$0-1]; this.$.push($$[$0]);  
 break;
-case 16: this.$ = [$$[$0]]; 
+case 16 : 
+/*! Production::     rules : rule */
+  this.$ = [$$[$0]];  
 break;
-case 17: this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1],$$[$0]]; 
+case 17 : 
+/*! Production::     rule : start_conditions regex action */
+  this.$ = $$[$0-2] ? [$$[$0-2], $$[$0-1], $$[$0]] : [$$[$0-1], $$[$0]];  
 break;
-case 18:this.$ = $$[$0-1];
+case 18 : 
+/*! Production::     action : { action_body } */
+ this.$ = $$[$0-1]; 
 break;
-case 19:this.$ = $$[$0];
+case 19 : 
+/*! Production::     action : ACTION */
+ this.$ = $$[$0]; 
 break;
-case 20:this.$ = '';
+case 20 : 
+/*! Production::     action_body :  */
+ this.$ = ''; 
 break;
-case 21:this.$ = $$[$0];
+case 21 : 
+/*! Production::     action_body : action_comments_body */
+ this.$ = $$[$0]; 
 break;
-case 22:this.$ = $$[$0-4] + $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
+case 22 : 
+/*! Production::     action_body : action_body { action_body } action_comments_body */
+ this.$ = $$[$0-4] + $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0]; 
 break;
-case 23:this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0];
+case 23 : 
+/*! Production::     action_body : action_body { action_body } */
+ this.$ = $$[$0-3] + $$[$0-2] + $$[$0-1] + $$[$0]; 
 break;
-case 24: this.$ = yytext; 
+case 24 : 
+/*! Production::     action_comments_body : ACTION_BODY */
+  this.$ = yytext;  
 break;
-case 25: this.$ = $$[$0-1] + $$[$0]; 
+case 25 : 
+/*! Production::     action_comments_body : action_comments_body ACTION_BODY */
+  this.$ = $$[$0-1] + $$[$0];  
 break;
-case 26: this.$ = $$[$0-1]; 
+case 26 : 
+/*! Production::     start_conditions : < name_list > */
+  this.$ = $$[$0-1];  
 break;
-case 27: this.$ = ['*']; 
+case 27 : 
+/*! Production::     start_conditions : < * > */
+  this.$ = ['*'];  
 break;
-case 29: this.$ = [$$[$0]]; 
+case 29 : 
+/*! Production::     name_list : NAME */
+  this.$ = [$$[$0]];  
 break;
-case 30: this.$ = $$[$0-2]; this.$.push($$[$0]); 
+case 30 : 
+/*! Production::     name_list : name_list , NAME */
+  this.$ = $$[$0-2]; this.$.push($$[$0]);  
 break;
-case 31:
+case 31 : 
+/*! Production::     regex : regex_list */
+ 
           this.$ = $$[$0];
-        
+         
 break;
-case 32: this.$ = $$[$0-2] + '|' + $$[$0]; 
+case 32 : 
+/*! Production::     regex_list : regex_list | regex_concat */
+  this.$ = $$[$0-2] + '|' + $$[$0];  
 break;
-case 33: this.$ = $$[$0-1] + '|'; 
+case 33 : 
+/*! Production::     regex_list : regex_list | */
+  this.$ = $$[$0-1] + '|';  
 break;
-case 35: this.$ = ''; 
+case 35 : 
+/*! Production::     regex_list :  */
+  this.$ = '';  
 break;
-case 36: this.$ = $$[$0-1] + $$[$0]; 
+case 36 : 
+/*! Production::     regex_concat : regex_concat regex_base */
+  this.$ = $$[$0-1] + $$[$0];  
 break;
-case 38: this.$ = '(' + $$[$0-1] + ')'; 
+case 38 : 
+/*! Production::     regex_base : ( regex_list ) */
+  this.$ = '(' + $$[$0-1] + ')';  
 break;
-case 39: this.$ = $$[$0-2] + $$[$0-1] + ')'; 
+case 39 : 
+/*! Production::     regex_base : SPECIAL_GROUP regex_list ) */
+  this.$ = $$[$0-2] + $$[$0-1] + ')';  
 break;
-case 40: this.$ = $$[$0-1] + '+'; 
+case 40 : 
+/*! Production::     regex_base : regex_base + */
+  this.$ = $$[$0-1] + '+';  
 break;
-case 41: this.$ = $$[$0-1] + '*'; 
+case 41 : 
+/*! Production::     regex_base : regex_base * */
+  this.$ = $$[$0-1] + '*';  
 break;
-case 42: this.$ = $$[$0-1] + '?'; 
+case 42 : 
+/*! Production::     regex_base : regex_base ? */
+  this.$ = $$[$0-1] + '?';  
 break;
-case 43: this.$ = '(?=' + $$[$0] + ')'; 
+case 43 : 
+/*! Production::     regex_base : / regex_base */
+  this.$ = '(?=' + $$[$0] + ')';  
 break;
-case 44: this.$ = '(?!' + $$[$0] + ')'; 
+case 44 : 
+/*! Production::     regex_base : /! regex_base */
+  this.$ = '(?!' + $$[$0] + ')';  
 break;
-case 46: this.$ = $$[$0-1] + $$[$0]; 
+case 46 : 
+/*! Production::     regex_base : regex_base range_regex */
+  this.$ = $$[$0-1] + $$[$0];  
 break;
-case 48: this.$ = '.'; 
+case 48 : 
+/*! Production::     regex_base : . */
+  this.$ = '.';  
 break;
-case 49: this.$ = '^'; 
+case 49 : 
+/*! Production::     regex_base : ^ */
+  this.$ = '^';  
 break;
-case 50: this.$ = '$'; 
+case 50 : 
+/*! Production::     regex_base : $ */
+  this.$ = '$';  
 break;
-case 54: this.$ = yytext; 
+case 54 : 
+/*! Production::     any_group_regex : ANY_GROUP_REGEX */
+  this.$ = yytext;  
 break;
-case 55: this.$ = yytext; 
+case 55 : 
+/*! Production::     escape_char : ESCAPE_CHAR */
+  this.$ = yytext;  
 break;
-case 56: this.$ = yytext; 
+case 56 : 
+/*! Production::     range_regex : RANGE_REGEX */
+  this.$ = yytext;  
 break;
-case 57: this.$ = prepareString(yytext.substr(1, yytext.length - 2)); 
+case 57 : 
+/*! Production::     string : STRING_LIT */
+  this.$ = prepareString(yytext.substr(1, yytext.length - 2));  
 break;
 }
 },
@@ -540,11 +638,11 @@ parse: function parse(input) {
 }};
 
 
-function encodeRE(s) {
+function encodeRE (s) {
     return s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
 }
 
-function prepareString(s) {
+function prepareString (s) {
     // unescape slashes
     s = s.replace(/\\\\/g, "\\");
     s = encodeRE(s);
@@ -899,143 +997,350 @@ performAction: function anonymous(yy,yy_,$avoiding_name_collisions,YY_START
 
 var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
-case 0:return 26;
-break;
-case 1:return 26;
-break;
-case 2:return 26; // regexp with braces or quotes (and no spaces)
-break;
-case 3:return 26;
-break;
-case 4:return 26;
-break;
-case 5:return 26;
-break;
-case 6:return 26;
-break;
-case 7:yy.depth++; return 22;
-break;
-case 8:if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return 24;
-break;
-case 9:return 12;
-break;
-case 10:this.popState(); return 29;
-break;
-case 11:return 31;
-break;
-case 12:return 30;
-break;
-case 13:/* empty */
-break;
-case 14:/* empty */
-break;
-case 15:this.begin('indented');
-break;
-case 16:this.begin('code'); return 5;
-break;
-case 17:return 56;
-break;
-case 18:yy.options[yy_.yytext] = true;
-break;
-case 19:this.begin('INITIAL');
-break;
-case 20:this.begin('INITIAL');
-break;
-case 21:/* empty */
-break;
-case 22:return 18;
-break;
-case 23:this.begin('INITIAL');
-break;
-case 24:this.begin('INITIAL');
-break;
-case 25:/* empty */
-break;
-case 26:this.begin('rules');
-break;
-case 27:yy.depth = 0; this.begin('action'); return 22;
-break;
-case 28:this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 11;
-break;
-case 29:yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 11;
-break;
-case 30:this.begin('rules'); return 11;
-break;
-case 31:/* empty */
-break;
-case 32:/* empty */
-break;
-case 33:/* ignore */
-break;
-case 34:/* ignore */
-break;
-case 35:return 12;
-break;
-case 36:yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 55;
-break;
-case 37:yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 55;
-break;
-case 38:return 33;
-break;
-case 39:return 52;
-break;
-case 40:return 38;
-break;
-case 41:return 38;
-break;
-case 42:return 38;
-break;
-case 43:return 36;
-break;
-case 44:return 37;
-break;
-case 45:return 39;
-break;
-case 46:return 30;
-break;
-case 47:return 40;
-break;
-case 48:return 47;
-break;
-case 49:return 31;
-break;
-case 50:return 48;
-break;
-case 51:this.begin('conditions'); return 27;
-break;
-case 52:return 42;
-break;
-case 53:return 41;
-break;
-case 54:return 53;
-break;
-case 55:yy_.yytext = yy_.yytext.replace(/^\\/g,''); return 53;
-break;
-case 56:return 48;
-break;
-case 57:return 46;
-break;
-case 58:yy.options = {}; this.begin('options');
-break;
-case 59:this.begin('start_condition'); return 14;
-break;
-case 60:this.begin('start_condition'); return 16;
-break;
-case 61:this.begin('rules'); return 5;
-break;
-case 62:return 54;
-break;
-case 63:return 51;
-break;
-case 64:return 22;
-break;
-case 65:return 24;
-break;
-case 66:throw new Error("unsupported input character: " + yy_.yytext); /* b0rk on bad characters */
-break;
-case 67:return 8;
-break;
-case 68:return 9;
+case 0 : 
+/*! Conditions:: action */ 
+/*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
+ return 26; 
+break;
+case 1 : 
+/*! Conditions:: action */ 
+/*! Rule::       \/\/.* */ 
+ return 26; 
+break;
+case 2 : 
+/*! Conditions:: action */ 
+/*! Rule::       \/[^ /]*?['"{}'][^ ]*?\/ */ 
+ return 26; // regexp with braces or quotes (and no spaces) 
+break;
+case 3 : 
+/*! Conditions:: action */ 
+/*! Rule::       "(\\\\|\\"|[^"])*" */ 
+ return 26; 
+break;
+case 4 : 
+/*! Conditions:: action */ 
+/*! Rule::       '(\\\\|\\'|[^'])*' */ 
+ return 26; 
+break;
+case 5 : 
+/*! Conditions:: action */ 
+/*! Rule::       [/"'][^{}/"']+ */ 
+ return 26; 
+break;
+case 6 : 
+/*! Conditions:: action */ 
+/*! Rule::       [^{}/"']+ */ 
+ return 26; 
+break;
+case 7 : 
+/*! Conditions:: action */ 
+/*! Rule::       \{ */ 
+ yy.depth++; return 22; 
+break;
+case 8 : 
+/*! Conditions:: action */ 
+/*! Rule::       \} */ 
+ if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return 24; 
+break;
+case 9 : 
+/*! Conditions:: conditions */ 
+/*! Rule::       {NAME} */ 
+ return 12; 
+break;
+case 10 : 
+/*! Conditions:: conditions */ 
+/*! Rule::       > */ 
+ this.popState(); return 29; 
+break;
+case 11 : 
+/*! Conditions:: conditions */ 
+/*! Rule::       , */ 
+ return 31; 
+break;
+case 12 : 
+/*! Conditions:: conditions */ 
+/*! Rule::       \* */ 
+ return 30; 
+break;
+case 13 : 
+/*! Conditions:: rules */ 
+/*! Rule::       {BR}+ */ 
+ /* empty */ 
+break;
+case 14 : 
+/*! Conditions:: rules */ 
+/*! Rule::       \s+{BR}+ */ 
+ /* empty */ 
+break;
+case 15 : 
+/*! Conditions:: rules */ 
+/*! Rule::       \s+ */ 
+ this.begin('indented'); 
+break;
+case 16 : 
+/*! Conditions:: rules */ 
+/*! Rule::       %% */ 
+ this.begin('code'); return 5; 
+break;
+case 17 : 
+/*! Conditions:: rules */ 
+/*! Rule::       [a-zA-Z0-9_]+ */ 
+ return 56; 
+break;
+case 18 : 
+/*! Conditions:: options */ 
+/*! Rule::       {NAME} */ 
+ yy.options[yy_.yytext] = true; 
+break;
+case 19 : 
+/*! Conditions:: options */ 
+/*! Rule::       {BR}+ */ 
+ this.begin('INITIAL'); 
+break;
+case 20 : 
+/*! Conditions:: options */ 
+/*! Rule::       \s+{BR}+ */ 
+ this.begin('INITIAL'); 
+break;
+case 21 : 
+/*! Conditions:: options */ 
+/*! Rule::       \s+ */ 
+ /* empty */ 
+break;
+case 22 : 
+/*! Conditions:: start_condition */ 
+/*! Rule::       {NAME} */ 
+ return 18; 
+break;
+case 23 : 
+/*! Conditions:: start_condition */ 
+/*! Rule::       {BR}+ */ 
+ this.begin('INITIAL'); 
+break;
+case 24 : 
+/*! Conditions:: start_condition */ 
+/*! Rule::       \s+{BR}+ */ 
+ this.begin('INITIAL'); 
+break;
+case 25 : 
+/*! Conditions:: start_condition */ 
+/*! Rule::       \s+ */ 
+ /* empty */ 
+break;
+case 26 : 
+/*! Conditions:: trail */ 
+/*! Rule::       \s*{BR}+ */ 
+ this.begin('rules'); 
+break;
+case 27 : 
+/*! Conditions:: indented */ 
+/*! Rule::       \{ */ 
+ yy.depth = 0; this.begin('action'); return 22; 
+break;
+case 28 : 
+/*! Conditions:: indented */ 
+/*! Rule::       %\{(.|{BR})*?%\} */ 
+ this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 11; 
+break;
+case 29 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       %\{(.|{BR})*?%\} */ 
+ yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 11; 
+break;
+case 30 : 
+/*! Conditions:: indented */ 
+/*! Rule::       .+ */ 
+ this.begin('rules'); return 11; 
+break;
+case 31 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
+ /* empty */ 
+break;
+case 32 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \/\/.* */ 
+ /* empty */ 
+break;
+case 33 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       {BR}+ */ 
+ /* ignore */ 
+break;
+case 34 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \s+ */ 
+ /* ignore */ 
+break;
+case 35 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       {NAME} */ 
+ return 12; 
+break;
+case 36 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       "(\\\\|\\"|[^"])*" */ 
+ yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 55; 
+break;
+case 37 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       '(\\\\|\\'|[^'])*' */ 
+ yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 55; 
+break;
+case 38 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \| */ 
+ return 33; 
+break;
+case 39 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \[(\\\\|\\\]|[^\]])*\] */ 
+ return 52; 
+break;
+case 40 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \(\?: */ 
+ return 38; 
+break;
+case 41 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \(\?= */ 
+ return 38; 
+break;
+case 42 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \(\?! */ 
+ return 38; 
+break;
+case 43 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \( */ 
+ return 36; 
+break;
+case 44 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \) */ 
+ return 37; 
+break;
+case 45 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \+ */ 
+ return 39; 
+break;
+case 46 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \* */ 
+ return 30; 
+break;
+case 47 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \? */ 
+ return 40; 
+break;
+case 48 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \^ */ 
+ return 47; 
+break;
+case 49 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       , */ 
+ return 31; 
+break;
+case 50 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       <<EOF>> */ 
+ return 48; 
+break;
+case 51 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       < */ 
+ this.begin('conditions'); return 27; 
+break;
+case 52 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \/! */ 
+ return 42; 
+break;
+case 53 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \/ */ 
+ return 41; 
+break;
+case 54 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
+ return 53; 
+break;
+case 55 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \\. */ 
+ yy_.yytext = yy_.yytext.replace(/^\\/g,''); return 53; 
+break;
+case 56 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \$ */ 
+ return 48; 
+break;
+case 57 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \. */ 
+ return 46; 
+break;
+case 58 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       %options */ 
+ yy.options = {}; this.begin('options'); 
+break;
+case 59 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       %s */ 
+ this.begin('start_condition'); return 14; 
+break;
+case 60 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       %x */ 
+ this.begin('start_condition'); return 16; 
+break;
+case 61 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       %% */ 
+ this.begin('rules'); return 5; 
+break;
+case 62 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
+ return 54; 
+break;
+case 63 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \{{NAME}\} */ 
+ return 51; 
+break;
+case 64 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \{ */ 
+ return 22; 
+break;
+case 65 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       \} */ 
+ return 24; 
+break;
+case 66 : 
+/*! Conditions:: indented trail rules INITIAL */ 
+/*! Rule::       . */ 
+ throw new Error("unsupported input character: " + yy_.yytext); /* b0rk on bad characters */ 
+break;
+case 67 : 
+/*! Conditions:: * */ 
+/*! Rule::       $ */ 
+ return 8; 
+break;
+case 68 : 
+/*! Conditions:: code */ 
+/*! Rule::       (.|{BR})+ */ 
+ return 9; 
 break;
 }
 },
