@@ -4,9 +4,10 @@ all: npm-install build test
 npm-install:
 	npm install
 
-build:
-	node ./node_modules/.bin/jison lex.y lex.l
-	mv lex.js lex-parser.js
+build: lex-parser.js
+
+lex-parser.js: npm-install lex.y lex.l
+	node ./node_modules/.bin/jison -o lex-parser.js lex.y lex.l
 
 test:
 	node tests/all-tests.js
