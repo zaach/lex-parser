@@ -45,11 +45,11 @@ BR                                      \r\n|\n|\r
 "%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 <indented>.+                            this.begin('rules'); return 'ACTION';
 
-"/*"(.|\n|\r)*?"*/"                     /* empty */
-"//".*                                  /* empty */
+"/*"(.|\n|\r)*?"*/"                     /* ignore */
+"//".*                                  /* ignore */
 
-{BR}+                                   /* ignore */
-\s+                                     /* ignore */
+{BR}+                                   /* empty */
+\s+                                     /* empty */
 {NAME}                                  return 'NAME';
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
