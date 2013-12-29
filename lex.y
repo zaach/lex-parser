@@ -132,6 +132,9 @@ regex
     : regex_list
         {
           $$ = $1;
+          if (yy.options && yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
+              $$ += "\\b";
+          }
         }
     ;
 
