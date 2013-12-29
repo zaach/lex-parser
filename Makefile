@@ -15,6 +15,7 @@ test:
 
 
 clean:
+	-rm -f lex-parser.js
 
 superclean: clean
 	-find . -type d -name 'node_modules' -exec rm -rf "{}" \;
