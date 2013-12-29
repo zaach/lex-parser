@@ -438,15 +438,15 @@ exports["test braced action with surplus whitespace between rules"] = function (
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
-exports["test %option easy_keyword_rules"] = function () {
-    var lexgrammar = '%option easy_keyword_rules\n'+
+exports["test %options easy_keyword_rules"] = function () {
+    var lexgrammar = '%options easy_keyword_rules\n'+
                      '%s TEST TEST2\n%x EAT\n%%\n'+
                      '"enter-test" {this.begin(\'TEST\');}\n'+
                      '<TEST,EAT>"x" {return \'T\';}\n'+
                      '<*>"z" {return \'Z\';}\n'+
-                     '<TEST>"y" {this.begin(\'INITIAL\'); return \'TY\';}'+
-                     '\\"\\\'"a" return 1;'+
-                     '\\"\\\'\\\\\\*\\i return 1;\n"a"\\b return 2;\n\\cA {}\n\\012 {}\n\\xFF {}'+
+                     '<TEST>"y" {this.begin(\'INITIAL\'); return \'TY\';}\n'+
+                     '\\"\\\'"a" return 1;\n'+
+                     '\\"\\\'\\\\\\*\\i return 1;\n"a"\\b return 2;\n\\cA {}\n\\012 {}\n\\xFF {}\n'+
                      '"["[^\\\\]"]" {return true;}\n\'f"oo\\\'bar\'  {return \'baz2\';}\n"fo\\"obar"  {return \'baz\';}\n';
     var expected = {
         startConditions: {
@@ -455,20 +455,23 @@ exports["test %option easy_keyword_rules"] = function () {
             "EAT": 1,
         },
         rules: [
-            ["enter-test", "this.begin('TEST');" ],
-            [["TEST","EAT"], "x", "return 'T';" ],
-            [["*"], "z", "return 'Z';" ],
-            [["TEST"], "y", "this.begin('INITIAL'); return 'TY';" ],
+            ["enter-test\\b", "this.begin('TEST');" ],
+            [["TEST","EAT"], "x\\b", "return 'T';" ],
+            [["*"], "z\\b", "return 'Z';" ],
+            [["TEST"], "y\\b", "this.begin('INITIAL'); return 'TY';" ],
             ["\"'a\\b", "return 1;"],
-            ["\"'\\\\\\*i", "return 1;"],
+            ["\"'\\\\\\*i\\b", "return 1;"],
             ["a\\b", "return 2;"],
             ["\\cA", ""],
             ["\\012", ""],
             ["\\xFF", ""],
             ["\\[[^\\\\]\\]", "return true;"],
-            ["f\"oo'bar", "return 'baz2';"],
-            ['fo"obar', "return 'baz';"]
-        ]
+            ["f\"oo'bar\\b", "return 'baz2';"],
+            ['fo"obar\\b', "return 'baz';"]
+        ],
+        options: {
+            "easy_keyword_rules": true
+        }
     };
 
     lexer_reset();
