@@ -5,6 +5,8 @@ BR                                      \r\n|\n|\r
 %s indented trail rules
 %x code start_condition options conditions action
 
+%options easy_keyword_rules
+
 %%
 
 <action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
