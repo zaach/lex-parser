@@ -76,7 +76,7 @@ BR                                      \r\n|\n|\r
 "\\".                                   yytext = yytext.replace(/^\\/g,''); return 'ESCAPE_CHAR';
 "$"                                     return '$';
 "."                                     return '.';
-"%options"                              yy.options = {}; this.begin('options');
+"%options"                              if (!yy.options) { yy.options = {}; } this.begin('options');
 "%s"                                    this.begin('start_condition'); return 'START_INC';
 "%x"                                    this.begin('start_condition'); return 'START_EXC';
 "%%"                                    this.begin('rules'); return '%%';
