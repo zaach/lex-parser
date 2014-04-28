@@ -6,8 +6,8 @@ npm-install:
 
 build: lex-parser.js
 
-lex-parser.js: npm-install lex.y lex.l
-	node ./node_modules/.bin/jison -o lex-parser.js lex.y lex.l
+lex-parser.js: lex.y lex.l
+	./node_modules/.bin/jison -o lex-parser.js lex.y lex.l
 
 test:
 	node tests/all-tests.js
