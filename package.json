@@ -19,7 +19,7 @@
   "author": "Zach Carter",
   "license": "MIT",
   "devDependencies": {
-    "jison": "git://github.com/GerHobbelt/jison.git",
+    "jison": "git://github.com/GerHobbelt/jison.git#master",
     "test": ">=0.4.0"
   }
 }
