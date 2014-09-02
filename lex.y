@@ -89,20 +89,20 @@ rule
 
 action
     : '{' action_body '}'
-        {$$ = $2;}
+        { $$ = $2; }
     | ACTION
-        {$$ = $1;}
+        { $$ = $1; }
     ;
 
 action_body
     :
-        {$$ = '';}
+        { $$ = ''; }
     | action_comments_body
-        {$$ = $1;}
+        { $$ = $1; }
     | action_body '{' action_body '}' action_comments_body
-        {$$ = $1 + $2 + $3 + $4 + $5;}
+        { $$ = $1 + $2 + $3 + $4 + $5; }
     | action_body '{' action_body '}'
-        {$$ = $1 + $2 + $3 + $4;}
+        { $$ = $1 + $2 + $3 + $4; }
     ;
 
 action_comments_body
