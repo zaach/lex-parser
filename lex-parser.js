@@ -116,7 +116,7 @@
                               `this` refers to the Lexer object.
   }
 */
-var parser = (function(){
+var lexParser = (function(){
 var __expand__ = function (k, v, o) {
   o = o || {};
   for (var l = k.length; l--; ) {
@@ -1514,9 +1514,9 @@ return new Parser;
 
 
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = parser;
-exports.Parser = parser.Parser;
-exports.parse = function () { return parser.parse.apply(parser, arguments); };
+exports.parser = lexParser;
+exports.Parser = lexParser.Parser;
+exports.parse = function () { return lexParser.parse.apply(lexParser, arguments); };
 exports.main = function commonjsMain(args) {
     if (!args[1]) {
         console.log('Usage: '+args[0]+' FILE');
