@@ -1791,7 +1791,7 @@ parseError: function parseError(str, hash) {
 parse: function parse(input) {
     var self = this,
         stack = [0],
-        
+
         vstack = [null],    // semantic value stack
         lstack = [],        // location stack
         table = this.table,
@@ -1799,6 +1799,7 @@ parse: function parse(input) {
         yylineno = 0,
         yyleng = 0,
 
+        error_signaled = false,
         TERROR = 2,
         EOF = 1;
 
@@ -1860,7 +1861,7 @@ parse: function parse(input) {
     var preErrorSymbol = null;
     var state, action, a, r;
     var yyval = {};
-    var p, len, newState;
+    var p, len, len1, this_production, lstack_begin, lstack_end, newState;
     var expected = [];
     var retval = false;
 
@@ -1869,6 +1870,23 @@ parse: function parse(input) {
     }
     if (sharedState.yy.pre_parse) {
         sharedState.yy.pre_parse.call(this, sharedState.yy);
+    }
+
+
+
+    function collect_expected_token_set(state) {
+        var tokenset = [];
+        for (var p in table[state]) {
+            if (p > TERROR) {
+                if (self.terminal_descriptions_ && self.terminal_descriptions_[p]) {
+                    tokenset.push(self.terminal_descriptions_[p]);
+                }
+                else if (self.terminals_[p]) {
+                    tokenset.push("'" + self.terminals_[p] + "'");
+                }
+            }
+        }
+        return tokenset;
     }
 
     try {
@@ -1889,24 +1907,20 @@ parse: function parse(input) {
 
             // handle parse error
             if (typeof action === 'undefined' || !action.length || !action[0]) {
-                var errStr = '';
+                var errStr;
 
                 // Report error
-                expected = [];
-                for (p in table[state]) {
-                    if (this.terminals_[p] && p > TERROR) {
-                        expected.push("'" + this.terminals_[p] + "'");
-                    }
-                }
+                expected = collect_expected_token_set(state);
                 if (lexer.showPosition) {
                     errStr = 'Parse error on line ' + (yylineno + 1) + ":\n" + lexer.showPosition() + "\nExpecting " + expected.join(', ') + ", got '" + (this.terminals_[symbol] || symbol) + "'";
                 } else {
                     errStr = 'Parse error on line ' + (yylineno + 1) + ": Unexpected " +
-                             (symbol == EOF ? "end of input" :
+                             (symbol === EOF ? "end of input" :
                               ("'" + (this.terminals_[symbol] || symbol) + "'"));
                 }
                 // we cannot recover from the error!
-                retval = this.parseError(errStr || 'Parsing halted. No suitable error recovery rule available.', {
+                error_signaled = true;
+                retval = this.parseError(errStr, {
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
                     line: lexer.yylineno,
@@ -1920,6 +1934,7 @@ parse: function parse(input) {
 
             // this shouldn't happen, unless resolve defaults are off
             if (action[0] instanceof Array && action.length > 1) {
+                error_signaled = true;
                 retval = this.parseError('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol, {
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
@@ -1957,35 +1972,38 @@ parse: function parse(input) {
                 // reduce
                 //this.reductionCount++;
 
-                len = this.productions_[action[1]][1];
+                this_production = this.productions_[action[1]]; 
+                len = this_production[1];
+                lstack_end = lstack.length;
+                lstack_begin = lstack_end - (len1 || 1);
+                lstack_end--;
 
                 // perform semantic action
                 yyval.$ = vstack[vstack.length - len]; // default to $$ = $1
                 // default location, uses first token for firsts, last for lasts
                 yyval._$ = {
-                    first_line: lstack[lstack.length - (len || 1)].first_line,
-                    last_line: lstack[lstack.length - 1].last_line,
-                    first_column: lstack[lstack.length - (len || 1)].first_column,
-                    last_column: lstack[lstack.length - 1].last_column
+                    first_line: lstack[lstack_begin].first_line,
+                    last_line: lstack[lstack_end].last_line,
+                    first_column: lstack[lstack_begin].first_column,
+                    last_column: lstack[lstack_end].last_column
                 };
                 if (ranges) {
-                  yyval._$.range = [lstack[lstack.length - (len || 1)].range[0], lstack[lstack.length - 1].range[1]];
+                  yyval._$.range = [lstack[lstack_begin].range[0], lstack[lstack_end].range[1]];
                 }
                 r = this.performAction.apply(yyval, [yytext, yyleng, yylineno, sharedState.yy, action[1], vstack, lstack].concat(args));
 
                 if (typeof r !== 'undefined') {
                     retval = r;
+                    error_signaled = true;
                     break;
                 }
 
                 // pop off stack
                 if (len) {
-                    stack = stack.slice(0, -1 * len * 2);
-                    vstack = vstack.slice(0, -1 * len);
-                    lstack = lstack.slice(0, -1 * len);
+                    popStack(len);
                 }
 
-                stack.push(this.productions_[action[1]][0]);    // push nonterminal (reduce)
+                stack.push(this_production[0]);    // push nonterminal (reduce)
                 vstack.push(yyval.$);
                 lstack.push(yyval._$);
                 // goto new state = table[STATE][NONTERMINAL]
@@ -1996,10 +2014,14 @@ parse: function parse(input) {
             case 3:
                 // accept
                 retval = true;
+                error_signaled = true;
                 break;
             }
 
             // break out of loop: we accept or fail with error
+            if (!error_signaled) {
+                // b0rk b0rk b0rk!
+            }
             break;
         }
     } finally {
@@ -2430,40 +2452,10 @@ performAction: function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) 
 
 var YYSTATE = YY_START;
 switch($avoiding_name_collisions) {
-case 0 : 
-/*! Conditions:: action */ 
-/*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
- return 26; 
-break;
-case 1 : 
-/*! Conditions:: action */ 
-/*! Rule::       \/\/.* */ 
- return 26; 
-break;
 case 2 : 
 /*! Conditions:: action */ 
 /*! Rule::       \/[^ /]*?['"{}'][^ ]*?\/ */ 
  return 26; // regexp with braces or quotes (and no spaces) 
-break;
-case 3 : 
-/*! Conditions:: action */ 
-/*! Rule::       "(\\\\|\\"|[^"])*" */ 
- return 26; 
-break;
-case 4 : 
-/*! Conditions:: action */ 
-/*! Rule::       '(\\\\|\\'|[^'])*' */ 
- return 26; 
-break;
-case 5 : 
-/*! Conditions:: action */ 
-/*! Rule::       [/"'][^{}/"']+ */ 
- return 26; 
-break;
-case 6 : 
-/*! Conditions:: action */ 
-/*! Rule::       [^{}/"']+ */ 
- return 26; 
 break;
 case 7 : 
 /*! Conditions:: action */ 
@@ -2475,25 +2467,10 @@ case 8 :
 /*! Rule::       \} */ 
  if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return 24; 
 break;
-case 9 : 
-/*! Conditions:: conditions */ 
-/*! Rule::       {NAME} */ 
- return 12; 
-break;
 case 10 : 
 /*! Conditions:: conditions */ 
 /*! Rule::       > */ 
  this.popState(); return 29; 
-break;
-case 11 : 
-/*! Conditions:: conditions */ 
-/*! Rule::       , */ 
- return 31; 
-break;
-case 12 : 
-/*! Conditions:: conditions */ 
-/*! Rule::       \* */ 
- return 30; 
 break;
 case 13 : 
 /*! Conditions:: rules */ 
@@ -2515,11 +2492,6 @@ case 16 :
 /*! Rule::       %% */ 
  this.begin('code'); return 5; 
 break;
-case 17 : 
-/*! Conditions:: rules */ 
-/*! Rule::       [a-zA-Z0-9_]+ */ 
- return 56; 
-break;
 case 18 : 
 /*! Conditions:: options */ 
 /*! Rule::       {NAME} */ 
@@ -2539,11 +2511,6 @@ case 21 :
 /*! Conditions:: options */ 
 /*! Rule::       \s+ */ 
  /* empty */ 
-break;
-case 22 : 
-/*! Conditions:: start_condition */ 
-/*! Rule::       {NAME} */ 
- return 18; 
 break;
 case 23 : 
 /*! Conditions:: start_condition */ 
@@ -2605,11 +2572,6 @@ case 34 :
 /*! Rule::       \s+ */ 
  /* empty */ 
 break;
-case 35 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       {NAME} */ 
- return 12; 
-break;
 case 36 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
@@ -2620,105 +2582,15 @@ case 37 :
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
  yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 55; 
 break;
-case 38 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \| */ 
- return 33; 
-break;
-case 39 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \[(\\\\|\\\]|[^\]])*\] */ 
- return 52; 
-break;
-case 40 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \(\?: */ 
- return 38; 
-break;
-case 41 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \(\?= */ 
- return 38; 
-break;
-case 42 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \(\?! */ 
- return 38; 
-break;
-case 43 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \( */ 
- return 36; 
-break;
-case 44 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \) */ 
- return 37; 
-break;
-case 45 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \+ */ 
- return 39; 
-break;
-case 46 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \* */ 
- return 30; 
-break;
-case 47 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \? */ 
- return 40; 
-break;
-case 48 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \^ */ 
- return 47; 
-break;
-case 49 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       , */ 
- return 31; 
-break;
-case 50 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       <<EOF>> */ 
- return 48; 
-break;
 case 51 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       < */ 
  this.begin('conditions'); return 27; 
 break;
-case 52 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \/! */ 
- return 42; 
-break;
-case 53 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \/ */ 
- return 41; 
-break;
-case 54 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
- return 53; 
-break;
 case 55 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \\. */ 
  yy_.yytext = yy_.yytext.replace(/^\\/g,''); return 53; 
-break;
-case 56 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \$ */ 
- return 48; 
-break;
-case 57 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \. */ 
- return 46; 
 break;
 case 58 : 
 /*! Conditions:: indented trail rules INITIAL */ 
@@ -2740,45 +2612,125 @@ case 61 :
 /*! Rule::       %% */ 
  this.begin('rules'); return 5; 
 break;
-case 62 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
- return 54; 
-break;
-case 63 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \{{NAME}\} */ 
- return 51; 
-break;
-case 64 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \{ */ 
- return 22; 
-break;
-case 65 : 
-/*! Conditions:: indented trail rules INITIAL */ 
-/*! Rule::       \} */ 
- return 24; 
-break;
 case 66 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       . */ 
  throw new Error("unsupported input character: " + yy_.yytext); /* b0rk on bad characters */ 
-break;
-case 68 : 
-/*! Conditions:: code */ 
-/*! Rule::       (.|{BR})+ */ 
- return 9; 
 break;
 default:
   return this.simpleCaseActionClusters[$avoiding_name_collisions];
 }
 },
 simpleCaseActionClusters: {
-67 : 
-/*! Conditions:: * */ 
-/*! Rule::       $ */ 
- 8
+
+  /*! Conditions:: action */ 
+  /*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
+   0 : 26,
+  /*! Conditions:: action */ 
+  /*! Rule::       \/\/.* */ 
+   1 : 26,
+  /*! Conditions:: action */ 
+  /*! Rule::       "(\\\\|\\"|[^"])*" */ 
+   3 : 26,
+  /*! Conditions:: action */ 
+  /*! Rule::       '(\\\\|\\'|[^'])*' */ 
+   4 : 26,
+  /*! Conditions:: action */ 
+  /*! Rule::       [/"'][^{}/"']+ */ 
+   5 : 26,
+  /*! Conditions:: action */ 
+  /*! Rule::       [^{}/"']+ */ 
+   6 : 26,
+  /*! Conditions:: conditions */ 
+  /*! Rule::       {NAME} */ 
+   9 : 12,
+  /*! Conditions:: conditions */ 
+  /*! Rule::       , */ 
+   11 : 31,
+  /*! Conditions:: conditions */ 
+  /*! Rule::       \* */ 
+   12 : 30,
+  /*! Conditions:: rules */ 
+  /*! Rule::       [a-zA-Z0-9_]+ */ 
+   17 : 56,
+  /*! Conditions:: start_condition */ 
+  /*! Rule::       {NAME} */ 
+   22 : 18,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       {NAME} */ 
+   35 : 12,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \| */ 
+   38 : 33,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \[(\\\\|\\\]|[^\]])*\] */ 
+   39 : 52,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \(\?: */ 
+   40 : 38,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \(\?= */ 
+   41 : 38,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \(\?! */ 
+   42 : 38,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \( */ 
+   43 : 36,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \) */ 
+   44 : 37,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \+ */ 
+   45 : 39,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \* */ 
+   46 : 30,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \? */ 
+   47 : 40,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \^ */ 
+   48 : 47,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       , */ 
+   49 : 31,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       <<EOF>> */ 
+   50 : 48,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \/! */ 
+   52 : 42,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \/ */ 
+   53 : 41,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
+   54 : 53,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \$ */ 
+   56 : 48,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \. */ 
+   57 : 46,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
+   62 : 54,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \{{NAME}\} */ 
+   63 : 51,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \{ */ 
+   64 : 22,
+  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Rule::       \} */ 
+   65 : 24,
+  /*! Conditions:: * */ 
+  /*! Rule::       $ */ 
+   67 : 8,
+  /*! Conditions:: code */ 
+  /*! Rule::       (.|{BR})+ */ 
+   68 : 9
 },
 rules: [
 /^(?:\/\*(.|\n|\r)*?\*\/)/,
