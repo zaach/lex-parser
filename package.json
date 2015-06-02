@@ -1,4 +1,9 @@
 {
+  "author": {
+    "name": "Zach Carter",
+    "email": "zach@carter.name",
+    "url": "http://zaa.ch"
+  },
   "name": "lex-parser",
   "version": "0.1.4",
   "description": "A parser for lexical grammars used by jison",
@@ -16,7 +21,6 @@
     "parser",
     "jison"
   ],
-  "author": "Zach Carter",
   "license": "MIT",
   "devDependencies": {
     "jison": "git://github.com/GerHobbelt/jison.git#master",
