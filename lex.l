@@ -1,11 +1,12 @@
 
-NAME                                    [a-zA-Z_][a-zA-Z0-9_-]*
+NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
 BR                                      \r\n|\n|\r
 
 %s indented trail rules
 %x code start_condition options conditions action
 
 %options easy_keyword_rules
+%options ranges
 
 %%
 
