@@ -29,7 +29,7 @@ epilogue
     | '%%' EOF
       { $$ = null; }
     | '%%' CODE EOF
-      { $$ = $2; }
+      { $$ = $CODE; }
     ;
 
 definitions
@@ -47,58 +47,58 @@ definitions
           }
         }
     | ACTION definitions
-        { yy.actionInclude += $1; $$ = $definitions; }
+        { yy.actionInclude += $ACTION; $$ = $definitions; }
     |
-        { yy.actionInclude = ''; $$ = [null,null]; }
+        { yy.actionInclude = ''; $$ = [null, null]; }
     ;
 
 definition
     : NAME regex
-        { $$ = [$1, $2]; }
+        { $$ = [$NAME, $regex]; }
     | START_INC names_inclusive
-        { $$ = $2; }
+        { $$ = $names_inclusive; }
     | START_EXC names_exclusive
-        { $$ = $2; }
+        { $$ = $names_exclusive; }
     ;
 
 names_inclusive
     : START_COND
-        { $$ = {}; $$[$1] = 0; }
+        { $$ = {}; $$[$START_COND] = 0; }
     | names_inclusive START_COND
-        { $$ = $1; $$[$2] = 0; }
+        { $$ = $names_inclusive; $$[$START_COND] = 0; }
     ;
 
 names_exclusive
     : START_COND
-        { $$ = {}; $$[$1] = 1; }
+        { $$ = {}; $$[$START_COND] = 1; }
     | names_exclusive START_COND
-        { $$ = $1; $$[$2] = 1; }
+        { $$ = $names_exclusive; $$[$START_COND] = 1; }
     ;
 
 rules
     : rules rule
-        { $$ = $1; $$.push($2); }
+        { $$ = $rules; $$.push($rule); }
     | rule
-        { $$ = [$1]; }
+        { $$ = [$rule]; }
     ;
 
 rule
     : start_conditions regex action
-        { $$ = $1 ? [$1, $2, $3] : [$2, $3]; }
+        { $$ = $start_conditions ? [$start_conditions, $regex, $action] : [$regex, $action]; }
     ;
 
 action
     : '{' action_body '}'
-        { $$ = $2; }
+        { $$ = $action_body; }
     | ACTION
-        { $$ = $1; }
+        { $$ = $ACTION; }
     ;
 
 action_body
     :
         { $$ = ''; }
     | action_comments_body
-        { $$ = $1; }
+        { $$ = $action_comments_body; }
     | action_body '{' action_body '}' action_comments_body
         { $$ = $1 + $2 + $3 + $4 + $5; }
     | action_body '{' action_body '}'
@@ -115,7 +115,7 @@ action_comments_body
 
 start_conditions
     : '<' name_list '>'
-        { $$ = $2; }
+        { $$ = $name_list; }
     | '<' '*' '>'
         { $$ = ['*']; }
     |
@@ -123,15 +123,15 @@ start_conditions
 
 name_list
     : NAME
-        { $$ = [$1]; }
+        { $$ = [$NAME]; }
     | name_list ',' NAME
-        { $$ = $1; $$.push($3); }
+        { $$ = $name_list; $$.push($NAME); }
     ;
 
 regex
     : regex_list
         {
-          $$ = $1;
+          $$ = $regex_list;
           if (yy.options && yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
               $$ += "\\b";
           }
@@ -156,19 +156,19 @@ regex_concat
 
 regex_base
     : '(' regex_list ')'
-        { $$ = '(' + $2 + ')'; }
+        { $$ = '(' + $regex_list + ')'; }
     | SPECIAL_GROUP regex_list ')'
-        { $$ = $1 + $2 + ')'; }
+        { $$ = $SPECIAL_GROUP + $regex_list + ')'; }
     | regex_base '+'
-        { $$ = $1 + '+'; }
+        { $$ = $regex_base + '+'; }
     | regex_base '*'
-        { $$ = $1 + '*'; }
+        { $$ = $regex_base + '*'; }
     | regex_base '?'
-        { $$ = $1 + '?'; }
+        { $$ = $regex_base + '?'; }
     | '/' regex_base
-        { $$ = '(?=' + $2 + ')'; }
+        { $$ = '(?=' + $regex_base + ')'; }
     | '/!' regex_base
-        { $$ = '(?!' + $2 + ')'; }
+        { $$ = '(?!' + $regex_base + ')'; }
     | name_expansion
     | regex_base range_regex
         { $$ = $1 + $2; }
