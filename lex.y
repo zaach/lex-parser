@@ -76,15 +76,41 @@ names_exclusive
     ;
 
 rules
-    : rules rule
+    : rules rules_collective
+        { $$ = $rules.concat($rules_collective); }
+    | rules_collective
+        { $$ = $rules_collective; }
+    ;
+
+rules_collective
+    : start_conditions rule
+        { 
+            if ($start_conditions) {
+                $rule.unshift($start_conditions);
+            }
+            $$ = [$rule];
+        }
+    | start_conditions '{' rule_block '}'
+        { 
+            if ($start_conditions) {
+                $rule_block.forEach(function (d) {
+                    d.unshift($start_conditions);
+                });
+            }
+            $$ = $rule_block;
+        }
+    ;
+
+rule_block
+    : rule_block rule
         { $$ = $rules; $$.push($rule); }
     | rule
         { $$ = [$rule]; }
     ;
 
 rule
-    : start_conditions regex action
-        { $$ = $start_conditions ? [$start_conditions, $regex, $action] : [$regex, $action]; }
+    : regex action
+        { $$ = [$regex, $action]; }
     ;
 
 action
