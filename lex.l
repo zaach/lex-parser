@@ -77,6 +77,7 @@ BR                \r\n|\n|\r
 "%s"                            this.begin('start_condition'); return 'START_INC';
 "%x"                            this.begin('start_condition'); return 'START_EXC';
 "%%"                            this.begin('rules'); return '%%';
+"%"[a-zA-Z]+[^\r\n]*            return 'UNKNOWN_DECL';
 "{"\d+(","\s?\d+|",")?"}"       return 'RANGE_REGEX';
 "{"{NAME}"}"                    return 'NAME_BRACE';
 "{"                             return '{';
@@ -87,4 +88,3 @@ BR                \r\n|\n|\r
 <code>(.|{BR})+                 return 'CODE';
 
 %%
-
