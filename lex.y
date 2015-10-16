@@ -10,16 +10,17 @@
 
 lex
     : definitions '%%' rules epilogue
-        { 
+        {
           $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
+          if ($definitions[2]) $$.unknownDecls = $definitions[2];
           if ($epilogue) $$.moduleInclude = $epilogue;
           if (yy.options) $$.options = yy.options;
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
-          return $$; 
+          return $$;
         }
     ;
 
@@ -39,11 +40,14 @@ definitions
           if ('length' in $definition) {
             $$[0] = $$[0] || {};
             $$[0][$definition[0]] = $definition[1];
-          } else {
+          } else if ($definition.type === 'names') {
             $$[1] = $$[1] || {};
-            for (var name in $definition) {
-              $$[1][name] = $definition[name];
+            for (var name in $definition.names) {
+              $$[1][name] = $definition.names[name];
             }
+          } else if ($definition.type === 'unknown') {
+            $$[2] = $$[2] || [];
+            $$[2].push($definition.body);
           }
         }
     | ACTION definitions
@@ -59,20 +63,22 @@ definition
         { $$ = $2; }
     | START_EXC names_exclusive
         { $$ = $2; }
+    | UNKNOWN_DECL
+        { $$ = {type: 'unknown', body: $1}; }
     ;
 
 names_inclusive
     : START_COND
-        { $$ = {}; $$[$1] = 0; }
+        { $$ = {type: 'names', names: {}}; $$.names[$1] = 0; }
     | names_inclusive START_COND
-        { $$ = $1; $$[$2] = 0; }
+        { $$ = $1; $$.names[$2] = 0; }
     ;
 
 names_exclusive
     : START_COND
-        { $$ = {}; $$[$1] = 1; }
+        { $$ = {type: 'names', names: {}}; $$.names[$1] = 1; }
     | names_exclusive START_COND
-        { $$ = $1; $$[$2] = 1; }
+        { $$ = $1; $$.names[$2] = 1; }
     ;
 
 rules
@@ -220,4 +226,3 @@ function prepareString (s) {
     s = encodeRE(s);
     return s;
 };
-
