@@ -2624,7 +2624,7 @@ break;
 case 66 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       . */ 
- throw new Error("unsupported input character: " + yy_.yytext); /* b0rk on bad characters */ 
+ throw new Error("unsupported input character: " + yy_.yytext + " @ " + JSON.stringify(yy_.yyloc)); /* b0rk on bad characters */ 
 break;
 default:
   return this.simpleCaseActionClusters[$avoiding_name_collisions];

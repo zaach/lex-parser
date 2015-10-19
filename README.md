@@ -108,7 +108,7 @@ The parser can parse its own lexical grammar, shown below:
     "{"{NAME}"}"                            return 'NAME_BRACE';
     "{"                                     return '{';
     "}"                                     return '}';
-    .                                       throw new Error("unsupported input character: " + yytext); /* b0rk on bad characters */
+    .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yyloc)); /* b0rk on bad characters */
     <*><<EOF>>                              return 'EOF';
 
     <code>(.|{BR})+                         return 'CODE';
