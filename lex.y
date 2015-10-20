@@ -14,7 +14,7 @@ lex
           $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
-          if ($epilogue) $$.moduleInclude = $epilogue;
+          if ($epilogue && $epilogue.trim() !== '') $$.moduleInclude = $epilogue;
           if (yy.options) $$.options = yy.options;
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
@@ -26,10 +26,8 @@ lex
 epilogue
     : EOF
       { $$ = null; }
-    | '%%' EOF
-      { $$ = null; }
-    | '%%' CODE EOF
-      { $$ = $CODE; }
+    | '%%' extra_lexer_module_code EOF
+      { $$ = $extra_lexer_module_code; }
     ;
 
 definitions
@@ -48,6 +46,8 @@ definitions
         }
     | ACTION definitions
         { yy.actionInclude += $ACTION; $$ = $definitions; }
+    | include_macro_code definitions
+        { yy.actionInclude += $include_macro_code; $$ = $definitions; }
     |
         { yy.actionInclude = ''; $$ = [null, null]; }
     ;
@@ -89,9 +89,11 @@ rule
 
 action
     : '{' action_body '}'
-        { $$ = $action_body; }
+        { console.log("one ACTION BODY: ", $action_body); $$ = $action_body; }
     | ACTION
-        { $$ = $ACTION; }
+        { console.log("one ACTION: ", $ACTION); $$ = $ACTION; }
+    | include_macro_code
+        { console.log("one INCLUDE: ", $include_macro_code); $$ = $include_macro_code; }
     ;
 
 action_body
@@ -107,9 +109,9 @@ action_body
 
 action_comments_body
     : ACTION_BODY
-        { $$ = yytext; }
+        { $$ = $ACTION_BODY; }
     | action_comments_body ACTION_BODY
-        { $$ = $1 + $2; }
+        { $$ = $action_comments_body + $ACTION_BODY; }
     ;
 
 
@@ -189,23 +191,59 @@ name_expansion
 
 any_group_regex
     : ANY_GROUP_REGEX
-        { $$ = yytext; }
+        { $$ = $ANY_GROUP_REGEX; }
     ;
 
 escape_char
     : ESCAPE_CHAR
-        { $$ = yytext; }
+        { $$ = $ESCAPE_CHAR; }
     ;
 
 range_regex
     : RANGE_REGEX
-        { $$ = yytext; }
+        { $$ = $RANGE_REGEX; }
     ;
 
 string
     : STRING_LIT
-        { $$ = prepareString(yytext.substr(1, yytext.length - 2)); }
+        { $$ = prepareString($STRING_LIT.substr(1, $STRING_LIT.length - 2)); }
     | CHARACTER_LIT
+    ;
+
+extra_lexer_module_code
+    : optional_module_code_chunk
+        { $$ = $optional_module_code_chunk; }
+    | optional_module_code_chunk include_macro_code extra_lexer_module_code
+        { $$ = $optional_module_code_chunk + $include_macro_code + $extra_lexer_module_code; }
+    ;
+
+include_macro_code
+    : INCLUDE PATH
+        { 
+            console.log("load file: ", $PATH); 
+            var fs = require('fs');
+            var fileContent = fs.readFileSync($PATH, { encoding: 'utf-8' });
+            // And no, we don't support nested '%include':
+            $$ = '\n// Included by Jison: ' + $PATH + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $PATH + '\n\n';
+        }
+    | INCLUDE error
+        { 
+            console.error("%include MUST be followed by a valid file path"); 
+        }
+    ;
+
+module_code_chunk
+    : CODE
+        { $$ = $CODE; }
+    | module_code_chunk CODE
+        { $$ = $module_code_chunk + $CODE; }
+    ;
+
+optional_module_code_chunk
+    : module_code_chunk
+        { $$ = $module_code_chunk; }
+    | /* nil */
+        { $$ = ''; }
     ;
 
 %%
