@@ -89,11 +89,11 @@ rule
 
 action
     : '{' action_body '}'
-        { console.log("one ACTION BODY: ", $action_body); $$ = $action_body; }
+        { $$ = $action_body; }
     | ACTION
-        { console.log("one ACTION: ", $ACTION); $$ = $ACTION; }
+        { $$ = $ACTION; }
     | include_macro_code
-        { console.log("one INCLUDE: ", $include_macro_code); $$ = $include_macro_code; }
+        { $$ = $include_macro_code; }
     ;
 
 action_body
@@ -220,7 +220,6 @@ extra_lexer_module_code
 include_macro_code
     : INCLUDE PATH
         { 
-            console.log("load file: ", $PATH); 
             var fs = require('fs');
             var fileContent = fs.readFileSync($PATH, { encoding: 'utf-8' });
             // And no, we don't support nested '%include':
