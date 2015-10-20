@@ -2884,7 +2884,7 @@ case 30 :
                                             // There's no real harm as we need to do something special in this case anyway:
                                             // push 2 (two!) conditions.
                                             //
-                                            // (Annecdotal: to find that we needed to place this almost-copy here to make the test grammar
+                                            // (Anecdotal: to find that we needed to place this almost-copy here to make the test grammar
                                             // parse correctly took several hours as the debug facilities were - and are - too meager to
                                             // quickly diagnose the problem while we hadn't. So the code got littered with debug prints
                                             // and finally it hit me what the *F* went wrong, after which I saw I needed to add *this* rule!)
