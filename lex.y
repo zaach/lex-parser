@@ -199,8 +199,20 @@ name_expansion
     ;
 
 any_group_regex
-    : REGEX_SET_START REGEX_SET REGEX_SET_END
-        { $$ = $REGEX_SET_START + $REGEX_SET + $REGEX_SET_END; }
+    : REGEX_SET_START regex_set REGEX_SET_END
+        { $$ = $REGEX_SET_START + $regex_set + $REGEX_SET_END; }
+    ;
+
+regex_set
+    : regex_set_atom regex_set
+        { $$ = $regex_set_atom + $regex_set; }
+    | regex_set_atom
+    ;
+
+regex_set_atom
+    : REGEX_SET
+    | name_expansion
+        { $$ = '{[' + $name_expansion + ']}'; }
     ;
 
 escape_char

@@ -117,22 +117,6 @@
   }
 */
 var lexParser = (function () {
-  'use strict';
-// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
-// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
-function JisonParserError(msg, hash) {
-    console.log("parser error: ", msg);
-    this.message = msg;
-    this.hash = hash;
-    var stacktrace = (new Error()).stack;
-    if (stacktrace) {
-      this.stack = stacktrace;
-    }
-}
-JisonParserError.prototype = Object.create(Error.prototype);
-JisonParserError.prototype.constructor = JisonParserError;
-JisonParserError.prototype.name = 'JisonParserError';
-
 var __expand__ = function (k, v, o) {
   o = o || {};
   for (var l = k.length; l--; ) {
@@ -140,17 +124,18 @@ var __expand__ = function (k, v, o) {
   }
   return o;
 },
-    $V0=[6,12,14,16,18,62],
-    $V1=[18,25,36,39,41,44,45,49,50,51,54,55,58,60,61],
-    $V2=[6,12,14,16,18,25,36,40,62],
-    $V3=[6,12,14,16,18,25,36,39,40,41,44,45,49,50,51,54,55,58,60,61,62],
+    $V0=[6,12,14,16,18,64],
+    $V1=[18,25,36,39,41,44,45,49,50,51,54,55,60,62,63],
+    $V2=[6,12,14,16,18,25,36,40,64],
+    $V3=[6,12,14,16,18,25,36,39,40,41,44,45,49,50,51,54,55,60,62,63,64],
     $V4=[36,40],
-    $V5=[6,12,14,16,18,25,33,36,39,40,41,42,43,44,45,49,50,51,54,55,58,59,60,61,62],
-    $V6=[6,12,14,16,18,21,62],
-    $V7=[6,9,12,14,16,18,25,30,36,39,41,44,45,49,50,51,54,55,58,60,61,62,69],
-    $V8=[6,9,18,25,30,36,39,41,44,45,49,50,51,54,55,58,60,61],
-    $V9=[9,69],
-    $Va=[25,27];
+    $V5=[6,12,14,16,18,25,33,36,39,40,41,42,43,44,45,49,50,51,54,55,60,61,62,63,64],
+    $V6=[6,12,14,16,18,21,64],
+    $V7=[6,9,12,14,16,18,25,30,36,39,41,44,45,49,50,51,54,55,60,62,63,64,71],
+    $V8=[6,9,18,25,30,36,39,41,44,45,49,50,51,54,55,60,62,63],
+    $V9=[54,57],
+    $Va=[9,71],
+    $Vb=[25,27];
 var parser = {
 trace: function trace() { },
 yy: {},
@@ -209,23 +194,25 @@ symbols_: {
   "escape_char": 53,
   "NAME_BRACE": 54,
   "REGEX_SET_START": 55,
-  "REGEX_SET": 56,
+  "regex_set": 56,
   "REGEX_SET_END": 57,
-  "ESCAPE_CHAR": 58,
-  "RANGE_REGEX": 59,
-  "STRING_LIT": 60,
-  "CHARACTER_LIT": 61,
-  "OPTIONS": 62,
-  "option_list": 63,
-  "OPTIONS_END": 64,
-  "option": 65,
-  "=": 66,
-  "OPTION_VALUE": 67,
-  "optional_module_code_chunk": 68,
-  "INCLUDE": 69,
-  "PATH": 70,
-  "module_code_chunk": 71,
-  "CODE": 72,
+  "regex_set_atom": 58,
+  "REGEX_SET": 59,
+  "ESCAPE_CHAR": 60,
+  "RANGE_REGEX": 61,
+  "STRING_LIT": 62,
+  "CHARACTER_LIT": 63,
+  "OPTIONS": 64,
+  "option_list": 65,
+  "OPTIONS_END": 66,
+  "option": 67,
+  "=": 68,
+  "OPTION_VALUE": 69,
+  "optional_module_code_chunk": 70,
+  "INCLUDE": 71,
+  "PATH": 72,
+  "module_code_chunk": 73,
+  "CODE": 74,
   "$accept": 0,
   "$end": 1
 },
@@ -258,19 +245,19 @@ terminals_: {
   51: "$",
   54: "NAME_BRACE",
   55: "REGEX_SET_START",
-  56: "REGEX_SET",
   57: "REGEX_SET_END",
-  58: "ESCAPE_CHAR",
-  59: "RANGE_REGEX",
-  60: "STRING_LIT",
-  61: "CHARACTER_LIT",
-  62: "OPTIONS",
-  64: "OPTIONS_END",
-  66: "=",
-  67: "OPTION_VALUE",
-  69: "INCLUDE",
-  70: "PATH",
-  72: "CODE"
+  59: "REGEX_SET",
+  60: "ESCAPE_CHAR",
+  61: "RANGE_REGEX",
+  62: "STRING_LIT",
+  63: "CHARACTER_LIT",
+  64: "OPTIONS",
+  66: "OPTIONS_END",
+  68: "=",
+  69: "OPTION_VALUE",
+  71: "INCLUDE",
+  72: "PATH",
+  74: "CODE"
 },
 productions_: [
   0,
@@ -503,6 +490,22 @@ productions_: [
     3
   ],
   [
+    56,
+    2
+  ],
+  [
+    56,
+    1
+  ],
+  [
+    58,
+    1
+  ],
+  [
+    58,
+    1
+  ],
+  [
     53,
     1
   ],
@@ -523,23 +526,23 @@ productions_: [
     3
   ],
   [
-    63,
+    65,
     2
   ],
   [
-    63,
-    1
-  ],
-  [
     65,
     1
   ],
   [
-    65,
+    67,
+    1
+  ],
+  [
+    67,
     3
   ],
   [
-    65,
+    67,
     3
   ],
   [
@@ -559,19 +562,19 @@ productions_: [
     2
   ],
   [
-    71,
+    73,
     1
   ],
   [
-    71,
+    73,
     2
   ],
   [
-    68,
+    70,
     1
   ],
   [
-    68,
+    70,
     0
   ]
 ],
@@ -649,15 +652,15 @@ case 8 :
 /*! Production::     action_body : action_comments_body */
  case 27 : 
 /*! Production::     action_comments_body : ACTION_BODY */
- case 58 : 
+ case 62 : 
 /*! Production::     escape_char : ESCAPE_CHAR */
- case 59 : 
+ case 63 : 
 /*! Production::     range_regex : RANGE_REGEX */
- case 68 : 
-/*! Production::     extra_lexer_module_code : optional_module_code_chunk */
  case 72 : 
+/*! Production::     extra_lexer_module_code : optional_module_code_chunk */
+ case 76 : 
 /*! Production::     module_code_chunk : CODE */
- case 74 : 
+ case 78 : 
 /*! Production::     optional_module_code_chunk : module_code_chunk */
   this.$ = $$[$0];  
 break;
@@ -701,7 +704,7 @@ case 23 :
 /*! Production::     action_body :  */
  case 38 : 
 /*! Production::     regex_list :  */
- case 75 : 
+ case 79 : 
 /*! Production::     optional_module_code_chunk :  */
   this.$ = '';  
 break;
@@ -719,7 +722,9 @@ case 28 :
 /*! Production::     regex_concat : regex_concat regex_base */
  case 49 : 
 /*! Production::     regex_base : regex_base range_regex */
- case 73 : 
+ case 58 : 
+/*! Production::     regex_set : regex_set_atom regex_set */
+ case 77 : 
 /*! Production::     module_code_chunk : module_code_chunk CODE */
   this.$ = $$[$0-1] + $$[$0];  
 break;
@@ -789,26 +794,30 @@ case 53 :
   this.$ = '$';  
 break;
 case 57 : 
-/*! Production::     any_group_regex : REGEX_SET_START REGEX_SET REGEX_SET_END */
- case 69 : 
+/*! Production::     any_group_regex : REGEX_SET_START regex_set REGEX_SET_END */
+ case 73 : 
 /*! Production::     extra_lexer_module_code : optional_module_code_chunk include_macro_code extra_lexer_module_code */
   this.$ = $$[$0-2] + $$[$0-1] + $$[$0];  
 break;
-case 60 : 
+case 61 : 
+/*! Production::     regex_set_atom : name_expansion */
+  this.$ = '{[' + $$[$0] + ']}';  
+break;
+case 64 : 
 /*! Production::     string : STRING_LIT */
   this.$ = prepareString($$[$0].substr(1, $$[$0].length - 2));  
 break;
-case 65 : 
+case 69 : 
 /*! Production::     option : NAME */
   yy.options[$$[$0]] = true;  
 break;
-case 66 : 
+case 70 : 
 /*! Production::     option : NAME = OPTION_VALUE */
- case 67 : 
+ case 71 : 
 /*! Production::     option : NAME = NAME */
   yy.options[$$[$0-2]] = $$[$0];  
 break;
-case 70 : 
+case 74 : 
 /*! Production::     include_macro_code : INCLUDE PATH */
   
             var fs = require('fs');
@@ -817,7 +826,7 @@ case 70 :
             this.$ = '\n// Included by Jison: ' + $$[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $$[$0] + '\n\n';
          
 break;
-case 71 : 
+case 75 : 
 /*! Production::     include_macro_code : INCLUDE error */
   
             console.error("%include MUST be followed by a valid file path"); 
@@ -829,7 +838,7 @@ table: [
   __expand__($V0, [
       2,
       4
-    ], {3:1,4:2,69:[
+    ], {3:1,4:2,71:[
       2,
       4
     ]
@@ -864,11 +873,11 @@ table: [
     ],
     19: 9,
     20: 10,
-    62: [
+    64: [
       1,
       12
     ],
-    69: [
+    71: [
       1,
       11
     ]
@@ -904,16 +913,16 @@ table: [
     ],
     19: 9,
     20: 10,
-    62: [
+    64: [
       1,
       12
     ],
-    69: [
+    71: [
       1,
       11
     ]
   },
-  __expand__([6,12,14,16,18,36,62], [
+  __expand__([6,12,14,16,18,36,64], [
       2,
       38
     ], {13:15,35:16,37:17,38:18,46:23,48:24,52:28,53:29,39:[
@@ -943,16 +952,16 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
-    ],69:[
+    ],71:[
       2,
       38
     ]
@@ -974,7 +983,7 @@ table: [
   __expand__($V0, [
       2,
       10
-    ], {69:[
+    ], {71:[
       2,
       10
     ]
@@ -982,7 +991,7 @@ table: [
   __expand__($V0, [
       2,
       11
-    ], {69:[
+    ], {71:[
       2,
       11
     ]
@@ -990,7 +999,7 @@ table: [
   __expand__($V0, [
       2,
       12
-    ], {69:[
+    ], {71:[
       2,
       12
     ]
@@ -1000,7 +1009,7 @@ table: [
       1,
       40
     ],
-    70: [
+    72: [
       1,
       39
     ]
@@ -1010,8 +1019,8 @@ table: [
       1,
       43
     ],
-    63: 41,
-    65: 42
+    65: 41,
+    67: 42
   },
   __expand__($V1, [
       2,
@@ -1019,7 +1028,7 @@ table: [
     ], {7:44,22:45,23:46,30:[
       1,
       47
-    ],69:[
+    ],71:[
       2,
       31
     ]
@@ -1033,18 +1042,18 @@ table: [
   __expand__($V0, [
       2,
       7
-    ], {69:[
+    ], {71:[
       2,
       7
     ]
   }),
-  __expand__([6,12,14,16,18,25,62], [
+  __expand__([6,12,14,16,18,25,64], [
       2,
       34
     ], {36:[
       1,
       48
-    ],69:[
+    ],71:[
       2,
       34
     ]
@@ -1079,16 +1088,16 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
-    ],69:[
+    ],71:[
       2,
       37
     ]
@@ -1105,10 +1114,10 @@ table: [
     ],43:[
       1,
       52
-    ],59:[
+    ],61:[
       1,
       54
-    ],69:[
+    ],71:[
       2,
       40
     ]
@@ -1143,13 +1152,13 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
     ]
@@ -1184,13 +1193,13 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
     ]
@@ -1237,15 +1246,15 @@ table: [
       1,
       31
     ],
-    58: [
+    60: [
       1,
       34
     ],
-    60: [
+    62: [
       1,
       32
     ],
-    61: [
+    63: [
       1,
       33
     ]
@@ -1292,15 +1301,15 @@ table: [
       1,
       31
     ],
-    58: [
+    60: [
       1,
       34
     ],
-    60: [
+    62: [
       1,
       32
     ],
-    61: [
+    63: [
       1,
       33
     ]
@@ -1308,7 +1317,7 @@ table: [
   __expand__($V5, [
       2,
       48
-    ], {69:[
+    ], {71:[
       2,
       48
     ]
@@ -1316,7 +1325,7 @@ table: [
   __expand__($V5, [
       2,
       50
-    ], {69:[
+    ], {71:[
       2,
       50
     ]
@@ -1324,7 +1333,7 @@ table: [
   __expand__($V5, [
       2,
       51
-    ], {69:[
+    ], {71:[
       2,
       51
     ]
@@ -1332,7 +1341,7 @@ table: [
   __expand__($V5, [
       2,
       52
-    ], {69:[
+    ], {71:[
       2,
       52
     ]
@@ -1340,7 +1349,7 @@ table: [
   __expand__($V5, [
       2,
       53
-    ], {69:[
+    ], {71:[
       2,
       53
     ]
@@ -1348,7 +1357,7 @@ table: [
   __expand__($V5, [
       2,
       54
-    ], {69:[
+    ], {71:[
       2,
       54
     ]
@@ -1356,47 +1365,54 @@ table: [
   __expand__($V5, [
       2,
       55
-    ], {69:[
+    ], {71:[
       2,
       55
     ]
   }),
-  __expand__($V5, [
+  __expand__([6,12,14,16,18,25,33,36,39,40,41,42,43,44,45,49,50,51,54,55,57,59,60,61,62,63,64], [
       2,
       56
-    ], {69:[
+    ], {71:[
       2,
       56
     ]
   }),
   {
-    56: [
+    46: 62,
+    54: [
       1,
-      59
+      30
+    ],
+    56: 59,
+    58: 60,
+    59: [
+      1,
+      61
     ]
   },
   __expand__($V5, [
       2,
-      60
-    ], {69:[
+      64
+    ], {71:[
       2,
-      60
+      64
     ]
   }),
   __expand__($V5, [
       2,
-      61
-    ], {69:[
+      65
+    ], {71:[
       2,
-      61
+      65
     ]
   }),
   __expand__($V5, [
       2,
-      58
-    ], {69:[
+      62
+    ], {71:[
       2,
-      58
+      62
     ]
   }),
   __expand__($V0, [
@@ -1404,8 +1420,8 @@ table: [
       8
     ], {21:[
       1,
-      60
-    ],69:[
+      63
+    ],71:[
       2,
       8
     ]
@@ -1413,7 +1429,7 @@ table: [
   __expand__($V6, [
       2,
       13
-    ], {69:[
+    ], {71:[
       2,
       13
     ]
@@ -1423,8 +1439,8 @@ table: [
       9
     ], {21:[
       1,
-      61
-    ],69:[
+      64
+    ],71:[
       2,
       9
     ]
@@ -1432,31 +1448,31 @@ table: [
   __expand__($V6, [
       2,
       15
-    ], {69:[
+    ], {71:[
       2,
       15
     ]
   }),
   __expand__($V7, [
       2,
-      70
-    ], {72:[
+      74
+    ], {74:[
       2,
-      70
+      74
     ]
   }),
   __expand__($V7, [
       2,
-      71
-    ], {72:[
+      75
+    ], {74:[
       2,
-      71
+      75
     ]
   }),
   {
-    64: [
+    66: [
       1,
-      62
+      65
     ]
   },
   {
@@ -1464,34 +1480,34 @@ table: [
       1,
       43
     ],
-    63: 63,
-    64: [
+    65: 66,
+    66: [
       2,
-      64
+      68
     ],
-    65: 42
+    67: 42
   },
-  __expand__([12,64], [
+  __expand__([12,66], [
       2,
-      65
-    ], {66:[
+      69
+    ], {68:[
       1,
-      64
+      67
     ]
   }),
   __expand__($V1, [
       2,
       31
-    ], {23:46,8:65,22:66,6:[
+    ], {23:46,8:68,22:69,6:[
       1,
-      68
+      71
     ],9:[
       1,
-      67
+      70
     ],30:[
       1,
       47
-    ],69:[
+    ],71:[
       2,
       31
     ]
@@ -1499,7 +1515,7 @@ table: [
   __expand__($V8, [
       2,
       18
-    ], {69:[
+    ], {71:[
       2,
       18
     ]
@@ -1507,7 +1523,7 @@ table: [
   __expand__([18,25,36], [
       2,
       38
-    ], {35:16,37:17,38:18,46:23,48:24,52:28,53:29,13:69,39:[
+    ], {35:16,37:17,38:18,46:23,48:24,52:28,53:29,13:72,39:[
       1,
       19
     ],41:[
@@ -1534,16 +1550,16 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
-    ],69:[
+    ],71:[
       2,
       38
     ]
@@ -1551,18 +1567,18 @@ table: [
   {
     12: [
       1,
-      72
+      75
     ],
-    31: 70,
+    31: 73,
     33: [
       1,
-      71
+      74
     ]
   },
   __expand__($V2, [
       2,
       36
-    ], {38:18,46:23,48:24,52:28,53:29,37:73,39:[
+    ], {38:18,46:23,48:24,52:28,53:29,37:76,39:[
       1,
       19
     ],41:[
@@ -1589,16 +1605,16 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
-    ],69:[
+    ],71:[
       2,
       36
     ]
@@ -1615,10 +1631,10 @@ table: [
     ],43:[
       1,
       52
-    ],59:[
+    ],61:[
       1,
       54
-    ],69:[
+    ],71:[
       2,
       39
     ]
@@ -1626,7 +1642,7 @@ table: [
   __expand__($V5, [
       2,
       43
-    ], {69:[
+    ], {71:[
       2,
       43
     ]
@@ -1634,7 +1650,7 @@ table: [
   __expand__($V5, [
       2,
       44
-    ], {69:[
+    ], {71:[
       2,
       44
     ]
@@ -1642,7 +1658,7 @@ table: [
   __expand__($V5, [
       2,
       45
-    ], {69:[
+    ], {71:[
       2,
       45
     ]
@@ -1650,17 +1666,17 @@ table: [
   __expand__($V5, [
       2,
       49
-    ], {69:[
+    ], {71:[
       2,
       49
     ]
   }),
   __expand__($V5, [
       2,
-      59
-    ], {69:[
+      63
+    ], {71:[
       2,
-      59
+      63
     ]
   }),
   {
@@ -1670,7 +1686,7 @@ table: [
     ],
     40: [
       1,
-      74
+      77
     ]
   },
   {
@@ -1680,7 +1696,7 @@ table: [
     ],
     40: [
       1,
-      75
+      78
     ]
   },
   __expand__($V3, [
@@ -1695,10 +1711,10 @@ table: [
     ],43:[
       1,
       52
-    ],59:[
+    ],61:[
       1,
       54
-    ],69:[
+    ],71:[
       2,
       46
     ]
@@ -1715,10 +1731,10 @@ table: [
     ],43:[
       1,
       52
-    ],59:[
+    ],61:[
       1,
       54
-    ],69:[
+    ],71:[
       2,
       47
     ]
@@ -1726,13 +1742,46 @@ table: [
   {
     57: [
       1,
-      76
+      79
     ]
   },
+  {
+    46: 62,
+    54: [
+      1,
+      30
+    ],
+    56: 80,
+    57: [
+      2,
+      59
+    ],
+    58: 60,
+    59: [
+      1,
+      61
+    ]
+  },
+  __expand__($V9, [
+      2,
+      60
+    ], {59:[
+      2,
+      60
+    ]
+  }),
+  __expand__($V9, [
+      2,
+      61
+    ], {59:[
+      2,
+      61
+    ]
+  }),
   __expand__($V6, [
       2,
       14
-    ], {69:[
+    ], {71:[
       2,
       14
     ]
@@ -1740,33 +1789,33 @@ table: [
   __expand__($V6, [
       2,
       16
-    ], {69:[
+    ], {71:[
       2,
       16
     ]
   }),
   __expand__($V0, [
       2,
-      62
-    ], {69:[
+      66
+    ], {71:[
       2,
-      62
+      66
     ]
   }),
   {
-    64: [
+    66: [
       2,
-      63
+      67
     ]
   },
   {
     12: [
       1,
-      78
+      82
     ],
-    67: [
+    69: [
       1,
-      77
+      81
     ]
   },
   {
@@ -1778,7 +1827,7 @@ table: [
   __expand__($V8, [
       2,
       17
-    ], {69:[
+    ], {71:[
       2,
       17
     ]
@@ -1789,26 +1838,26 @@ table: [
       2
     ]
   },
-  __expand__($V9, [
+  __expand__($Va, [
       2,
-      75
-    ], {10:79,68:80,71:81,72:[
+      79
+    ], {10:83,70:84,73:85,74:[
       1,
-      82
+      86
     ]
   }),
   {
     18: [
       1,
-      85
+      89
     ],
-    19: 86,
-    24: 83,
+    19: 90,
+    24: 87,
     25: [
       1,
-      84
+      88
     ],
-    69: [
+    71: [
       1,
       11
     ]
@@ -1816,17 +1865,17 @@ table: [
   {
     32: [
       1,
-      87
+      91
     ],
     34: [
       1,
-      88
+      92
     ]
   },
   {
     32: [
       1,
-      89
+      93
     ]
   },
   {
@@ -1869,16 +1918,16 @@ table: [
     ],55:[
       1,
       31
-    ],58:[
-      1,
-      34
     ],60:[
       1,
+      34
+    ],62:[
+      1,
       32
-    ],61:[
+    ],63:[
       1,
       33
-    ],69:[
+    ],71:[
       2,
       35
     ]
@@ -1886,7 +1935,7 @@ table: [
   __expand__($V5, [
       2,
       41
-    ], {69:[
+    ], {71:[
       2,
       41
     ]
@@ -1894,7 +1943,7 @@ table: [
   __expand__($V5, [
       2,
       42
-    ], {69:[
+    ], {71:[
       2,
       42
     ]
@@ -1902,84 +1951,90 @@ table: [
   __expand__($V5, [
       2,
       57
-    ], {69:[
+    ], {71:[
       2,
       57
     ]
   }),
   {
-    12: [
+    57: [
       2,
-      66
-    ],
-    64: [
-      2,
-      66
+      58
     ]
   },
   {
     12: [
       2,
-      67
+      70
     ],
-    64: [
+    66: [
       2,
-      67
+      70
+    ]
+  },
+  {
+    12: [
+      2,
+      71
+    ],
+    66: [
+      2,
+      71
     ]
   },
   {
     9: [
       1,
-      90
+      94
     ]
   },
   {
     9: [
       2,
-      68
+      72
     ],
-    19: 91,
-    69: [
+    19: 95,
+    71: [
       1,
       11
     ]
   },
-  __expand__($V9, [
+  __expand__($Va, [
       2,
-      74
-    ], {72:[
+      78
+    ], {74:[
       1,
-      92
+      96
     ]
   }),
-  __expand__($V9, [
+  __expand__($Va, [
       2,
-      72
-    ], {72:[
+      76
+    ], {74:[
       2,
-      72
+      76
     ]
   }),
   __expand__($V8, [
       2,
       19
-    ], {69:[
+    ], {71:[
       2,
       19
     ]
   }),
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       23
-    ], {26:93,28:94,29:[
+    ], {26:97,28:98,29:[
       1,
-      95
+      99
     ]
   }),
   __expand__($V8, [
       2,
       21
-    ], {69:[
+    ], {71:[
       2,
       21
     ]
@@ -1987,7 +2042,7 @@ table: [
   __expand__($V8, [
       2,
       22
-    ], {69:[
+    ], {71:[
       2,
       22
     ]
@@ -1995,7 +2050,7 @@ table: [
   __expand__($V1, [
       2,
       29
-    ], {69:[
+    ], {71:[
       2,
       29
     ]
@@ -2003,13 +2058,13 @@ table: [
   {
     12: [
       1,
-      96
+      100
     ]
   },
   __expand__($V1, [
       2,
       30
-    ], {69:[
+    ], {71:[
       2,
       30
     ]
@@ -2020,41 +2075,41 @@ table: [
       3
     ]
   },
-  __expand__($V9, [
+  __expand__($Va, [
       2,
-      75
-    ], {68:80,71:81,10:97,72:[
+      79
+    ], {70:84,73:85,10:101,74:[
       1,
-      82
+      86
     ]
   }),
-  __expand__($V9, [
+  __expand__($Va, [
       2,
-      73
-    ], {72:[
+      77
+    ], {74:[
       2,
-      73
+      77
     ]
   }),
   {
     25: [
       1,
-      99
+      103
     ],
     27: [
       1,
-      98
+      102
     ]
   },
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       24
     ], {29:[
       1,
-      100
+      104
     ]
   }),
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       27
     ], {29:[
@@ -2075,26 +2130,26 @@ table: [
   {
     9: [
       2,
-      69
+      73
     ]
   },
   __expand__($V8, [
       2,
       20
-    ], {69:[
+    ], {71:[
       2,
       20
     ]
   }),
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       23
-    ], {28:94,26:101,29:[
+    ], {28:98,26:105,29:[
       1,
-      95
+      99
     ]
   }),
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       28
     ], {29:[
@@ -2105,27 +2160,27 @@ table: [
   {
     25: [
       1,
-      99
+      103
     ],
     27: [
       1,
-      102
+      106
     ]
   },
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       26
-    ], {28:103,29:[
+    ], {28:107,29:[
       1,
-      95
+      99
     ]
   }),
-  __expand__($Va, [
+  __expand__($Vb, [
       2,
       25
     ], {29:[
       1,
-      100
+      104
     ]
   })
 ],
@@ -2134,32 +2189,42 @@ defaultActions: {
     2,
     5
   ],
-  63: [
+  66: [
     2,
-    63
+    67
   ],
-  65: [
+  68: [
     2,
     1
   ],
-  67: [
+  70: [
     2,
     2
   ],
-  90: [
+  80: [
+    2,
+    58
+  ],
+  94: [
     2,
     3
   ],
-  97: [
+  101: [
     2,
-    69
+    73
   ]
 },
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
-        throw new JisonParserError(str, hash);
+        function _parseError (msg, hash) {
+            this.message = msg;
+            this.hash = hash;
+        }
+        _parseError.prototype = new Error();
+
+        throw new _parseError(str, hash);
     }
 },
 parse: function parse(input) {
@@ -2506,21 +2571,6 @@ function prepareString (s) {
 
 /* generated by jison-lex 0.3.4 */
 var lexer = (function () {
-// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
-// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
-function JisonLexerError(msg, hash) {
-    console.log("lexer error: ", msg);
-    this.message = msg;
-    this.hash = hash;
-    var stacktrace = (new Error()).stack;
-    if (stacktrace) {
-      this.stack = stacktrace;
-    }
-}
-JisonLexerError.prototype = Object.create(Error.prototype);
-JisonLexerError.prototype.constructor = JisonLexerError;
-JisonLexerError.prototype.name = 'JisonLexerError';
-
 var lexer = ({
 
 EOF:1,
@@ -2531,7 +2581,7 @@ parseError:function parseError(str, hash) {
         if (this.yy.parser) {
             return this.yy.parser.parseError(str, hash) || this.ERROR;
         } else {
-            throw new JisonLexerError(str);
+            throw new Error(str);
         }
     },
 
@@ -2962,22 +3012,22 @@ break;
 case 20 : 
 /*! Conditions:: options */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 67; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 69; 
 break;
 case 21 : 
 /*! Conditions:: options */ 
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 67; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 69; 
 break;
 case 23 : 
 /*! Conditions:: options */ 
 /*! Rule::       {BR}+ */ 
- this.popState(); return 64; 
+ this.popState(); return 66; 
 break;
 case 24 : 
 /*! Conditions:: options */ 
 /*! Rule::       \s+{BR}+ */ 
- this.popState(); return 64; 
+ this.popState(); return 66; 
 break;
 case 25 : 
 /*! Conditions:: options */ 
@@ -3039,7 +3089,7 @@ case 34 :
                                             this.pushState('trail'); 
                                             // then push the immediate need: the 'path' condition.
                                             this.pushState('path'); 
-                                            return 69;
+                                            return 71;
                                          
 break;
 case 35 : 
@@ -3070,64 +3120,59 @@ break;
 case 41 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
- yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 60; 
+ yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 62; 
 break;
 case 42 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
- yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 60; 
+ yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 62; 
 break;
 case 43 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \[ */ 
  this.pushState('set'); return 55; 
 break;
-case 45 : 
-/*! Conditions:: set */ 
-/*! Rule::       \] */ 
- this.popState('set'); return 57; 
-break;
-case 58 : 
+case 56 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       < */ 
  this.begin('conditions'); return 30; 
 break;
-case 59 : 
+case 57 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \/! */ 
  return 45;                    // treated as `(?!atom)` 
 break;
-case 60 : 
+case 58 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \/ */ 
  return 44;                     // treated as `(?=atom)`  
 break;
-case 62 : 
+case 60 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \\. */ 
- yy_.yytext = yy_.yytext.replace(/^\\/g, ''); return 58; 
+ yy_.yytext = yy_.yytext.replace(/^\\/g, ''); return 60; 
 break;
-case 65 : 
+case 63 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       %options\b */ 
- if (!yy.options) { yy.options = {}; } this.begin('options'); return 62; 
+ if (!yy.options) { yy.options = {}; } this.begin('options'); return 64; 
 break;
-case 66 : 
+case 64 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       %s\b */ 
  this.begin('start_condition'); return 14; 
 break;
-case 67 : 
+case 65 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       %x\b */ 
  this.begin('start_condition'); return 16; 
 break;
-case 68 : 
+case 66 : 
 /*! Conditions:: INITIAL trail code */ 
 /*! Rule::       %include\b */ 
- this.pushState('path'); return 69; 
+ this.pushState('path'); return 71; 
 break;
-case 69 : 
+case 67 : 
 /*! Conditions:: INITIAL rules trail code */ 
 /*! Rule::       %{NAME}[^\r\n]+ */ 
   
@@ -3135,20 +3180,25 @@ case 69 :
                                             console.warn('ignoring unsupported lexer option: ', yy_.yytext, ' @ ' + JSON.stringify(yy_.yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                          
 break;
-case 70 : 
+case 68 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       %% */ 
  this.begin('rules'); return 6; 
 break;
-case 76 : 
+case 74 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       . */ 
  throw new Error("unsupported input character: " + yy_.yytext + " @ " + JSON.stringify(yy_.yylloc)); /* b0rk on bad characters */ 
 break;
+case 77 : 
+/*! Conditions:: set */ 
+/*! Rule::       \] */ 
+ this.popState('set'); return 57; 
+break;
 case 79 : 
 /*! Conditions:: code */ 
 /*! Rule::       [^\r\n]+ */ 
- return 72;      // the bit of CODE just before EOF... 
+ return 74;      // the bit of CODE just before EOF... 
 break;
 case 80 : 
 /*! Conditions:: path */ 
@@ -3158,12 +3208,12 @@ break;
 case 81 : 
 /*! Conditions:: path */ 
 /*! Rule::       '[^\r\n]+' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 70; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 72; 
 break;
 case 82 : 
 /*! Conditions:: path */ 
 /*! Rule::       "[^\r\n]+" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 70; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 72; 
 break;
 case 83 : 
 /*! Conditions:: path */ 
@@ -3173,7 +3223,7 @@ break;
 case 84 : 
 /*! Conditions:: path */ 
 /*! Rule::       [^\s\r\n]+ */ 
- this.popState(); return 70; 
+ this.popState(); return 72; 
 break;
 case 85 : 
 /*! Conditions:: * */ 
@@ -3218,91 +3268,91 @@ simpleCaseActionClusters: {
    12 : 33,
   /*! Conditions:: rules */ 
   /*! Rule::       [a-zA-Z0-9_]+ */ 
-   17 : 61,
+   17 : 63,
   /*! Conditions:: options */ 
   /*! Rule::       {NAME} */ 
    18 : 12,
   /*! Conditions:: options */ 
   /*! Rule::       = */ 
-   19 : 66,
+   19 : 68,
   /*! Conditions:: options */ 
   /*! Rule::       [^\s\r\n]+ */ 
-   22 : 67,
+   22 : 69,
   /*! Conditions:: start_condition */ 
   /*! Rule::       {NAME} */ 
    26 : 21,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       {NAME} */ 
    40 : 12,
-  /*! Conditions:: set */ 
-  /*! Rule::       (\\\\|\\\]|[^\]])+ */ 
-   44 : 56,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \| */ 
-   46 : 36,
+   44 : 36,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \(\?: */ 
-   47 : 41,
+   45 : 41,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \(\?= */ 
-   48 : 41,
+   46 : 41,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \(\?! */ 
-   49 : 41,
+   47 : 41,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \( */ 
-   50 : 39,
+   48 : 39,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \) */ 
-   51 : 40,
+   49 : 40,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \+ */ 
-   52 : 42,
+   50 : 42,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \* */ 
-   53 : 33,
+   51 : 33,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \? */ 
-   54 : 43,
+   52 : 43,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \^ */ 
-   55 : 50,
+   53 : 50,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       , */ 
-   56 : 34,
+   54 : 34,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       <<EOF>> */ 
-   57 : 51,
+   55 : 51,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
-   61 : 58,
+   59 : 60,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \$ */ 
-   63 : 51,
+   61 : 51,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \. */ 
-   64 : 49,
+   62 : 49,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
-   71 : 59,
+   69 : 61,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \{{NAME}\} */ 
-   72 : 54,
+   70 : 54,
   /*! Conditions:: set options */ 
   /*! Rule::       \{{NAME}\} */ 
-   73 : 54,
+   71 : 54,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \{ */ 
-   74 : 25,
+   72 : 25,
   /*! Conditions:: indented trail rules INITIAL */ 
   /*! Rule::       \} */ 
-   75 : 27,
+   73 : 27,
   /*! Conditions:: * */ 
   /*! Rule::       $ */ 
-   77 : 9,
+   75 : 9,
+  /*! Conditions:: set */ 
+  /*! Rule::       (\\\\|\\\]|[^\]])+ */ 
+   76 : 59,
   /*! Conditions:: code */ 
   /*! Rule::       [^\r\n]*(\r|\n)+ */ 
-   78 : 72
+   78 : 74
 },
 rules: [
 /^(?:\/\*(.|\n|\r)*?\*\/)/,
@@ -3349,8 +3399,6 @@ rules: [
 /^(?:"(\\\\|\\"|[^"])*")/,
 /^(?:'(\\\\|\\'|[^'])*')/,
 /^(?:\[)/,
-/^(?:(\\\\|\\\]|[^\]])+)/,
-/^(?:\])/,
 /^(?:\|)/,
 /^(?:\(\?:)/,
 /^(?:\(\?=)/,
@@ -3383,6 +3431,8 @@ rules: [
 /^(?:\})/,
 /^(?:.)/,
 /^(?:$)/,
+/^(?:(\\\\|\\\]|[^\]])+)/,
+/^(?:\])/,
 /^(?:[^\r\n]*(\r|\n)+)/,
 /^(?:[^\r\n]+)/,
 /^(?:[\r\n])/,
@@ -3395,9 +3445,9 @@ rules: [
 conditions: {
   "code": {
     "rules": [
-      68,
-      69,
-      77,
+      66,
+      67,
+      75,
       78,
       79,
       85
@@ -3410,7 +3460,7 @@ conditions: {
       27,
       28,
       29,
-      77,
+      75,
       85
     ],
     "inclusive": false
@@ -3425,8 +3475,8 @@ conditions: {
       23,
       24,
       25,
-      73,
-      77,
+      71,
+      75,
       85
     ],
     "inclusive": false
@@ -3437,7 +3487,7 @@ conditions: {
       10,
       11,
       12,
-      77,
+      75,
       85
     ],
     "inclusive": false
@@ -3453,14 +3503,14 @@ conditions: {
       6,
       7,
       8,
-      77,
+      75,
       85
     ],
     "inclusive": false
   },
   "path": {
     "rules": [
-      77,
+      75,
       80,
       81,
       82,
@@ -3472,9 +3522,9 @@ conditions: {
   },
   "set": {
     "rules": [
-      44,
-      45,
-      73,
+      71,
+      75,
+      76,
       77,
       85
     ],
@@ -3495,6 +3545,8 @@ conditions: {
       41,
       42,
       43,
+      44,
+      45,
       46,
       47,
       48,
@@ -3515,15 +3567,13 @@ conditions: {
       63,
       64,
       65,
-      66,
-      67,
+      68,
+      69,
       70,
-      71,
       72,
+      73,
       74,
       75,
-      76,
-      77,
       85
     ],
     "inclusive": true
@@ -3540,6 +3590,8 @@ conditions: {
       41,
       42,
       43,
+      44,
+      45,
       46,
       47,
       48,
@@ -3565,12 +3617,10 @@ conditions: {
       68,
       69,
       70,
-      71,
       72,
+      73,
       74,
       75,
-      76,
-      77,
       85
     ],
     "inclusive": true
@@ -3591,6 +3641,8 @@ conditions: {
       41,
       42,
       43,
+      44,
+      45,
       46,
       47,
       48,
@@ -3611,16 +3663,14 @@ conditions: {
       63,
       64,
       65,
-      66,
       67,
+      68,
       69,
       70,
-      71,
       72,
+      73,
       74,
       75,
-      76,
-      77,
       85
     ],
     "inclusive": true
@@ -3636,6 +3686,8 @@ conditions: {
       41,
       42,
       43,
+      44,
+      45,
       46,
       47,
       48,
@@ -3661,23 +3713,19 @@ conditions: {
       68,
       69,
       70,
-      71,
       72,
+      73,
       74,
       75,
-      76,
-      77,
       85
     ],
     "inclusive": true
   }
 }
 });
-lexer.JisonLexerError = JisonLexerError;
 return lexer;
 })();
 parser.lexer = lexer;
-parser.JisonParserError = JisonParserError;
 
 function Parser () {
   this.yy = {};

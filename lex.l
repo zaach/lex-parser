@@ -80,8 +80,6 @@ BR                                      \r\n|\n|\r
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
-<set>("\\\\"|"\]"|[^\]])+               return 'REGEX_SET';
-<set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 "|"                                     return '|';
 // "["("\\\\"|"\]"|[^\]])*"]"            return 'ANY_GROUP_REGEX';
 "(?:"                                   return 'SPECIAL_GROUP';
@@ -120,6 +118,10 @@ BR                                      \r\n|\n|\r
 "}"                                     return '}';
 .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
 <*><<EOF>>                              return 'EOF';
+
+
+<set>("\\\\"|"\]"|[^\]])+               return 'REGEX_SET';
+<set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
 // in the trailing CODE block, only accept these `%include` macros when they appear at the start of a line
