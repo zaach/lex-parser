@@ -8,7 +8,8 @@
 
   Parser.prototype: {
     yy: {},
-    trace: function(),
+    trace: function(errorMessage, errorHash),
+    JisonParserError: function(msg, hash),
     symbols_: {associative list: name ==> number},
     terminals_: {associative list: number ==> name},
     productions_: [...],
@@ -21,11 +22,14 @@
 
     lexer: {
         EOF: 1,
+        ERROR: 2,
+        JisonLexerError: function(msg, hash),
         parseError: function(str, hash),
         setInput: function(input),
         input: function(),
         unput: function(str),
         more: function(),
+        reject: function(),
         less: function(n),
         pastInput: function(),
         upcomingInput: function(),
@@ -117,14 +121,29 @@
   }
 */
 var lexParser = (function () {
-var __expand__ = function (k, v, o) {
+// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+function JisonParserError(msg, hash) {
+    this.message = msg;
+    this.hash = hash;
+    var stacktrace = (new Error()).stack;
+    if (stacktrace) {
+      this.stack = stacktrace;
+    }
+}
+JisonParserError.prototype = Object.create(Error.prototype);
+JisonParserError.prototype.constructor = JisonParserError;
+JisonParserError.prototype.name = 'JisonParserError';
+
+function __expand__(k, v, o) {
   o = o || {};
   for (var l = k.length; l--; ) {
     o[k[l]] = v;
   }
   return o;
-},
-    $V0=[6,12,14,16,18,64],
+}
+
+var $V0=[6,12,14,16,18,64],
     $V1=[18,25,36,39,41,44,45,49,50,51,54,55,60,62,63],
     $V2=[6,12,14,16,18,25,36,40,64],
     $V3=[6,12,14,16,18,25,36,39,40,41,44,45,49,50,51,54,55,60,62,63,64],
@@ -136,8 +155,10 @@ var __expand__ = function (k, v, o) {
     $V9=[54,57],
     $Va=[9,71],
     $Vb=[25,27];
+
 var parser = {
 trace: function trace() { },
+JisonParserError: JisonParserError,
 yy: {},
 symbols_: {
   "error": 2,
@@ -2218,13 +2239,7 @@ parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
     } else {
-        function _parseError (msg, hash) {
-            this.message = msg;
-            this.hash = hash;
-        }
-        _parseError.prototype = new Error();
-
-        throw new _parseError(str, hash);
+        throw new this.JisonParserError(str, hash);
     }
 },
 parse: function parse(input) {
@@ -2238,7 +2253,6 @@ parse: function parse(input) {
         yylineno = 0,
         yyleng = 0,
         recovering = 0,     // (only used when the grammar contains error recovery rules)
-        error_signaled = false,
         TERROR = 2,
         EOF = 1;
 
@@ -2382,7 +2396,6 @@ parse: function parse(input) {
                                  (symbol === EOF ? 'end of input' :
                                   ("'" + (this.terminals_[symbol] || symbol) + "'"));
                     }
-                    error_signaled = true;
                     a = this.parseError(errStr, p = {
                         text: lexer.match,
                         token: this.terminals_[symbol] || symbol,
@@ -2402,7 +2415,6 @@ parse: function parse(input) {
                 // just recovered from another error
                 if (recovering === 3) {
                     if (symbol === EOF || preErrorSymbol === EOF) {
-                        error_signaled = true;
                         retval = this.parseError(errStr || 'Parsing halted while starting to recover from another error.', {
                             text: lexer.match,
                             token: this.terminals_[symbol] || symbol,
@@ -2424,7 +2436,6 @@ parse: function parse(input) {
 
                 // try to recover from error
                 if (error_rule_depth === false) {
-                    error_signaled = true;
                     retval = this.parseError(errStr || 'Parsing halted. No suitable error recovery rule available.', {
                         text: lexer.match,
                         token: this.terminals_[symbol] || symbol,
@@ -2447,7 +2458,6 @@ parse: function parse(input) {
 
             // this shouldn't happen, unless resolve defaults are off
             if (action[0] instanceof Array && action.length > 1) {
-                error_signaled = true;
                 retval = this.parseError('Parse Error: multiple actions possible at state: ' + state + ', token: ' + symbol, {
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
@@ -2509,7 +2519,6 @@ parse: function parse(input) {
 
                 if (typeof r !== 'undefined') {
                     retval = r;
-                    error_signaled = true;
                     break;
                 }
 
@@ -2529,14 +2538,10 @@ parse: function parse(input) {
             case 3:
                 // accept
                 retval = true;
-                error_signaled = true;
                 break;
             }
 
             // break out of loop: we accept or fail with error
-            if (!error_signaled) {
-                // b0rk b0rk b0rk!
-            }
             break;
         }
     } finally {
@@ -2571,6 +2576,20 @@ function prepareString (s) {
 
 /* generated by jison-lex 0.3.4 */
 var lexer = (function () {
+// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+// http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+function JisonLexerError(msg, hash) {
+    this.message = msg;
+    this.hash = hash;
+    var stacktrace = (new Error()).stack;
+    if (stacktrace) {
+      this.stack = stacktrace;
+    }
+}
+JisonLexerError.prototype = Object.create(Error.prototype);
+JisonLexerError.prototype.constructor = JisonLexerError;
+JisonLexerError.prototype.name = 'JisonLexerError';
+
 var lexer = ({
 
 EOF:1,
@@ -2581,7 +2600,7 @@ parseError:function parseError(str, hash) {
         if (this.yy.parser) {
             return this.yy.parser.parseError(str, hash) || this.ERROR;
         } else {
-            throw new Error(str);
+            throw new this.JisonLexerError(str);
         }
     },
 
@@ -2965,6 +2984,7 @@ options: {
   "easy_keyword_rules": true,
   "ranges": true
 },
+JisonLexerError: JisonLexerError,
 performAction: function anonymous(yy, yy_, $avoiding_name_collisions, YY_START) {
 
 var YYSTATE = YY_START;
@@ -3723,6 +3743,7 @@ conditions: {
   }
 }
 });
+// lexer.JisonLexerError = JisonLexerError;
 return lexer;
 })();
 parser.lexer = lexer;
@@ -3732,6 +3753,7 @@ function Parser () {
 }
 Parser.prototype = parser;
 parser.Parser = Parser;
+// parser.JisonParserError = JisonParserError;
 
 return new Parser();
 })();
