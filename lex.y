@@ -9,7 +9,7 @@
 %%
 
 lex
-    : definitions '%%' rules epilogue
+    : init definitions '%%' rules epilogue
         {
           $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
@@ -30,26 +30,30 @@ epilogue
       { $$ = $extra_lexer_module_code; }
     ;
 
+// because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
+init
+    :
+        { yy.actionInclude = ''; }
+    ;
+
 definitions
     : definition definitions
         {
           $$ = $definitions;
-          if ('length' in $definition) {
-            $$[0] = $$[0] || {};
-            $$[0][$definition[0]] = $definition[1];
-          } else {
-            $$[1] = $$[1] || {};
-            for (var name in $definition) {
-              $$[1][name] = $definition[name];
+          if ($definition != null) {
+            if ('length' in $definition) {
+              $$[0] = $$[0] || {};
+              $$[0][$definition[0]] = $definition[1];
+            } else {
+              $$[1] = $$[1] || {};
+              for (var name in $definition) {
+                $$[1][name] = $definition[name];
+              }
             }
           }
         }
-    | ACTION definitions
-        { yy.actionInclude += $ACTION; $$ = $definitions; }
-    | include_macro_code definitions
-        { yy.actionInclude += $include_macro_code; $$ = $definitions; }
     |
-        { yy.actionInclude = ''; $$ = [null, null]; }
+        { $$ = [null, null]; }
     ;
 
 definition
@@ -59,6 +63,12 @@ definition
         { $$ = $names_inclusive; }
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
+    | ACTION
+        { yy.actionInclude += $ACTION; $$ = null; }
+    | include_macro_code
+        { yy.actionInclude += $include_macro_code; $$ = null; }
+    | options
+        { $$ = null; }
     ;
 
 names_inclusive
@@ -113,7 +123,6 @@ action_comments_body
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
     ;
-
 
 start_conditions
     : '<' name_list '>'
@@ -190,8 +199,8 @@ name_expansion
     ;
 
 any_group_regex
-    : ANY_GROUP_REGEX
-        { $$ = $ANY_GROUP_REGEX; }
+    : REGEX_SET_START REGEX_SET REGEX_SET_END
+        { $$ = $REGEX_SET_START + $REGEX_SET + $REGEX_SET_END; }
     ;
 
 escape_char
@@ -208,6 +217,24 @@ string
     : STRING_LIT
         { $$ = prepareString($STRING_LIT.substr(1, $STRING_LIT.length - 2)); }
     | CHARACTER_LIT
+    ;
+
+options
+    : OPTIONS option_list OPTIONS_END
+    ;
+
+option_list
+    : option option_list
+    | option
+    ;
+
+option
+    : NAME[option]
+        { yy.options[$option] = true; }
+    | NAME[option] '=' OPTION_VALUE[value]
+        { yy.options[$option] = $value; }
+    | NAME[option] '=' NAME[value]
+        { yy.options[$option] = $value; }
     ;
 
 extra_lexer_module_code

@@ -3,7 +3,7 @@ NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
 BR                                      \r\n|\n|\r
 
 %s indented trail rules
-%x code start_condition options conditions action path
+%x code start_condition options conditions action path set
 
 %options easy_keyword_rules
 %options ranges
@@ -31,9 +31,13 @@ BR                                      \r\n|\n|\r
 <rules>"%%"                             this.begin('code'); return '%%';
 <rules>[a-zA-Z0-9_]+                    return 'CHARACTER_LIT';
 
-<options>{NAME}                         yy.options[yytext] = true;
-<options>{BR}+                          this.popState();
-<options>\s+{BR}+                       this.popState();
+<options>{NAME}                         return 'NAME';
+<options>"="                            return '=';
+<options>\"("\\\\"|'\"'|[^"])*\"        yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
+<options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
+<options>[^\s\r\n]+                     return 'OPTION_VALUE';
+<options>{BR}+                          this.popState(); return 'OPTIONS_END';
+<options>\s+{BR}+                       this.popState(); return 'OPTIONS_END';
 <options>\s+                            /* empty */
 
 <start_condition>{NAME}                 return 'START_COND';
@@ -75,8 +79,11 @@ BR                                      \r\n|\n|\r
 {NAME}                                  return 'NAME';
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
+"["                                     this.pushState('set'); return 'REGEX_SET_START';
+<set>("\\\\"|"\]"|[^\]])+               return 'REGEX_SET';
+<set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 "|"                                     return '|';
-"["("\\\\"|"\]"|[^\]])*"]"              return 'ANY_GROUP_REGEX';
+// "["("\\\\"|"\]"|[^\]])*"]"            return 'ANY_GROUP_REGEX';
 "(?:"                                   return 'SPECIAL_GROUP';
 "(?="                                   return 'SPECIAL_GROUP';
 "(?!"                                   return 'SPECIAL_GROUP';
@@ -89,14 +96,14 @@ BR                                      \r\n|\n|\r
 ","                                     return ',';
 "<<EOF>>"                               return '$';
 "<"                                     this.begin('conditions'); return '<';
-"/!"                                    return '/!';
-"/"                                     return '/';
+"/!"                                    return '/!';                    // treated as `(?!atom)`
+"/"                                     return '/';                     // treated as `(?=atom)` 
 "\\"([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|"c"[A-Z]|"x"[0-9A-F]{2}|"u"[a-fA-F0-9]{4})
                                         return 'ESCAPE_CHAR';
 "\\".                                   yytext = yytext.replace(/^\\/g, ''); return 'ESCAPE_CHAR';
 "$"                                     return '$';
 "."                                     return '.';
-"%options"                              if (!yy.options) { yy.options = {}; } this.begin('options'); return false;
+"%options"                              if (!yy.options) { yy.options = {}; } this.begin('options'); return 'OPTIONS';
 "%s"                                    this.begin('start_condition'); return 'START_INC';
 "%x"                                    this.begin('start_condition'); return 'START_EXC';
 <INITIAL,trail,code>"%include"          this.pushState('path'); return 'INCLUDE';
@@ -108,6 +115,7 @@ BR                                      \r\n|\n|\r
 "%%"                                    this.begin('rules'); return '%%';
 "{"\d+(","\s?\d+|",")?"}"               return 'RANGE_REGEX';
 "{"{NAME}"}"                            return 'NAME_BRACE';
+<set,options>"{"{NAME}"}"               return 'NAME_BRACE';
 "{"                                     return '{';
 "}"                                     return '}';
 .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */

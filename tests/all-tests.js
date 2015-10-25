@@ -350,6 +350,41 @@ exports["test options"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test options with values"] = function () {
+    var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\'\n%%\n"foo" return 1;';
+    var expected = {
+        rules: [
+            ["foo", "return 1;"]
+        ],
+        options: {
+            ping: "666",
+            bla: "blub",
+            bool1: true,
+            s1: "s1value",
+            s2: "s2value"
+        }
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
+exports["test options with string values which have embedded quotes"] = function () {
+    var lexgrammar = '%options s1="s1\\"val\'ue" s2=\'s2\\\\x\\\'val\"ue\'\n%%\n"foo" return 1;';
+    var expected = {
+        rules: [
+            ["foo", "return 1;"]
+        ],
+        options: {
+            s1: "s1\\\"val'ue",
+            s2: "s2\\\\x\\'val\"ue"
+        }
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test unquoted string rules"] = function () {
     var lexgrammar = "%%\nfoo* return 1";
     var expected = {
