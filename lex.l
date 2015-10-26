@@ -1,5 +1,6 @@
 
 NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
+ID                                      [a-zA-Z_][a-zA-Z0-9_]*
 BR                                      \r\n|\n|\r
 
 %s indented trail rules
@@ -40,7 +41,7 @@ BR                                      \r\n|\n|\r
 <options>\s+{BR}+                       this.popState(); return 'OPTIONS_END';
 <options>\s+                            /* empty */
 
-<start_condition>{NAME}                 return 'START_COND';
+<start_condition>{ID}                   return 'START_COND';
 <start_condition>{BR}+                  this.popState();
 <start_condition>\s+{BR}+               this.popState();
 <start_condition>\s+                    /* empty */
@@ -76,7 +77,7 @@ BR                                      \r\n|\n|\r
 
 {BR}+                                   /* empty */
 \s+                                     /* empty */
-{NAME}                                  return 'NAME';
+{ID}                                    return 'NAME';
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
@@ -112,8 +113,8 @@ BR                                      \r\n|\n|\r
                                         %}
 "%%"                                    this.begin('rules'); return '%%';
 "{"\d+(","\s?\d+|",")?"}"               return 'RANGE_REGEX';
-"{"{NAME}"}"                            return 'NAME_BRACE';
-<set,options>"{"{NAME}"}"               return 'NAME_BRACE';
+"{"{ID}"}"                              return 'NAME_BRACE';
+<set,options>"{"{ID}"}"                 return 'NAME_BRACE';
 "{"                                     return '{';
 "}"                                     return '}';
 .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
@@ -136,7 +137,7 @@ BR                                      \r\n|\n|\r
 <path>\s+                               // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
-<*>.                    %{ 
+<*>.                                    %{ 
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                         %}
