@@ -350,6 +350,19 @@ exports["test options"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test if %options names with a hyphen are correctly recognized"] = function () {
+    var lexgrammar = '%options token-stack\n%%\n"foo" return 1;';
+    var expected = {
+        rules: [
+            ["foo", "return 1;"]
+        ],
+        options: {"token-stack": true}
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test options with values"] = function () {
     var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\'\n%%\n"foo" return 1;';
     var expected = {
