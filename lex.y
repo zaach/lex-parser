@@ -14,6 +14,7 @@ lex
           $$ = { rules: $rules };
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
+          if ($definitions[2]) $$.unknownDecls = $definitions[2];
           if ($epilogue && $epilogue.trim() !== '') $$.moduleInclude = $epilogue;
           if (yy.options) $$.options = yy.options;
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
@@ -44,11 +45,14 @@ definitions
             if ('length' in $definition) {
               $$[0] = $$[0] || {};
               $$[0][$definition[0]] = $definition[1];
-            } else {
+            } else if ($definition.type === 'names') {
               $$[1] = $$[1] || {};
-              for (var name in $definition) {
-                $$[1][name] = $definition[name];
+              for (var name in $definition.names) {
+                $$[1][name] = $definition.names[name];
               }
+            } else if ($definition.type === 'unknown') {
+              $$[2] = $$[2] || [];
+              $$[2].push($definition.body);
             }
           }
         }
@@ -69,20 +73,22 @@ definition
         { yy.actionInclude += $include_macro_code; $$ = null; }
     | options
         { $$ = null; }
+    | UNKNOWN_DECL
+        { $$ = {type: 'unknown', body: $1}; }
     ;
 
 names_inclusive
     : START_COND
-        { $$ = {}; $$[$START_COND] = 0; }
+        { $$ = {type: 'names', names: {}}; $$.names[$START_COND] = 0; }
     | names_inclusive START_COND
-        { $$ = $names_inclusive; $$[$START_COND] = 0; }
+        { $$ = $names_inclusive; $$.names[$START_COND] = 0; }
     ;
 
 names_exclusive
     : START_COND
-        { $$ = {}; $$[$START_COND] = 1; }
+        { $$ = {type: 'names', names: {}}; $$.names[$START_COND] = 1; }
     | names_exclusive START_COND
-        { $$ = $names_exclusive; $$[$START_COND] = 1; }
+        { $$ = $names_exclusive; $$.names[$START_COND] = 1; }
     ;
 
 rules

@@ -223,6 +223,22 @@ exports["test start conditions"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test unknown declarations"] = function () {
+    var lexgrammar = '%a b c\n%foo[bar] baz qux\n%a b c\n%%\n. //';
+    var expected = {
+        unknownDecls: [
+            '%a b c',
+            '%foo[bar] baz qux',
+            '%a b c'
+        ],
+        rules: [
+            ['.', '//']
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "unknown declarations should be parsed correctly");
+};
+
 exports["test no brace action"] = function () {
     var lexgrammar = '%%\n"["[^\\]]"]" return true;\n"x" return 1;';
     var expected = {

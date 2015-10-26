@@ -110,6 +110,7 @@ BR                                      \r\n|\n|\r
                                         %{ 
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer option: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            return 'UNKNOWN_DECL';
                                         %}
 "%%"                                    this.begin('rules'); return '%%';
 "{"\d+(","\s?\d+|",")?"}"               return 'RANGE_REGEX';
