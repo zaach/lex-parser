@@ -3226,7 +3226,7 @@ case 67 :
 /*! Rule::       %{NAME}[^\r\n]+ */ 
   
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer option: ', yy_.yytext, ' @ ' + JSON.stringify(yy_.yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            console.warn('ignoring unsupported lexer option: ', yy_.yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                             return 21;
                                          
 break;

@@ -109,7 +109,7 @@ BR                                      \r\n|\n|\r
 <INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+                       
                                         %{ 
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer option: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            console.warn('ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                             return 'UNKNOWN_DECL';
                                         %}
 "%%"                                    this.begin('rules'); return '%%';
