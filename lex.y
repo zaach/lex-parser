@@ -113,19 +113,15 @@ action
     ;
 
 action_body
-    :
-        { $$ = ''; }
-    | action_comments_body
+    : action_comments_body
         { $$ = $action_comments_body; }
     | action_body '{' action_body '}' action_comments_body
         { $$ = $1 + $2 + $3 + $4 + $5; }
-    | action_body '{' action_body '}'
-        { $$ = $1 + $2 + $3 + $4; }
     ;
 
 action_comments_body
-    : ACTION_BODY
-        { $$ = $ACTION_BODY; }
+    :
+        { $$ = ''; }
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
     ;
@@ -264,15 +260,15 @@ extra_lexer_module_code
 
 include_macro_code
     : INCLUDE PATH
-        { 
+        {
             var fs = require('fs');
             var fileContent = fs.readFileSync($PATH, { encoding: 'utf-8' });
             // And no, we don't support nested '%include':
             $$ = '\n// Included by Jison: ' + $PATH + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $PATH + '\n\n';
         }
     | INCLUDE error
-        { 
-            console.error("%include MUST be followed by a valid file path"); 
+        {
+            console.error("%include MUST be followed by a valid file path");
         }
     ;
 
