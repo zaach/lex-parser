@@ -16,7 +16,12 @@ lex
           if ($definitions[1]) $$.startConditions = $definitions[1];
           if ($definitions[2]) $$.unknownDecls = $definitions[2];
           if ($epilogue && $epilogue.trim() !== '') $$.moduleInclude = $epilogue;
-          if (yy.options) $$.options = yy.options;
+          // if there are any options, add them all, otherwise set options to NULL:
+          // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
+          for (var k in yy.options) {
+            $$.options = yy.options;
+            break;
+          }
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
@@ -34,7 +39,10 @@ epilogue
 // because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
 init
     :
-        { yy.actionInclude = ''; }
+        {
+            yy.actionInclude = '';
+            if (!yy.options) yy.options = {};
+        }
     ;
 
 definitions

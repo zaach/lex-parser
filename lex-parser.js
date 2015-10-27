@@ -610,7 +610,12 @@ case 1 :
           if ($$[$0-3][1]) this.$.startConditions = $$[$0-3][1];
           if ($$[$0-3][2]) this.$.unknownDecls = $$[$0-3][2];
           if ($$[$0] && $$[$0].trim() !== '') this.$.moduleInclude = $$[$0];
-          if (yy.options) this.$.options = yy.options;
+          // if there are any options, add them all, otherwise set options to NULL:
+          // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
+          for (var k in yy.options) {
+            this.$.options = yy.options;
+            break;
+          }
           if (yy.actionInclude) this.$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
@@ -633,7 +638,10 @@ case 3 :
 break;
 case 4 : 
 /*! Production::     init :  */
-  yy.actionInclude = '';  
+ 
+            yy.actionInclude = '';
+            if (!yy.options) yy.options = {};
+         
 break;
 case 5 : 
 /*! Production::     definitions : definition definitions */
