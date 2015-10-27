@@ -30,8 +30,12 @@ BR                                      \r\n|\n|\r
 <rules>\s+{BR}+                         /* empty */
 <rules>\s+                              this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
-<rules>[a-zA-Z0-9_]+                    return 'CHARACTER_LIT';
-
+<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
+                                        %{                      
+                                            // accept any non-regex, non-lex, non-string-delim, 
+                                            // non-escape-starter, non-space character as-is
+                                            return 'CHARACTER_LIT';
+                                        %}
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
 <options>\"("\\\\"|'\"'|[^"])*\"        yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
@@ -134,7 +138,7 @@ BR                                      \r\n|\n|\r
 
 <path>[\r\n]                            this.popState(); this.unput(yytext);
 <path>"'"[^\r\n]+"'"                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
-<path>\"[^\r\n]+\"                      yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
+<path>'"'[^\r\n]+'"'                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
 <path>\s+                               // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 

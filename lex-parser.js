@@ -3119,6 +3119,15 @@ case 16 :
 /*! Rule::       %% */ 
  this.begin('code'); return 6; 
 break;
+case 17 : 
+/*! Conditions:: rules */ 
+/*! Rule::       [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+ */ 
+                       
+                                            // accept any non-regex, non-lex, non-string-delim, 
+                                            // non-escape-starter, non-space character as-is
+                                            return 64;
+                                         
+break;
 case 20 : 
 /*! Conditions:: options */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
@@ -3265,7 +3274,7 @@ break;
 case 63 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       %options\b */ 
- if (!yy.options) { yy.options = {}; } this.begin('options'); return 65; 
+ this.begin('options'); return 65; 
 break;
 case 64 : 
 /*! Conditions:: indented trail rules INITIAL */ 
@@ -3377,9 +3386,6 @@ simpleCaseActionClusters: {
   /*! Conditions:: conditions */ 
   /*! Rule::       \* */ 
    12 : 34,
-  /*! Conditions:: rules */ 
-  /*! Rule::       [a-zA-Z0-9_]+ */ 
-   17 : 64,
   /*! Conditions:: options */ 
   /*! Rule::       {NAME} */ 
    18 : 12,
@@ -3483,7 +3489,7 @@ rules: [
 /^(?:\s+(\r\n|\n|\r)+)/,
 /^(?:\s+)/,
 /^(?:%%)/,
-/^(?:[a-zA-Z0-9_]+)/,
+/^(?:[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+)/,
 /^(?:([a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?))/,
 /^(?:=)/,
 /^(?:"(\\\\|\\"|[^"])*")/,
