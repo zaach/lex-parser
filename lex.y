@@ -9,13 +9,12 @@
 %%
 
 lex
-    : init definitions '%%' rules epilogue
+    : init definitions '%%' rules_and_epilogue
         {
-          $$ = { rules: $rules };
+          $$ = $rules_and_epilogue;
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
           if ($definitions[2]) $$.unknownDecls = $definitions[2];
-          if ($epilogue && $epilogue.trim() !== '') $$.moduleInclude = $epilogue;
           // if there are any options, add them all, otherwise set options to NULL:
           // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
           for (var k in yy.options) {
@@ -29,11 +28,31 @@ lex
         }
     ;
 
-epilogue
-    : EOF
-      { $$ = null; }
+rules_and_epilogue
+    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ EOF
+      {
+        $$ = { rules: null };
+      }
     | '%%' extra_lexer_module_code EOF
-      { $$ = $extra_lexer_module_code; }
+      {
+        if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
+          $$ = { rules: null, moduleInclude: $extra_lexer_module_code };
+        } else {
+          $$ = { rules: null };
+        }
+      }
+    | rules '%%' extra_lexer_module_code EOF
+      {
+        if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
+          $$ = { rules: $rules, moduleInclude: $extra_lexer_module_code };
+        } else {
+          $$ = { rules: $rules };
+        }
+      }
+    | rules EOF
+      {
+        $$ = { rules: $rules };
+      }
     ;
 
 // because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
