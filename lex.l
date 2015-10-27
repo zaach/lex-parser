@@ -102,7 +102,7 @@ BR                                      \r\n|\n|\r
 "\\".                                   yytext = yytext.replace(/^\\/g, ''); return 'ESCAPE_CHAR';
 "$"                                     return '$';
 "."                                     return '.';
-"%options"                              if (!yy.options) { yy.options = {}; } this.begin('options'); return 'OPTIONS';
+"%options"                              this.begin('options'); return 'OPTIONS';
 "%s"                                    this.begin('start_condition'); return 'START_INC';
 "%x"                                    this.begin('start_condition'); return 'START_EXC';
 <INITIAL,trail,code>"%include"          this.pushState('path'); return 'INCLUDE';
