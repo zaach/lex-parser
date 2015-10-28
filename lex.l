@@ -31,8 +31,8 @@ BR                                      \r\n|\n|\r
 <rules>\s+                              this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
 <rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
-                                        %{                      
-                                            // accept any non-regex, non-lex, non-string-delim, 
+                                        %{
+                                            // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
                                             return 'CHARACTER_LIT';
                                         %}
@@ -56,9 +56,9 @@ BR                                      \r\n|\n|\r
 <indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 "%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 <indented>"%include"                    %{
-                                            // This is an include instruction in place of an action: 
-                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate 
-                                            // the `%include` token recognition here vs. the almost-identical rule for the same 
+                                            // This is an include instruction in place of an action:
+                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
+                                            // the `%include` token recognition here vs. the almost-identical rule for the same
                                             // further below.
                                             // There's no real harm as we need to do something special in this case anyway:
                                             // push 2 (two!) conditions.
@@ -69,11 +69,11 @@ BR                                      \r\n|\n|\r
                                             // and finally it hit me what the *F* went wrong, after which I saw I needed to add *this* rule!)
 
                                             // first push the 'trail' condition which will be the follow-up after we're done parsing the path parameter...
-                                            this.pushState('trail'); 
+                                            this.pushState('trail');
                                             // then push the immediate need: the 'path' condition.
-                                            this.pushState('path'); 
+                                            this.pushState('path');
                                             return 'INCLUDE';
-                                        %} 
+                                        %}
 <indented>.+                            this.begin('rules'); return 'ACTION';
 
 "/*"(.|\n|\r)*?"*/"                     /* ignore */
@@ -100,7 +100,7 @@ BR                                      \r\n|\n|\r
 "<<EOF>>"                               return '$';
 "<"                                     this.begin('conditions'); return '<';
 "/!"                                    return '/!';                    // treated as `(?!atom)`
-"/"                                     return '/';                     // treated as `(?=atom)` 
+"/"                                     return '/';                     // treated as `(?=atom)`
 "\\"([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|"c"[A-Z]|"x"[0-9A-F]{2}|"u"[a-fA-F0-9]{4})
                                         return 'ESCAPE_CHAR';
 "\\".                                   yytext = yytext.replace(/^\\/g, ''); return 'ESCAPE_CHAR';
@@ -110,8 +110,8 @@ BR                                      \r\n|\n|\r
 "%s"                                    this.begin('start_condition'); return 'START_INC';
 "%x"                                    this.begin('start_condition'); return 'START_EXC';
 <INITIAL,trail,code>"%include"          this.pushState('path'); return 'INCLUDE';
-<INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+                       
-                                        %{ 
+<INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+
+                                        %{
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                             return 'UNKNOWN_DECL';
@@ -142,7 +142,7 @@ BR                                      \r\n|\n|\r
 <path>\s+                               // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
-<*>.                                    %{ 
+<*>.                                    %{
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                         %}

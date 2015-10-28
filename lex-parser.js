@@ -3122,8 +3122,8 @@ break;
 case 17 : 
 /*! Conditions:: rules */ 
 /*! Rule::       [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+ */ 
-                       
-                                            // accept any non-regex, non-lex, non-string-delim, 
+ 
+                                            // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
                                             return 64;
                                          
@@ -3191,9 +3191,9 @@ case 34 :
 /*! Conditions:: indented */ 
 /*! Rule::       %include\b */ 
  
-                                            // This is an include instruction in place of an action: 
-                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate 
-                                            // the `%include` token recognition here vs. the almost-identical rule for the same 
+                                            // This is an include instruction in place of an action:
+                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
+                                            // the `%include` token recognition here vs. the almost-identical rule for the same
                                             // further below.
                                             // There's no real harm as we need to do something special in this case anyway:
                                             // push 2 (two!) conditions.
@@ -3204,9 +3204,9 @@ case 34 :
                                             // and finally it hit me what the *F* went wrong, after which I saw I needed to add *this* rule!)
 
                                             // first push the 'trail' condition which will be the follow-up after we're done parsing the path parameter...
-                                            this.pushState('trail'); 
+                                            this.pushState('trail');
                                             // then push the immediate need: the 'path' condition.
-                                            this.pushState('path'); 
+                                            this.pushState('path');
                                             return 72;
                                          
 case 35 : 
@@ -3262,7 +3262,7 @@ break;
 case 58 : 
 /*! Conditions:: indented trail rules INITIAL */ 
 /*! Rule::       \/ */ 
- return 45;                     // treated as `(?=atom)`  
+ return 45;                     // treated as `(?=atom)` 
 break;
 case 60 : 
 /*! Conditions:: indented trail rules INITIAL */ 
@@ -3292,7 +3292,7 @@ break;
 case 67 : 
 /*! Conditions:: INITIAL rules trail code */ 
 /*! Rule::       %{NAME}[^\r\n]+ */ 
-  
+ 
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer option: ', yy_.yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                             return 21;
@@ -3345,7 +3345,7 @@ break;
 case 85 : 
 /*! Conditions:: * */ 
 /*! Rule::       . */ 
-  
+ 
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer input: ', yy_.yytext, ' @ ' + JSON.stringify(yy_.yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                          
