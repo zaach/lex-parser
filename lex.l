@@ -86,7 +86,6 @@ BR                                      \r\n|\n|\r
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
 "|"                                     return '|';
-// "["("\\\\"|"\]"|[^\]])*"]"            return 'ANY_GROUP_REGEX';
 "(?:"                                   return 'SPECIAL_GROUP';
 "(?="                                   return 'SPECIAL_GROUP';
 "(?!"                                   return 'SPECIAL_GROUP';
@@ -126,7 +125,8 @@ BR                                      \r\n|\n|\r
 <*><<EOF>>                              return 'EOF';
 
 
-<set>("\\\\"|"\]"|[^\]])+               return 'REGEX_SET';
+<set>("\\\\"|"\]"|[^\]{])+              return 'REGEX_SET';
+<set>"{"                                return 'REGEX_SET';
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
