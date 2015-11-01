@@ -31,14 +31,14 @@ lex
 rules_and_epilogue
     : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ EOF
       {
-        $$ = { rules: null };
+        $$ = { rules: [] };
       }
     | '%%' extra_lexer_module_code EOF
       {
         if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
-          $$ = { rules: null, moduleInclude: $extra_lexer_module_code };
+          $$ = { rules: [], moduleInclude: $extra_lexer_module_code };
         } else {
-          $$ = { rules: null };
+          $$ = { rules: [] };
         }
       }
     | rules '%%' extra_lexer_module_code EOF

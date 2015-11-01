@@ -650,16 +650,16 @@ break;
 case 2 : 
 /*! Production::     rules_and_epilogue : EOF */
  
-        this.$ = { rules: null };
+        this.$ = { rules: [] };
        
 break;
 case 3 : 
 /*! Production::     rules_and_epilogue : '%%' extra_lexer_module_code EOF */
  
         if ($$[$0-1] && $$[$0-1].trim() !== '') {
-          this.$ = { rules: null, moduleInclude: $$[$0-1] };
+          this.$ = { rules: [], moduleInclude: $$[$0-1] };
         } else {
-          this.$ = { rules: null };
+          this.$ = { rules: [] };
         }
        
 break;
