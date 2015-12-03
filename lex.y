@@ -9,13 +9,18 @@
 %%
 
 lex
-    : init definitions '%%' rules epilogue
+    : init definitions '%%' rules_and_epilogue
         {
-          $$ = { rules: $rules };
+          $$ = $rules_and_epilogue;
           if ($definitions[0]) $$.macros = $definitions[0];
           if ($definitions[1]) $$.startConditions = $definitions[1];
-          if ($epilogue && $epilogue.trim() !== '') $$.moduleInclude = $epilogue;
-          if (yy.options) $$.options = yy.options;
+          if ($definitions[2]) $$.unknownDecls = $definitions[2];
+          // if there are any options, add them all, otherwise set options to NULL:
+          // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
+          for (var k in yy.options) {
+            $$.options = yy.options;
+            break;
+          }
           if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
           delete yy.options;
           delete yy.actionInclude;
@@ -23,17 +28,40 @@ lex
         }
     ;
 
-epilogue
-    : EOF
-      { $$ = null; }
+rules_and_epilogue
+    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ EOF
+      {
+        $$ = { rules: [] };
+      }
     | '%%' extra_lexer_module_code EOF
-      { $$ = $extra_lexer_module_code; }
+      {
+        if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
+          $$ = { rules: [], moduleInclude: $extra_lexer_module_code };
+        } else {
+          $$ = { rules: [] };
+        }
+      }
+    | rules '%%' extra_lexer_module_code EOF
+      {
+        if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
+          $$ = { rules: $rules, moduleInclude: $extra_lexer_module_code };
+        } else {
+          $$ = { rules: $rules };
+        }
+      }
+    | rules EOF
+      {
+        $$ = { rules: $rules };
+      }
     ;
 
 // because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
 init
     :
-        { yy.actionInclude = ''; }
+        {
+            yy.actionInclude = '';
+            if (!yy.options) yy.options = {};
+        }
     ;
 
 definitions
@@ -44,11 +72,14 @@ definitions
             if ('length' in $definition) {
               $$[0] = $$[0] || {};
               $$[0][$definition[0]] = $definition[1];
-            } else {
+            } else if ($definition.type === 'names') {
               $$[1] = $$[1] || {};
-              for (var name in $definition) {
-                $$[1][name] = $definition[name];
+              for (var name in $definition.names) {
+                $$[1][name] = $definition.names[name];
               }
+            } else if ($definition.type === 'unknown') {
+              $$[2] = $$[2] || [];
+              $$[2].push($definition.body);
             }
           }
         }
@@ -69,20 +100,22 @@ definition
         { yy.actionInclude += $include_macro_code; $$ = null; }
     | options
         { $$ = null; }
+    | UNKNOWN_DECL
+        { $$ = {type: 'unknown', body: $1}; }
     ;
 
 names_inclusive
     : START_COND
-        { $$ = {}; $$[$START_COND] = 0; }
+        { $$ = {type: 'names', names: {}}; $$.names[$START_COND] = 0; }
     | names_inclusive START_COND
-        { $$ = $names_inclusive; $$[$START_COND] = 0; }
+        { $$ = $names_inclusive; $$.names[$START_COND] = 0; }
     ;
 
 names_exclusive
     : START_COND
-        { $$ = {}; $$[$START_COND] = 1; }
+        { $$ = {type: 'names', names: {}}; $$.names[$START_COND] = 1; }
     | names_exclusive START_COND
-        { $$ = $names_exclusive; $$[$START_COND] = 1; }
+        { $$ = $names_exclusive; $$.names[$START_COND] = 1; }
     ;
 
 rules
@@ -107,19 +140,15 @@ action
     ;
 
 action_body
-    :
-        { $$ = ''; }
-    | action_comments_body
+    : action_comments_body
         { $$ = $action_comments_body; }
     | action_body '{' action_body '}' action_comments_body
         { $$ = $1 + $2 + $3 + $4 + $5; }
-    | action_body '{' action_body '}'
-        { $$ = $1 + $2 + $3 + $4; }
     ;
 
 action_comments_body
-    : ACTION_BODY
-        { $$ = $ACTION_BODY; }
+    :
+        { $$ = ''; }
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
     ;
@@ -258,15 +287,15 @@ extra_lexer_module_code
 
 include_macro_code
     : INCLUDE PATH
-        { 
+        {
             var fs = require('fs');
             var fileContent = fs.readFileSync($PATH, { encoding: 'utf-8' });
             // And no, we don't support nested '%include':
             $$ = '\n// Included by Jison: ' + $PATH + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $PATH + '\n\n';
         }
     | INCLUDE error
-        { 
-            console.error("%include MUST be followed by a valid file path"); 
+        {
+            console.error("%include MUST be followed by a valid file path");
         }
     ;
 

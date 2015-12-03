@@ -22,9 +22,9 @@ function lexer_reset() {
 }
 
 exports["test lex grammar with macros"] = function () {
-    var lexgrammar = 'D [0-9]\nID [a-zA-Z][a-zA-Z0-9]+\n%%\n\n{D}"ohhai" {print(9);}\n"{" return \'{\';';
+    var lexgrammar = 'D [0-9]\nID [a-zA-Z_][a-zA-Z0-9_]+\n%%\n\n{D}"ohhai" {print(9);}\n"{" return \'{\';';
     var expected = {
-        macros: {"D": "[0-9]", "ID": "[a-zA-Z][a-zA-Z0-9]+"},
+        macros: {"D": "[0-9]", "ID": "[a-zA-Z_][a-zA-Z0-9_]+"},
         rules: [
             ["{D}ohhai", "print(9);"],
             ["\\{", "return '{';"]
@@ -223,6 +223,22 @@ exports["test start conditions"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test unknown declarations"] = function () {
+    var lexgrammar = '%a b c\n%foo[bar] baz qux\n%a b c\n%%\n. //';
+    var expected = {
+        unknownDecls: [
+            '%a b c',
+            '%foo[bar] baz qux',
+            '%a b c'
+        ],
+        rules: [
+            ['.', '//']
+        ]
+    };
+
+    assert.deepEqual(lex.parse(lexgrammar), expected, "unknown declarations should be parsed correctly");
+};
+
 exports["test no brace action"] = function () {
     var lexgrammar = '%%\n"["[^\\]]"]" return true;\n"x" return 1;';
     var expected = {
@@ -344,6 +360,19 @@ exports["test options"] = function () {
             ["foo", "return 1;"]
         ],
         options: {flex: true}
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
+exports["test if %options names with a hyphen are correctly recognized"] = function () {
+    var lexgrammar = '%options token-stack\n%%\n"foo" return 1;';
+    var expected = {
+        rules: [
+            ["foo", "return 1;"]
+        ],
+        options: {"token-stack": true}
     };
 
     lexer_reset();
