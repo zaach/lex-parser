@@ -60,6 +60,10 @@ init
     :
         {
             yy.actionInclude = '';
+            console.log('yy/options: ', {
+                yyoptions: yy.options,
+                lexeroptions: yy.lexer && yy.lexer.options
+            });
             if (!yy.options) yy.options = {};
         }
     ;
@@ -172,7 +176,7 @@ regex
     : regex_list
         {
           $$ = $regex_list;
-          if (yy.options && yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
+          if (yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
               $$ += "\\b";
           }
         }
@@ -241,7 +245,19 @@ regex_set
 regex_set_atom
     : REGEX_SET
     | name_expansion
-        { $$ = '{[' + $name_expansion + ']}'; }
+        { 
+            console.log('LEXED NAME: ', {
+                name: $name_expansion.replace(/[{}]/g, ''),
+                is_unicode_slug: XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')),
+                upcheck: $name_expansion.toUpperCase() !== $name_expansion
+            });
+            if ((yy.options.xregexp || 1) && XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) && $name_expansion.toUpperCase() !== $name_expansion) {
+                // treat this as part of an XRegExp `\p{...}` Unicode slug:
+                $$ = $name_expansion;
+            } else {
+                $$ = '{[' + $name_expansion + ']}';
+            }
+        }
     ;
 
 escape_char
@@ -315,8 +331,10 @@ optional_module_code_chunk
 
 %%
 
+var XRegExp = require('xregexp');
+
 function encodeRE (s) {
-    return s.replace(/([.*+?^${}()|[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
+    return s.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
 }
 
 function prepareString (s) {
