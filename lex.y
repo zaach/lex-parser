@@ -60,10 +60,6 @@ init
     :
         {
             yy.actionInclude = '';
-            console.log('yy/options: ', {
-                yyoptions: yy.options,
-                lexeroptions: yy.lexer && yy.lexer.options
-            });
             if (!yy.options) yy.options = {};
         }
     ;
@@ -246,12 +242,7 @@ regex_set_atom
     : REGEX_SET
     | name_expansion
         { 
-            console.log('LEXED NAME: ', {
-                name: $name_expansion.replace(/[{}]/g, ''),
-                is_unicode_slug: XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')),
-                upcheck: $name_expansion.toUpperCase() !== $name_expansion
-            });
-            if ((yy.options.xregexp || 1) && XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) && $name_expansion.toUpperCase() !== $name_expansion) {
+            if (XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) && $name_expansion.toUpperCase() !== $name_expansion) {
                 // treat this as part of an XRegExp `\p{...}` Unicode slug:
                 $$ = $name_expansion;
             } else {

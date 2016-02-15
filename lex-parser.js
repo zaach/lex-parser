@@ -1033,13 +1033,7 @@ case 58 :
 break;
 case 62 : 
 /*! Production::     regex_set_atom : name_expansion */
-  
-            console.log('LEXED NAME: ', {
-                name: $$[$0].replace(/[{}]/g, ''),
-                is_unicode_slug: XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')),
-                upcheck: $$[$0].toUpperCase() !== $$[$0]
-            });
-            if ((yy.options.xregexp || 1) && XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) && $$[$0].toUpperCase() !== $$[$0]) {
+            if (XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) && $$[$0].toUpperCase() !== $$[$0]) {
                 // treat this as part of an XRegExp `\p{...}` Unicode slug:
                 this.$ = $$[$0];
             } else {
