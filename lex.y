@@ -21,7 +21,13 @@ lex
             $$.options = yy.options;
             break;
           }
-          if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
+          if (yy.actionInclude) {
+            var asrc = yy.actionInclude.join('\n\n');
+            // Only a non-empty action code chunk should actually make it through:
+            if (asrc.trim() !== '') {
+              $$.actionInclude = asrc; 
+            }
+          }
           delete yy.options;
           delete yy.actionInclude;
           return $$;
@@ -59,7 +65,7 @@ rules_and_epilogue
 init
     :
         {
-            yy.actionInclude = '';
+            yy.actionInclude = [];
             if (!yy.options) yy.options = {};
         }
     ;
@@ -95,9 +101,9 @@ definition
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
     | ACTION
-        { yy.actionInclude += $ACTION; $$ = null; }
+        { yy.actionInclude.push($ACTION); $$ = null; }
     | include_macro_code
-        { yy.actionInclude += $include_macro_code; $$ = null; }
+        { yy.actionInclude.push($include_macro_code); $$ = null; }
     | options
         { $$ = null; }
     | UNKNOWN_DECL
@@ -334,4 +340,3 @@ function prepareString (s) {
     s = encodeRE(s);
     return s;
 };
-
