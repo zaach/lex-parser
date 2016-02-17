@@ -24,7 +24,10 @@ function lexer_reset() {
 exports["test lex grammar with macros"] = function () {
     var lexgrammar = 'D [0-9]\nID [a-zA-Z_][a-zA-Z0-9_]+\n%%\n\n{D}"ohhai" {print(9);}\n"{" return \'{\';';
     var expected = {
-        macros: {"D": "[0-9]", "ID": "[a-zA-Z_][a-zA-Z0-9_]+"},
+        macros: {
+            "D": "[0-9]", 
+            "ID": "[a-zA-Z_][a-zA-Z0-9_]+"
+        },
         rules: [
             ["{D}ohhai", "print(9);"],
             ["\\{", "return '{';"]
@@ -380,7 +383,7 @@ exports["test if %options names with a hyphen are correctly recognized"] = funct
 };
 
 exports["test options with values"] = function () {
-    var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\'\n%%\n"foo" return 1;';
+    var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\' a-b-c="d"\n%%\n"foo" return 1;';
     var expected = {
         rules: [
             ["foo", "return 1;"]
@@ -390,7 +393,8 @@ exports["test options with values"] = function () {
             bla: "blub",
             bool1: true,
             s1: "s1value",
-            s2: "s2value"
+            s2: "s2value",
+            "a-b-c": "d"            // %option camel-casing is done very late in the game: see Jison.Generator source code.
         }
     };
 
