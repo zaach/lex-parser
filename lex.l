@@ -2,8 +2,12 @@
 NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
 ID                                      [a-zA-Z_][a-zA-Z0-9_]*
 BR                                      \r\n|\n|\r
+// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use that one directly. 
+// Instead we define the {WS} macro here:
+WS                                      [^\S\r\n]
 
-%s indented trail rules
+
+%s indented trail rules macro
 %x code start_condition options conditions action path set
 
 %options easy_keyword_rules
@@ -27,10 +31,10 @@ BR                                      \r\n|\n|\r
 <conditions>"*"                         return '*';
 
 <rules>{BR}+                            /* empty */
-<rules>\s+{BR}+                         /* empty */
+<rules>{WS}+{BR}+                       /* empty */
 <rules>\s+                              this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
-<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
+<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
@@ -42,15 +46,13 @@ BR                                      \r\n|\n|\r
 <options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
 <options>[^\s\r\n]+                     return 'OPTION_VALUE';
 <options>{BR}+                          this.popState(); return 'OPTIONS_END';
-<options>\s+{BR}+                       this.popState(); return 'OPTIONS_END';
-<options>\s+                            /* empty */
+<options>{WS}+                          /* skip whitespace */
 
 <start_condition>{ID}                   return 'START_COND';
 <start_condition>{BR}+                  this.popState();
-<start_condition>\s+{BR}+               this.popState();
-<start_condition>\s+                    /* empty */
+<start_condition>{WS}+                  /* empty */
 
-<trail>\s*{BR}+                         this.begin('rules');
+<trail>{WS}*{BR}+                       this.begin('rules');
 
 <indented>"{"                           yy.depth = 0; this.begin('action'); return '{';
 <indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
@@ -79,9 +81,20 @@ BR                                      \r\n|\n|\r
 "/*"(.|\n|\r)*?"*/"                     /* ignore */
 "//".*                                  /* ignore */
 
+<INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
+<macro>{BR}+                            this.popState('macro');
+
+// Accept any non-regex-special character as a direct literal without the need to put quotes around it:
+<macro>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
+                                        %{
+                                            // accept any non-regex, non-lex, non-string-delim,
+                                            // non-escape-starter, non-space character as-is
+                                            return 'CHARACTER_LIT';
+                                        %}
+
 {BR}+                                   /* empty */
 \s+                                     /* empty */
-{ID}                                    return 'NAME';
+
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
@@ -121,7 +134,9 @@ BR                                      \r\n|\n|\r
 <set,options>"{"{ID}"}"                 return 'NAME_BRACE';
 "{"                                     return '{';
 "}"                                     return '}';
+
 .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
+
 <*><<EOF>>                              return 'EOF';
 
 
@@ -136,10 +151,10 @@ BR                                      \r\n|\n|\r
 <code>[^\r\n]+                          return 'CODE';      // the bit of CODE just before EOF...
 
 
-<path>[\r\n]                            this.popState(); this.unput(yytext);
+<path>{BR}                              this.popState(); this.unput(yytext);
 <path>"'"[^\r\n]+"'"                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
 <path>'"'[^\r\n]+'"'                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
-<path>\s+                               // skip whitespace in the line
+<path>{WS}+                             // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
 <*>.                                    %{
