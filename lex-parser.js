@@ -3304,7 +3304,7 @@ case 13 :
 break;
 case 14 : 
 /*! Conditions:: rules */ 
-/*! Rule::       \s+{BR}+ */ 
+/*! Rule::       {WS}+{BR}+ */ 
  /* empty */ 
 break;
 case 15 : 
@@ -3319,7 +3319,7 @@ case 16 :
 break;
 case 17 : 
 /*! Conditions:: rules */ 
-/*! Rule::       [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+ */ 
+/*! Rule::       [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+ */ 
  
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
@@ -3343,50 +3343,40 @@ case 23 :
 break;
 case 24 : 
 /*! Conditions:: options */ 
-/*! Rule::       \s+{BR}+ */ 
- this.popState(); return 176; 
+/*! Rule::       {WS}+ */ 
+ /* skip whitespace */ 
 break;
-case 25 : 
-/*! Conditions:: options */ 
-/*! Rule::       \s+ */ 
- /* empty */ 
-break;
-case 27 : 
+case 26 : 
 /*! Conditions:: start_condition */ 
 /*! Rule::       {BR}+ */ 
  this.popState(); 
 break;
-case 28 : 
+case 27 : 
 /*! Conditions:: start_condition */ 
-/*! Rule::       \s+{BR}+ */ 
- this.popState(); 
-break;
-case 29 : 
-/*! Conditions:: start_condition */ 
-/*! Rule::       \s+ */ 
+/*! Rule::       {WS}+ */ 
  /* empty */ 
 break;
-case 30 : 
+case 28 : 
 /*! Conditions:: trail */ 
-/*! Rule::       \s*{BR}+ */ 
+/*! Rule::       {WS}*{BR}+ */ 
  this.begin('rules'); 
 break;
-case 31 : 
+case 29 : 
 /*! Conditions:: indented */ 
 /*! Rule::       \{ */ 
  yy.depth = 0; this.begin('action'); return 123; 
 break;
-case 32 : 
+case 30 : 
 /*! Conditions:: indented */ 
 /*! Rule::       %\{(.|{BR})*?%\} */ 
  this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 142; 
 break;
-case 33 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+case 31 : 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %\{(.|{BR})*?%\} */ 
  yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 142; 
 break;
-case 34 : 
+case 32 : 
 /*! Conditions:: indented */ 
 /*! Rule::       %include\b */ 
  
@@ -3409,78 +3399,97 @@ case 34 :
                                             return 180;
                                          
 break;
-case 35 : 
+case 33 : 
 /*! Conditions:: indented */ 
 /*! Rule::       .+ */ 
  this.begin('rules'); return 142; 
 break;
-case 36 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+case 34 : 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
  /* ignore */ 
 break;
-case 37 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+case 35 : 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \/\/.* */ 
  /* ignore */ 
 break;
+case 36 : 
+/*! Conditions:: INITIAL */ 
+/*! Rule::       {ID} */ 
+ this.pushState('macro'); return 136; 
+break;
+case 37 : 
+/*! Conditions:: macro */ 
+/*! Rule::       {BR}+ */ 
+ this.popState('macro'); 
+break;
 case 38 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: macro */ 
+/*! Rule::       [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+ */ 
+ 
+                                            // accept any non-regex, non-lex, non-string-delim,
+                                            // non-escape-starter, non-space character as-is
+                                            return 173;
+                                         
+break;
+case 39 : 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       {BR}+ */ 
  /* empty */ 
 break;
-case 39 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+case 40 : 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \s+ */ 
  /* empty */ 
 break;
 case 41 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
  yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 172; 
 break;
 case 42 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
  yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 172; 
 break;
 case 43 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \[ */ 
  this.pushState('set'); return 165; 
 break;
 case 56 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       < */ 
  this.begin('conditions'); return 60; 
 break;
 case 57 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \/! */ 
  return 158;                    // treated as `(?!atom)` 
 break;
 case 58 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \/ */ 
  return 47;                     // treated as `(?=atom)` 
 break;
 case 60 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \\. */ 
  yy_.yytext = yy_.yytext.replace(/^\\/g, ''); return 170; 
 break;
 case 63 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %options\b */ 
  this.begin('options'); return 174; 
 break;
 case 64 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %s\b */ 
  this.begin('start_condition'); return 138; 
 break;
 case 65 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %x\b */ 
  this.begin('start_condition'); return 140; 
 break;
@@ -3499,12 +3508,12 @@ case 67 :
                                          
 break;
 case 68 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %% */ 
  this.begin('rules'); return 130; 
 break;
 case 74 : 
-/*! Conditions:: indented trail rules INITIAL */ 
+/*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       . */ 
  throw new Error("unsupported input character: " + yy_.yytext + " @ " + JSON.stringify(yy_.yylloc)); /* b0rk on bad characters */ 
 break;
@@ -3520,7 +3529,7 @@ case 80 :
 break;
 case 81 : 
 /*! Conditions:: path */ 
-/*! Rule::       [\r\n] */ 
+/*! Rule::       {BR} */ 
  this.popState(); this.unput(yy_.yytext); 
 break;
 case 82 : 
@@ -3535,7 +3544,7 @@ case 83 :
 break;
 case 84 : 
 /*! Conditions:: path */ 
-/*! Rule::       \s+ */ 
+/*! Rule::       {WS}+ */ 
  // skip whitespace in the line 
 break;
 case 85 : 
@@ -3595,68 +3604,65 @@ simpleCaseActionClusters: {
    22 : 178,
   /*! Conditions:: start_condition */ 
   /*! Rule::       {ID} */ 
-   26 : 146,
-  /*! Conditions:: indented trail rules INITIAL */ 
-  /*! Rule::       {ID} */ 
-   40 : 136,
-  /*! Conditions:: indented trail rules INITIAL */ 
+   25 : 146,
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \| */ 
    44 : 124,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?: */ 
    45 : 157,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?= */ 
    46 : 157,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?! */ 
    47 : 157,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \( */ 
    48 : 40,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \) */ 
    49 : 41,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \+ */ 
    50 : 43,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \* */ 
    51 : 42,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \? */ 
    52 : 63,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \^ */ 
    53 : 94,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       , */ 
    54 : 44,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       <<EOF>> */ 
    55 : 36,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
    59 : 170,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \$ */ 
    61 : 36,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \. */ 
    62 : 46,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
    69 : 171,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{{ID}\} */ 
    70 : 164,
   /*! Conditions:: set options */ 
   /*! Rule::       \{{ID}\} */ 
    71 : 164,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{ */ 
    72 : 123,
-  /*! Conditions:: indented trail rules INITIAL */ 
+  /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \} */ 
    73 : 125,
   /*! Conditions:: * */ 
@@ -3687,23 +3693,21 @@ rules: [
 /^(?:,)/,
 /^(?:\*)/,
 /^(?:(\r\n|\n|\r)+)/,
-/^(?:\s+(\r\n|\n|\r)+)/,
+/^(?:([^\S\r\n])+(\r\n|\n|\r)+)/,
 /^(?:\s+)/,
 /^(?:%%)/,
-/^(?:[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+)/,
+/^(?:[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+)/,
 /^(?:([a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?))/,
 /^(?:=)/,
 /^(?:"(\\\\|\\"|[^"])*")/,
 /^(?:'(\\\\|\\'|[^'])*')/,
 /^(?:[^\s\r\n]+)/,
 /^(?:(\r\n|\n|\r)+)/,
-/^(?:\s+(\r\n|\n|\r)+)/,
-/^(?:\s+)/,
+/^(?:([^\S\r\n])+)/,
 /^(?:([a-zA-Z_][a-zA-Z0-9_]*))/,
 /^(?:(\r\n|\n|\r)+)/,
-/^(?:\s+(\r\n|\n|\r)+)/,
-/^(?:\s+)/,
-/^(?:\s*(\r\n|\n|\r)+)/,
+/^(?:([^\S\r\n])+)/,
+/^(?:([^\S\r\n])*(\r\n|\n|\r)+)/,
 /^(?:\{)/,
 /^(?:%\{(.|(\r\n|\n|\r))*?%\})/,
 /^(?:%\{(.|(\r\n|\n|\r))*?%\})/,
@@ -3711,9 +3715,11 @@ rules: [
 /^(?:.+)/,
 /^(?:\/\*(.|\n|\r)*?\*\/)/,
 /^(?:\/\/.*)/,
+/^(?:([a-zA-Z_][a-zA-Z0-9_]*))/,
+/^(?:(\r\n|\n|\r)+)/,
+/^(?:[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+)/,
 /^(?:(\r\n|\n|\r)+)/,
 /^(?:\s+)/,
-/^(?:([a-zA-Z_][a-zA-Z0-9_]*))/,
 /^(?:"(\\\\|\\"|[^"])*")/,
 /^(?:'(\\\\|\\'|[^'])*')/,
 /^(?:\[)/,
@@ -3754,10 +3760,10 @@ rules: [
 /^(?:\])/,
 /^(?:[^\r\n]*(\r|\n)+)/,
 /^(?:[^\r\n]+)/,
-/^(?:[\r\n])/,
+/^(?:(\r\n|\n|\r))/,
 /^(?:'[^\r\n]+')/,
 /^(?:"[^\r\n]+")/,
-/^(?:\s+)/,
+/^(?:([^\S\r\n])+)/,
 /^(?:[^\s\r\n]+)/,
 /^(?:.)/
 ],
@@ -3775,10 +3781,9 @@ conditions: {
   },
   "start_condition": {
     rules: [
+      25,
       26,
       27,
-      28,
-      29,
       75,
       86
     ],
@@ -3793,7 +3798,6 @@ conditions: {
       22,
       23,
       24,
-      25,
       71,
       75,
       86
@@ -3852,14 +3856,13 @@ conditions: {
   },
   "indented": {
     rules: [
+      29,
+      30,
       31,
       32,
       33,
       34,
       35,
-      36,
-      37,
-      38,
       39,
       40,
       41,
@@ -3900,11 +3903,10 @@ conditions: {
   },
   "trail": {
     rules: [
-      30,
-      33,
-      36,
-      37,
-      38,
+      28,
+      31,
+      34,
+      35,
       39,
       40,
       41,
@@ -3952,10 +3954,9 @@ conditions: {
       15,
       16,
       17,
-      33,
-      36,
-      37,
-      38,
+      31,
+      34,
+      35,
       39,
       40,
       41,
@@ -3995,12 +3996,57 @@ conditions: {
     ],
     inclusive: true
   },
-  "INITIAL": {
+  "macro": {
     rules: [
-      33,
-      36,
+      31,
+      34,
+      35,
       37,
       38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      68,
+      69,
+      70,
+      72,
+      73,
+      74,
+      75,
+      86
+    ],
+    inclusive: true
+  },
+  "INITIAL": {
+    rules: [
+      31,
+      34,
+      35,
+      36,
       39,
       40,
       41,
