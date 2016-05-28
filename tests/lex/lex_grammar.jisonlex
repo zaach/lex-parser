@@ -3,7 +3,7 @@
 \n+    	{yy.freshLine = true;}
 \s+    	{yy.freshLine = false;}
 "y{"[^}]*"}"    	{yytext = yytext.substr(2, yytext.length-3);return 'ACTION';}
-[a-zA-Z_][a-zA-Z0-9_-]*    	{return 'NAME';}
+[a-zA-Z_][a-zA-Z0-9_]*    	{return 'NAME';}
 '"'([^"]|'\"')*'"'    	{return 'STRING_LIT';}
 "'"([^']|"\'")*"'"    	{return 'STRING_LIT';}
 "|"    	{return '|';}
