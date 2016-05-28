@@ -63,7 +63,7 @@ rules_and_epilogue
 
 // because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
 init
-    :
+    : %epsilon
         {
             yy.actionInclude = [];
             if (!yy.options) yy.options = {};
@@ -89,7 +89,7 @@ definitions
             }
           }
         }
-    |
+    | %epsilon
         { $$ = [null, null]; }
     ;
 
@@ -153,7 +153,7 @@ action_body
     ;
 
 action_comments_body
-    :
+    : %epsilon
         { $$ = ''; }
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
@@ -190,7 +190,7 @@ regex_list
     | regex_list '|'
         { $$ = $1 + '|'; }
     | regex_concat
-    |
+    | %epsilon
         { $$ = ''; }
     ;
 
@@ -322,7 +322,7 @@ module_code_chunk
 optional_module_code_chunk
     : module_code_chunk
         { $$ = $module_code_chunk; }
-    | /* nil */
+    | %epsilon
         { $$ = ''; }
     ;
 
