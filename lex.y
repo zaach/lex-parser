@@ -177,9 +177,34 @@ name_list
 regex
     : regex_list
         {
+          // Detect if the regex is a pure (Unicode) word;
+          // we *do* consider escaped characters which are 'alphanumeric' to be equivalent to their non-escaped version,
+          // hence these are all valid 'words' for the 'easy keyword rules' option:
+          //
+          // - hello_kitty
+          // - γεια_σου_γατούλα
+          // - \u03B3\u03B5\u03B9\u03B1_\u03C3\u03BF\u03C5_\u03B3\u03B1\u03C4\u03BF\u03CD\u03BB\u03B1
+          //
+          // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
+          //
           $$ = $regex_list;
-          if (yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
-              $$ += "\\b";
+          if (yy.options.easy_keyword_rules && !$$.match(/\\[^ux0-9]|"/)) {
+            try {
+              // no need to 'protect' JSON.parse here through `$$.replace(/"/g, '\\"')` as we already checked
+              // against that occasion above: keywords are not allowed to contain double-quotes anyway.
+              // JSON.parse *does* gobble some escapes (such as `\b`) but we protect against that through
+              // the simple regex in the condition above. It will also catch escaped escapes (`\\`), which
+              // cannot be part of a keyword either, so no need to worry about JSON.parse 'correctly' 
+              // converting convoluted constructs like '\\\\\\\\\\b' in here.
+              $$ = JSON.parse('"' + $$ + '"');
+              if ($$.match(/^[\w\d]+$/u)) {
+                $$ = $regex_list + "\\b";
+              } else {
+                $$ = $regex_list;
+              }
+            } catch (ex) {
+              $$ = $regex_list;
+            }
           }
         }
     ;

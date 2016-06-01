@@ -510,6 +510,7 @@ exports["test %options easy_keyword_rules"] = function () {
     var lexgrammar = '%options easy_keyword_rules\n'+
                      '%s TEST TEST2\n%x EAT\n%%\n'+
                      '"enter-test" {this.begin(\'TEST\');}\n'+
+                     '"enter_test" {this.begin(\'TEST\');}\n'+
                      '<TEST,EAT>"x" {return \'T\';}\n'+
                      '<*>"z" {return \'Z\';}\n'+
                      '<TEST>"y" {this.begin(\'INITIAL\'); return \'TY\';}\n'+
@@ -523,19 +524,20 @@ exports["test %options easy_keyword_rules"] = function () {
             "EAT": 1,
         },
         rules: [
-            ["enter-test\\b", "this.begin('TEST');" ],
+            ["enter-test", "this.begin('TEST');" ],                 // '-' dash is NOT accepted as being part of a *keyword*, hence no automatic `\b` word-boundary check added!
+            ["enter_test\\b", "this.begin('TEST');" ],
             [["TEST","EAT"], "x\\b", "return 'T';" ],
             [["*"], "z\\b", "return 'Z';" ],
             [["TEST"], "y\\b", "this.begin('INITIAL'); return 'TY';" ],
-            ["\"'a\\b", "return 1;"],
-            ["\"'\\\\\\*i\\b", "return 1;"],
+            ["\"'a", "return 1;"],                                  // only keywords *without any non-keyword prefix*, i.e. keywords 'on their own', get the special 'easy keyword' treatment!
+            ["\"'\\\\\\*i", "return 1;"],
             ["a\\b", "return 2;"],
             ["\\cA", ""],
             ["\\012", ""],
             ["\\xFF", ""],
             ["\\[[^\\\\]\\]", "return true;"],
-            ["f\"oo'bar\\b", "return 'baz2';"],
-            ['fo"obar\\b', "return 'baz';"]
+            ["f\"oo'bar", "return 'baz2';"],
+            ['fo"obar', "return 'baz';"]
         ],
         options: {
             "easy_keyword_rules": true
