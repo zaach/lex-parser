@@ -1,6 +1,13 @@
 
-NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
-ID                                      [a-zA-Z_][a-zA-Z0-9_]*
+ASCII_LETTER                            [a-zA-z]
+// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge with {UNICODE_LETTER}:
+UNICODE_LETTER                          [\p{Alphabetic}]
+ALPHA                                   [{UNICODE_LETTER}_]
+DIGIT                                   [\p{Number}]
+WHITESPACE                              [\s\r\n\p{Separator}]
+
+NAME                                    [{ALPHA}](?:[{ALPHA}{DIGIT}-]*[{ALPHA}{DIGIT}])?
+ID                                      [{ALPHA}][{ALPHA}{DIGIT}]*
 BR                                      \r\n|\n|\r
 // WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use that one directly. 
 // Instead we define the {WS} macro here:
@@ -9,6 +16,15 @@ WS                                      [^\S\r\n]
 
 %s indented trail rules macro
 %x code start_condition options conditions action path set
+
+
+// Off Topic
+// ---------
+//
+// Do not specify the xregexp option as we want the XRegExp \p{...} regex macros converted to 
+// native regexes and used as such:
+//
+// %options xregexp
 
 %options easy_keyword_rules
 %options ranges
