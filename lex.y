@@ -279,6 +279,7 @@ regex_set_atom
             } else {
                 $$ = '{[' + $name_expansion + ']}';
             }
+            console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
         }
     ;
 

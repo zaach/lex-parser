@@ -894,7 +894,8 @@ case 62 :
                 this.$ = $$[$0];
             } else {
                 this.$ = '{[' + $$[$0] + ']}';
-            } 
+            }
+            console.log("name expansion for: ", { name: $$[$0], redux: $$[$0].replace(/[{}]/g, ''), output: this.$ }); 
 break;
 case 65 : 
 /*! Production::     string : STRING_LIT */
@@ -3265,7 +3266,7 @@ simpleCaseActionClusters: {
   /*! Rule::       $ */ 
    75 : 1,
   /*! Conditions:: set */ 
-  /*! Rule::       (\\\\|\\\]|[^\]{])+ */ 
+  /*! Rule::       (?:\\\\|\\\]|[^\]{])+ */ 
    76 : 168,
   /*! Conditions:: set */ 
   /*! Rule::       \{ */ 
@@ -3351,7 +3352,7 @@ rules: [
 /^(?:\})/,
 /^(?:.)/,
 /^(?:$)/,
-/^(?:(\\\\|\\\]|[^\]{])+)/,
+/^(?:(?:\\\\|\\\]|[^\]{])+)/,
 /^(?:\{)/,
 /^(?:\])/,
 /^(?:[^\r\n]*(\r|\n)+)/,

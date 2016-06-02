@@ -156,7 +156,7 @@ WS                                      [^\S\r\n]
 <*><<EOF>>                              return 'EOF';
 
 
-<set>("\\\\"|"\]"|[^\]{])+              return 'REGEX_SET';
+<set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
 <set>"{"                                return 'REGEX_SET';
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
