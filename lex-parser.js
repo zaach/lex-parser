@@ -803,7 +803,7 @@ case 34 :
 break;
 case 35 : 
 /*! Production::     regex : regex_list */
- // Detect if the regex is a pure (Unicode) word;
+ // Detect if the regex ends with a pure (Unicode) word;
           // we *do* consider escaped characters which are 'alphanumeric' to be equivalent to their non-escaped version,
           // hence these are all valid 'words' for the 'easy keyword rules' option:
           //
@@ -813,17 +813,33 @@ case 35 :
           //
           // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
           //
+          // As we only check the *tail*, we also accept these as 'easy keywords':
+          //
+          // - %options
+          // - %foo-bar    
+          // - +++a:b:c1
+          //
+          // Note the dash in that last example: there the code will consider `bar` to be the keyword, 
+          // which is fine with us as we're only interested in the taiol boundary and patching that one
+          // for the `easy_keyword_rules` option.
           this.$ = $$[$0];
-          if (yy.options.easy_keyword_rules && !this.$.match(/\\[^ux0-9]|"/)) {
+          if (yy.options.easy_keyword_rules) {
             try {
-              // no need to 'protect' JSON.parse here through `$$.replace(/"/g, '\\"')` as we already checked
-              // against that occasion above: keywords are not allowed to contain double-quotes anyway.
+              // We need to 'protect' JSON.parse here as keywords are allowed to contain double-quotes and
+              // other leading cruft.
               // JSON.parse *does* gobble some escapes (such as `\b`) but we protect against that through
-              // the simple regex in the condition above. It will also catch escaped escapes (`\\`), which
-              // cannot be part of a keyword either, so no need to worry about JSON.parse 'correctly' 
-              // converting convoluted constructs like '\\\\\\\\\\b' in here.
+              // a simple replace regex: we're not interested in the special escapes' exact value anyway.
+              // It will also catch escaped escapes (`\\`), which are not word characters either, 
+              // so no need to worry about JSON.parse 'correctly' converting convoluted constructs like 
+              // '\\\\\\\\\\b' in here.
+              this.$ = this.$
+              .replace(/"/g, '.' /* '\\"' */)
+              .replace(/\\c[A-Z]/g, '.')
+              .replace(/\\[^xu0-9]/g, '.');
+
               this.$ = JSON.parse('"' + this.$ + '"');
-              if (this.$.match(/^[\w\d]+$/u)) {
+              // a 'keyword' starts with an alphanumeric character, followed by zero or more alphanumerics or digits:
+              if (this.$.match(/\w[\w\d]*$/u)) {
                 this.$ = $$[$0] + "\\b";
               } else {
                 this.$ = $$[$0];
