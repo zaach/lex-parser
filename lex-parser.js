@@ -393,74 +393,74 @@ symbols_: {
   ",": 44,
   ".": 46,
   "/": 47,
-  "/!": 157,
+  "/!": 158,
   "<": 60,
   "=": 61,
   ">": 62,
   "?": 63,
-  "ACTION": 141,
-  "ACTION_BODY": 151,
-  "CHARACTER_LIT": 172,
-  "CODE": 182,
-  "EOF": 1,
-  "ESCAPE_CHAR": 169,
-  "INCLUDE": 179,
-  "NAME": 135,
-  "NAME_BRACE": 163,
-  "OPTIONS": 173,
-  "OPTIONS_END": 175,
-  "OPTION_VALUE": 177,
-  "PATH": 180,
-  "RANGE_REGEX": 170,
-  "REGEX_SET": 168,
-  "REGEX_SET_END": 166,
-  "REGEX_SET_START": 164,
-  "SPECIAL_GROUP": 156,
-  "START_COND": 145,
-  "START_EXC": 139,
-  "START_INC": 137,
-  "STRING_LIT": 171,
-  "UNKNOWN_DECL": 144,
+  "ACTION": 142,
+  "ACTION_BODY": 152,
+  "CHARACTER_LIT": 173,
+  "CODE": 183,
+  "EOF": 132,
+  "ESCAPE_CHAR": 170,
+  "INCLUDE": 180,
+  "NAME": 136,
+  "NAME_BRACE": 164,
+  "OPTIONS": 174,
+  "OPTIONS_END": 176,
+  "OPTION_VALUE": 178,
+  "PATH": 181,
+  "RANGE_REGEX": 171,
+  "REGEX_SET": 169,
+  "REGEX_SET_END": 167,
+  "REGEX_SET_START": 165,
+  "SPECIAL_GROUP": 157,
+  "START_COND": 146,
+  "START_EXC": 140,
+  "START_INC": 138,
+  "STRING_LIT": 172,
+  "UNKNOWN_DECL": 145,
   "^": 94,
-  "action": 148,
-  "action_body": 149,
-  "action_comments_body": 150,
-  "any_group_regex": 160,
-  "definition": 134,
+  "action": 149,
+  "action_body": 150,
+  "action_comments_body": 151,
+  "any_group_regex": 161,
+  "definition": 135,
   "definitions": 129,
   "error": 2,
-  "escape_char": 162,
-  "extra_lexer_module_code": 132,
-  "include_macro_code": 142,
+  "escape_char": 163,
+  "extra_lexer_module_code": 133,
+  "include_macro_code": 143,
   "init": 128,
   "lex": 127,
-  "module_code_chunk": 181,
-  "name_expansion": 158,
-  "name_list": 152,
-  "names_exclusive": 140,
-  "names_inclusive": 138,
-  "option": 176,
-  "option_list": 174,
-  "optional_module_code_chunk": 178,
-  "options": 143,
-  "range_regex": 159,
-  "regex": 136,
-  "regex_base": 155,
-  "regex_concat": 154,
-  "regex_list": 153,
-  "regex_set": 165,
-  "regex_set_atom": 167,
-  "rule": 146,
-  "rules": 133,
+  "module_code_chunk": 182,
+  "name_expansion": 159,
+  "name_list": 153,
+  "names_exclusive": 141,
+  "names_inclusive": 139,
+  "option": 177,
+  "option_list": 175,
+  "optional_module_code_chunk": 179,
+  "options": 144,
+  "range_regex": 160,
+  "regex": 137,
+  "regex_base": 156,
+  "regex_concat": 155,
+  "regex_list": 154,
+  "regex_set": 166,
+  "regex_set_atom": 168,
+  "rule": 147,
+  "rules": 134,
   "rules_and_epilogue": 131,
-  "start_conditions": 147,
-  "string": 161,
+  "start_conditions": 148,
+  "string": 162,
   "{": 123,
   "|": 124,
   "}": 125
 },
 terminals_: {
-  1: "EOF",
+  1: "$end",
   2: "error",
   36: "$",
   40: "(",
@@ -479,29 +479,30 @@ terminals_: {
   124: "|",
   125: "}",
   130: "%%",
-  135: "NAME",
-  137: "START_INC",
-  139: "START_EXC",
-  141: "ACTION",
-  144: "UNKNOWN_DECL",
-  145: "START_COND",
-  151: "ACTION_BODY",
-  156: "SPECIAL_GROUP",
-  157: "/!",
-  163: "NAME_BRACE",
-  164: "REGEX_SET_START",
-  166: "REGEX_SET_END",
-  168: "REGEX_SET",
-  169: "ESCAPE_CHAR",
-  170: "RANGE_REGEX",
-  171: "STRING_LIT",
-  172: "CHARACTER_LIT",
-  173: "OPTIONS",
-  175: "OPTIONS_END",
-  177: "OPTION_VALUE",
-  179: "INCLUDE",
-  180: "PATH",
-  182: "CODE"
+  132: "EOF",
+  136: "NAME",
+  138: "START_INC",
+  140: "START_EXC",
+  142: "ACTION",
+  145: "UNKNOWN_DECL",
+  146: "START_COND",
+  152: "ACTION_BODY",
+  157: "SPECIAL_GROUP",
+  158: "/!",
+  164: "NAME_BRACE",
+  165: "REGEX_SET_START",
+  167: "REGEX_SET_END",
+  169: "REGEX_SET",
+  170: "ESCAPE_CHAR",
+  171: "RANGE_REGEX",
+  172: "STRING_LIT",
+  173: "CHARACTER_LIT",
+  174: "OPTIONS",
+  176: "OPTIONS_END",
+  178: "OPTION_VALUE",
+  180: "INCLUDE",
+  181: "PATH",
+  183: "CODE"
 },
 productions_: bp({
   pop: u([
@@ -512,54 +513,54 @@ productions_: bp({
   129,
   129,
   s,
-  [134, 7],
-  138,
-  138,
-  140,
-  140,
-  133,
-  133,
-  146,
+  [135, 7],
+  139,
+  139,
+  141,
+  141,
+  134,
+  134,
+  147,
+  s,
+  [149, 3],
+  150,
+  150,
+  151,
+  151,
   s,
   [148, 3],
-  149,
-  149,
-  150,
-  150,
+  153,
+  153,
+  137,
   s,
-  [147, 3],
-  152,
-  152,
-  136,
+  [154, 4],
+  155,
+  155,
   s,
-  [153, 4],
-  154,
-  154,
-  s,
-  [155, 15],
-  158,
-  160,
-  165,
-  165,
-  167,
-  167,
-  162,
+  [156, 15],
   159,
   161,
-  161,
-  143,
-  174,
-  174,
+  166,
+  166,
+  168,
+  168,
+  163,
+  160,
+  162,
+  162,
+  144,
+  175,
+  175,
   s,
-  [176, 3],
-  132,
-  132,
-  142,
-  142,
-  181,
-  181,
-  178,
-  178
+  [177, 3],
+  133,
+  133,
+  143,
+  143,
+  182,
+  182,
+  179,
+  179
 ]),
   rule: u([
   4,
@@ -621,7 +622,8 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 1 : 
 /*! Production::     lex : init definitions '%%' rules_and_epilogue */
- this.$ = $$[$0];
+ 
+          this.$ = $$[$0];
           if ($$[$0 - 2][0]) this.$.macros = $$[$0 - 2][0];
           if ($$[$0 - 2][1]) this.$.startConditions = $$[$0 - 2][1];
           if ($$[$0 - 2][2]) this.$.unknownDecls = $$[$0 - 2][2];
@@ -640,40 +642,52 @@ case 1 :
           }
           delete yy.options;
           delete yy.actionInclude;
-          return this.$; 
+          return this.$;
+         
 break;
 case 2 : 
 /*! Production::     rules_and_epilogue : EOF */
- this.$ = { rules: [] }; 
+ 
+        this.$ = { rules: [] };
+       
 break;
 case 3 : 
 /*! Production::     rules_and_epilogue : '%%' extra_lexer_module_code EOF */
- if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
+ 
+        if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
           this.$ = { rules: [], moduleInclude: $$[$0 - 1] };
         } else {
           this.$ = { rules: [] };
-        } 
+        }
+       
 break;
 case 4 : 
 /*! Production::     rules_and_epilogue : rules '%%' extra_lexer_module_code EOF */
- if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
+ 
+        if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
           this.$ = { rules: $$[$0 - 3], moduleInclude: $$[$0 - 1] };
         } else {
           this.$ = { rules: $$[$0 - 3] };
-        } 
+        }
+       
 break;
 case 5 : 
 /*! Production::     rules_and_epilogue : rules EOF */
- this.$ = { rules: $$[$0 - 1] }; 
+ 
+        this.$ = { rules: $$[$0 - 1] };
+       
 break;
 case 6 : 
-/*! Production::     init : ε */
- yy.actionInclude = [];
-            if (!yy.options) yy.options = {}; 
+/*! Production::     init :  */
+ 
+            yy.actionInclude = [];
+            if (!yy.options) yy.options = {};
+         
 break;
 case 7 : 
 /*! Production::     definitions : definition definitions */
- this.$ = $$[$0];
+ 
+          this.$ = $$[$0];
           if ($$[$0 - 1] != null) {
             if ('length' in $$[$0 - 1]) {
               this.$[0] = this.$[0] || {};
@@ -687,15 +701,16 @@ case 7 :
               this.$[2] = this.$[2] || [];
               this.$[2].push($$[$0 - 1].body);
             }
-          } 
+          }
+         
 break;
 case 8 : 
-/*! Production::     definitions : ε */
- this.$ = [null, null]; 
+/*! Production::     definitions :  */
+  this.$ = [null, null];  
 break;
 case 9 : 
 /*! Production::     definition : NAME regex */
- this.$ = [$$[$0 - 1], $$[$0]]; 
+  this.$ = [$$[$0 - 1], $$[$0]];  
 break;
 case 10 : 
 /*! Production::     definition : START_INC names_inclusive */
@@ -717,69 +732,69 @@ case 10 :
 /*! Production::     module_code_chunk : CODE */
  case 79 : 
 /*! Production::     optional_module_code_chunk : module_code_chunk */
- this.$ = $$[$0]; 
+  this.$ = $$[$0];  
 break;
 case 12 : 
 /*! Production::     definition : ACTION */
  case 13 : 
 /*! Production::     definition : include_macro_code */
- yy.actionInclude.push($$[$0]); this.$ = null; 
+  yy.actionInclude.push($$[$0]); this.$ = null;  
 break;
 case 14 : 
 /*! Production::     definition : options */
- this.$ = null; 
+  this.$ = null;  
 break;
 case 15 : 
 /*! Production::     definition : UNKNOWN_DECL */
- this.$ = {type: 'unknown', body: $$[$0]}; 
+  this.$ = {type: 'unknown', body: $$[$0]};  
 break;
 case 16 : 
 /*! Production::     names_inclusive : START_COND */
- this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 0; 
+  this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 0;  
 break;
 case 17 : 
 /*! Production::     names_inclusive : names_inclusive START_COND */
- this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 0; 
+  this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 0;  
 break;
 case 18 : 
 /*! Production::     names_exclusive : START_COND */
- this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 1; 
+  this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 1;  
 break;
 case 19 : 
 /*! Production::     names_exclusive : names_exclusive START_COND */
- this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 1; 
+  this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 1;  
 break;
 case 20 : 
 /*! Production::     rules : rules rule */
- this.$ = $$[$0 - 1]; this.$.push($$[$0]); 
+  this.$ = $$[$0 - 1]; this.$.push($$[$0]);  
 break;
 case 21 : 
 /*! Production::     rules : rule */
  case 33 : 
 /*! Production::     name_list : NAME */
- this.$ = [$$[$0]]; 
+  this.$ = [$$[$0]];  
 break;
 case 22 : 
 /*! Production::     rule : start_conditions regex action */
- this.$ = $$[$0 - 2] ? [$$[$0 - 2], $$[$0 - 1], $$[$0]] : [$$[$0 - 1], $$[$0]]; 
+  this.$ = $$[$0 - 2] ? [$$[$0 - 2], $$[$0 - 1], $$[$0]] : [$$[$0 - 1], $$[$0]];  
 break;
 case 23 : 
 /*! Production::     action : '{' action_body '}' */
  case 30 : 
 /*! Production::     start_conditions : '<' name_list '>' */
- this.$ = $$[$0 - 1]; 
+  this.$ = $$[$0 - 1];  
 break;
 case 27 : 
 /*! Production::     action_body : action_body '{' action_body '}' action_comments_body */
- this.$ = $$[$0 - 4] + $$[$0 - 3] + $$[$0 - 2] + $$[$0 - 1] + $$[$0]; 
+  this.$ = $$[$0 - 4] + $$[$0 - 3] + $$[$0 - 2] + $$[$0 - 1] + $$[$0];  
 break;
 case 28 : 
-/*! Production::     action_comments_body : ε */
+/*! Production::     action_comments_body :  */
  case 39 : 
-/*! Production::     regex_list : ε */
+/*! Production::     regex_list :  */
  case 80 : 
-/*! Production::     optional_module_code_chunk : ε */
- this.$ = ''; 
+/*! Production::     optional_module_code_chunk :  */
+  this.$ = '';  
 break;
 case 29 : 
 /*! Production::     action_comments_body : action_comments_body ACTION_BODY */
@@ -791,19 +806,20 @@ case 29 :
 /*! Production::     regex_set : regex_set_atom regex_set */
  case 78 : 
 /*! Production::     module_code_chunk : module_code_chunk CODE */
- this.$ = $$[$0 - 1] + $$[$0]; 
+  this.$ = $$[$0 - 1] + $$[$0];  
 break;
 case 31 : 
 /*! Production::     start_conditions : '<' '*' '>' */
- this.$ = ['*']; 
+  this.$ = ['*'];  
 break;
 case 34 : 
 /*! Production::     name_list : name_list ',' NAME */
- this.$ = $$[$0 - 2]; this.$.push($$[$0]); 
+  this.$ = $$[$0 - 2]; this.$.push($$[$0]);  
 break;
 case 35 : 
 /*! Production::     regex : regex_list */
- // Detect if the regex ends with a pure (Unicode) word;
+ 
+          // Detect if the regex ends with a pure (Unicode) word;
           // we *do* consider escaped characters which are 'alphanumeric' to be equivalent to their non-escaped version,
           // hence these are all valid 'words' for the 'easy keyword rules' option:
           //
@@ -811,7 +827,7 @@ case 35 :
           // - γεια_σου_γατούλα
           // - \u03B3\u03B5\u03B9\u03B1_\u03C3\u03BF\u03C5_\u03B3\u03B1\u03C4\u03BF\u03CD\u03BB\u03B1
           //
-          // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
+          // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode# 12869914
           //
           // As we only check the *tail*, we also accept these as 'easy keywords':
           //
@@ -847,96 +863,103 @@ case 35 :
             } catch (ex) {
               this.$ = $$[$0];
             }
-          } 
+          }
+         
 break;
 case 36 : 
 /*! Production::     regex_list : regex_list '|' regex_concat */
- this.$ = $$[$0 - 2] + '|' + $$[$0]; 
+  this.$ = $$[$0 - 2] + '|' + $$[$0];  
 break;
 case 37 : 
 /*! Production::     regex_list : regex_list '|' */
- this.$ = $$[$0 - 1] + '|'; 
+  this.$ = $$[$0 - 1] + '|';  
 break;
 case 42 : 
 /*! Production::     regex_base : '(' regex_list ')' */
- this.$ = '(' + $$[$0 - 1] + ')'; 
+  this.$ = '(' + $$[$0 - 1] + ')';  
 break;
 case 43 : 
 /*! Production::     regex_base : SPECIAL_GROUP regex_list ')' */
- this.$ = $$[$0 - 2] + $$[$0 - 1] + ')'; 
+  this.$ = $$[$0 - 2] + $$[$0 - 1] + ')';  
 break;
 case 44 : 
 /*! Production::     regex_base : regex_base '+' */
- this.$ = $$[$0 - 1] + '+'; 
+  this.$ = $$[$0 - 1] + '+';  
 break;
 case 45 : 
 /*! Production::     regex_base : regex_base '*' */
- this.$ = $$[$0 - 1] + '*'; 
+  this.$ = $$[$0 - 1] + '*';  
 break;
 case 46 : 
 /*! Production::     regex_base : regex_base '?' */
- this.$ = $$[$0 - 1] + '?'; 
+  this.$ = $$[$0 - 1] + '?';  
 break;
 case 47 : 
 /*! Production::     regex_base : '/' regex_base */
- this.$ = '(?=' + $$[$0] + ')'; 
+  this.$ = '(?=' + $$[$0] + ')';  
 break;
 case 48 : 
 /*! Production::     regex_base : '/!' regex_base */
- this.$ = '(?!' + $$[$0] + ')'; 
+  this.$ = '(?!' + $$[$0] + ')';  
 break;
 case 52 : 
 /*! Production::     regex_base : '.' */
- this.$ = '.'; 
+  this.$ = '.';  
 break;
 case 53 : 
 /*! Production::     regex_base : '^' */
- this.$ = '^'; 
+  this.$ = '^';  
 break;
 case 54 : 
 /*! Production::     regex_base : '$' */
- this.$ = '$'; 
+  this.$ = '$';  
 break;
 case 58 : 
 /*! Production::     any_group_regex : REGEX_SET_START regex_set REGEX_SET_END */
  case 74 : 
 /*! Production::     extra_lexer_module_code : optional_module_code_chunk include_macro_code extra_lexer_module_code */
- this.$ = $$[$0 - 2] + $$[$0 - 1] + $$[$0]; 
+  this.$ = $$[$0 - 2] + $$[$0 - 1] + $$[$0];  
 break;
 case 62 : 
 /*! Production::     regex_set_atom : name_expansion */
- if (XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) && $$[$0].toUpperCase() !== $$[$0]) {
+  
+            if (XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) && $$[$0].toUpperCase() !== $$[$0]) {
                 // treat this as part of an XRegExp `\p{...}` Unicode slug:
                 this.$ = $$[$0];
             } else {
                 this.$ = '{[' + $$[$0] + ']}';
             }
-            console.log("name expansion for: ", { name: $$[$0], redux: $$[$0].replace(/[{}]/g, ''), output: this.$ }); 
+            console.log("name expansion for: ", { name: $$[$0], redux: $$[$0].replace(/[{}]/g, ''), output: this.$ });
+         
 break;
 case 65 : 
 /*! Production::     string : STRING_LIT */
- this.$ = prepareString($$[$0].substr(1, $$[$0].length - 2)); 
+  this.$ = prepareString($$[$0].substr(1, $$[$0].length - 2));  
 break;
 case 70 : 
 /*! Production::     option : NAME[option] */
- yy.options[$$[$0]] = true; 
+  yy.options[$$[$0]] = true;  
 break;
 case 71 : 
 /*! Production::     option : NAME[option] '=' OPTION_VALUE[value] */
  case 72 : 
 /*! Production::     option : NAME[option] '=' NAME[value] */
- yy.options[$$[$0 - 2]] = $$[$0]; 
+  yy.options[$$[$0 - 2]] = $$[$0];  
 break;
 case 75 : 
 /*! Production::     include_macro_code : INCLUDE PATH */
- var fs = require('fs');
+ 
+            var fs = require('fs');
             var fileContent = fs.readFileSync($$[$0], { encoding: 'utf-8' });
             // And no, we don't support nested '%include':
-            this.$ = '\n// Included by Jison: ' + $$[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $$[$0] + '\n\n'; 
+            this.$ = '\n// Included by Jison: ' + $$[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $$[$0] + '\n\n';
+         
 break;
 case 76 : 
 /*! Production::     include_macro_code : INCLUDE error */
- console.error("%include MUST be followed by a valid file path"); 
+ 
+            console.error("%include MUST be followed by a valid file path");
+         
 break;
 }
 },
@@ -1042,18 +1065,18 @@ table: bt({
   128,
   130,
   s,
-  [135, 4, 2],
-  144,
-  173,
-  179,
+  [136, 4, 2],
+  145,
+  174,
+  180,
   1,
   129,
   130,
-  134,
+  135,
   c,
   [11, 4],
-  142,
   143,
+  144,
   c,
   [13, 3],
   130,
@@ -1066,55 +1089,55 @@ table: bt({
   94,
   124,
   130,
-  135,
   136,
+  137,
   c,
   [41, 4],
   s,
-  [153, 6, 1],
+  [154, 6, 1],
   s,
-  [160, 5, 1],
-  169,
-  171,
+  [161, 5, 1],
+  170,
   172,
   173,
-  179,
-  138,
-  145,
-  140,
-  145,
+  174,
+  180,
+  139,
+  146,
+  141,
+  146,
   c,
   [67, 8],
   c,
   [8, 24],
   2,
-  180,
-  135,
-  174,
-  176,
-  1,
+  181,
+  136,
+  175,
+  177,
   c,
-  [71, 4],
+  [70, 4],
   60,
   94,
   123,
   124,
   130,
   131,
-  133,
-  141,
-  146,
+  132,
+  134,
+  142,
   147,
-  156,
+  148,
   157,
+  158,
   c,
   [65, 5],
-  179,
+  180,
   130,
   c,
   [37, 8],
   c,
-  [25, 3],
+  [26, 3],
   c,
   [10, 7],
   36,
@@ -1135,13 +1158,13 @@ table: bt({
   63,
   c,
   [31, 9],
-  156,
   157,
-  159,
+  158,
+  160,
   c,
   [27, 3],
   s,
-  [170, 4, 1],
+  [171, 4, 1],
   c,
   [56, 7],
   124,
@@ -1159,45 +1182,47 @@ table: bt({
   [103, 11],
   c,
   [27, 180],
-  166,
-  s,
-  [168, 6, 1],
-  179,
-  158,
-  163,
-  165,
   167,
+  s,
+  [169, 6, 1],
+  180,
+  159,
+  164,
+  166,
   168,
+  169,
   c,
   [115, 81],
   c,
   [16, 6],
-  145,
+  146,
   c,
   [9, 29],
   c,
-  [514, 10],
+  [514, 9],
+  132,
   c,
   [61, 10],
   c,
   [60, 4],
-  182,
+  183,
   c,
   [25, 25],
-  175,
-  135,
-  174,
+  176,
+  136,
   175,
   176,
+  177,
   61,
-  135,
-  175,
-  s,
-  [1, 3],
+  136,
+  176,
+  1,
+  1,
   132,
-  178,
+  133,
   179,
-  181,
+  180,
+  182,
   c,
   [41, 11],
   c,
@@ -1205,19 +1230,17 @@ table: bt({
   c,
   [21, 11],
   c,
-  [19, 8],
+  [19, 12],
   c,
-  [463, 5],
-  123,
-  124,
-  136,
-  141,
+  [18, 3],
+  137,
+  142,
   c,
   [503, 14],
-  179,
+  180,
   42,
-  135,
-  152,
+  136,
+  153,
   c,
   [605, 14],
   c,
@@ -1234,41 +1257,42 @@ table: bt({
   [167, 47],
   c,
   [28, 9],
-  166,
+  167,
   c,
   [508, 3],
-  166,
   167,
   168,
-  163,
-  166,
+  169,
+  164,
+  167,
   c,
   [3, 4],
   c,
   [425, 24],
-  173,
-  179,
-  175,
-  135,
-  177,
-  1,
-  1,
-  142,
-  179,
-  1,
+  174,
+  180,
+  176,
+  136,
+  178,
+  132,
+  132,
+  143,
+  180,
+  132,
+  180,
+  183,
   c,
-  [409, 3],
+  [3, 4],
   c,
-  [3, 3],
-  c,
-  [377, 6],
+  [377, 5],
+  1,
   c,
   [357, 19],
   123,
-  141,
   142,
-  148,
-  179,
+  143,
+  149,
+  180,
   44,
   62,
   62,
@@ -1278,41 +1302,41 @@ table: bt({
   [945, 47],
   c,
   [257, 62],
-  166,
-  135,
-  175,
+  167,
+  136,
+  176,
   c,
-  [529, 4],
+  [529, 3],
   c,
   [151, 6],
   c,
-  [160, 3],
+  [160, 4],
   c,
   [154, 20],
   125,
-  149,
   150,
   151,
+  152,
   c,
-  [24, 19],
+  [535, 23],
   c,
-  [554, 26],
+  [554, 22],
   c,
   [16, 9],
-  135,
+  136,
   c,
   [17, 16],
-  1,
+  132,
   1,
   123,
   125,
   123,
   125,
-  151,
-  44,
-  62,
+  152,
   c,
-  [104, 24],
+  [229, 4],
+  c,
+  [104, 22],
   c,
   [29, 3],
   c,
@@ -1349,9 +1373,9 @@ table: bt({
   s,
   [2, 25],
   c,
-  [73, 12],
+  [73, 11],
   c,
-  [12, 3],
+  [50, 4],
   c,
   [88, 13],
   c,
@@ -1375,11 +1399,11 @@ table: bt({
   c,
   [174, 132],
   c,
-  [565, 10],
+  [577, 9],
   c,
-  [593, 24],
+  [465, 15],
   c,
-  [235, 28],
+  [235, 38],
   c,
   [469, 15],
   c,
@@ -1393,15 +1417,13 @@ table: bt({
   c,
   [28, 36],
   c,
-  [324, 4],
+  [891, 5],
   c,
-  [209, 39],
+  [81, 47],
   c,
-  [306, 10],
+  [377, 16],
   c,
-  [51, 26],
-  c,
-  [312, 22],
+  [388, 33],
   c,
   [839, 102],
   c,
@@ -1506,11 +1528,11 @@ table: bt({
   s,
   [2, 32],
   c,
-  [54, 8],
+  [53, 7],
   c,
   [5, 4],
   c,
-  [45, 20],
+  [45, 21],
   c,
   [20, 9],
   c,
@@ -1520,11 +1542,11 @@ table: bt({
   c,
   [26, 8],
   c,
-  [59, 16],
+  [39, 10],
   c,
-  [83, 6],
+  [54, 11],
   c,
-  [50, 6],
+  [50, 7],
   c,
   [157, 10],
   c,
@@ -1542,17 +1564,15 @@ table: bt({
   c,
   [421, 4],
   c,
-  [179, 12],
+  [454, 12],
   c,
-  [538, 24],
+  [188, 33],
   c,
-  [650, 14],
+  [441, 8],
   c,
-  [532, 11],
+  [657, 12],
   c,
-  [492, 9],
-  c,
-  [556, 43],
+  [556, 48],
   c,
   [421, 137],
   c,
@@ -1626,13 +1646,13 @@ table: bt({
   41,
   40,
   44,
-  46,
   s,
   [32, 4],
   51,
   s,
   [32, 3],
   47,
+  46,
   s,
   [32, 9],
   7,
@@ -1730,10 +1750,10 @@ table: bt({
   80,
   80,
   75,
-  77,
   c,
   [538, 8],
   76,
+  77,
   s,
   [32, 9],
   s,
@@ -2893,7 +2913,7 @@ switch($avoiding_name_collisions) {
 case 2 : 
 /*! Conditions:: action */ 
 /*! Rule::       \/[^ /]*?['"{}'][^ ]*?\/ */ 
- return 151; // regexp with braces or quotes (and no spaces) 
+ return 152; // regexp with braces or quotes (and no spaces) 
 break;
 case 7 : 
 /*! Conditions:: action */ 
@@ -2936,23 +2956,23 @@ case 17 :
  
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
-                                            return 172;
+                                            return 173;
                                          
 break;
 case 20 : 
 /*! Conditions:: options */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 177; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 178; 
 break;
 case 21 : 
 /*! Conditions:: options */ 
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 177; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yytext.length - 2); return 178; 
 break;
 case 23 : 
 /*! Conditions:: options */ 
 /*! Rule::       {BR}+ */ 
- this.popState(); return 175; 
+ this.popState(); return 176; 
 break;
 case 24 : 
 /*! Conditions:: options */ 
@@ -2982,12 +3002,12 @@ break;
 case 30 : 
 /*! Conditions:: indented */ 
 /*! Rule::       %\{(.|{BR})*?%\} */ 
- this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 141; 
+ this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 142; 
 break;
 case 31 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %\{(.|{BR})*?%\} */ 
- yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 141; 
+ yy_.yytext = yy_.yytext.substr(2, yy_.yytext.length - 4); return 142; 
 break;
 case 32 : 
 /*! Conditions:: indented */ 
@@ -3009,13 +3029,13 @@ case 32 :
                                             this.pushState('trail');
                                             // then push the immediate need: the 'path' condition.
                                             this.pushState('path');
-                                            return 179;
+                                            return 180;
                                          
 break;
 case 33 : 
 /*! Conditions:: indented */ 
 /*! Rule::       .+ */ 
- this.begin('rules'); return 141; 
+ this.begin('rules'); return 142; 
 break;
 case 34 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
@@ -3030,7 +3050,7 @@ break;
 case 36 : 
 /*! Conditions:: INITIAL */ 
 /*! Rule::       {ID} */ 
- this.pushState('macro'); return 135; 
+ this.pushState('macro'); return 136; 
 break;
 case 37 : 
 /*! Conditions:: macro */ 
@@ -3043,7 +3063,7 @@ case 38 :
  
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
-                                            return 172;
+                                            return 173;
                                          
 break;
 case 39 : 
@@ -3059,17 +3079,17 @@ break;
 case 41 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       "(\\\\|\\"|[^"])*" */ 
- yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 171; 
+ yy_.yytext = yy_.yytext.replace(/\\"/g,'"'); return 172; 
 break;
 case 42 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       '(\\\\|\\'|[^'])*' */ 
- yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 171; 
+ yy_.yytext = yy_.yytext.replace(/\\'/g,"'"); return 172; 
 break;
 case 43 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \[ */ 
- this.pushState('set'); return 164; 
+ this.pushState('set'); return 165; 
 break;
 case 56 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
@@ -3079,7 +3099,7 @@ break;
 case 57 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \/! */ 
- return 157;                    // treated as `(?!atom)` 
+ return 158;                    // treated as `(?!atom)` 
 break;
 case 58 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
@@ -3089,27 +3109,27 @@ break;
 case 60 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       \\. */ 
- yy_.yytext = yy_.yytext.replace(/^\\/g, ''); return 169; 
+ yy_.yytext = yy_.yytext.replace(/^\\/g, ''); return 170; 
 break;
 case 63 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %options\b */ 
- this.begin('options'); return 173; 
+ this.begin('options'); return 174; 
 break;
 case 64 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %s\b */ 
- this.begin('start_condition'); return 137; 
+ this.begin('start_condition'); return 138; 
 break;
 case 65 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %x\b */ 
- this.begin('start_condition'); return 139; 
+ this.begin('start_condition'); return 140; 
 break;
 case 66 : 
 /*! Conditions:: INITIAL trail code */ 
 /*! Rule::       %include\b */ 
- this.pushState('path'); return 179; 
+ this.pushState('path'); return 180; 
 break;
 case 67 : 
 /*! Conditions:: INITIAL rules trail code */ 
@@ -3117,7 +3137,7 @@ case 67 :
  
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer option: ', yy_.yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
-                                            return 144;
+                                            return 145;
                                          
 break;
 case 68 : 
@@ -3133,12 +3153,12 @@ break;
 case 78 : 
 /*! Conditions:: set */ 
 /*! Rule::       \] */ 
- this.popState('set'); return 166; 
+ this.popState('set'); return 167; 
 break;
 case 80 : 
 /*! Conditions:: code */ 
 /*! Rule::       [^\r\n]+ */ 
- return 182;      // the bit of CODE just before EOF... 
+ return 183;      // the bit of CODE just before EOF... 
 break;
 case 81 : 
 /*! Conditions:: path */ 
@@ -3148,12 +3168,12 @@ break;
 case 82 : 
 /*! Conditions:: path */ 
 /*! Rule::       '[^\r\n]+' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 180; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 181; 
 break;
 case 83 : 
 /*! Conditions:: path */ 
 /*! Rule::       "[^\r\n]+" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 180; 
+ yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 181; 
 break;
 case 84 : 
 /*! Conditions:: path */ 
@@ -3163,7 +3183,7 @@ break;
 case 85 : 
 /*! Conditions:: path */ 
 /*! Rule::       [^\s\r\n]+ */ 
- this.popState(); return 180; 
+ this.popState(); return 181; 
 break;
 case 86 : 
 /*! Conditions:: * */ 
@@ -3181,25 +3201,25 @@ simpleCaseActionClusters: {
 
   /*! Conditions:: action */ 
   /*! Rule::       \/\*(.|\n|\r)*?\*\/ */ 
-   0 : 151,
+   0 : 152,
   /*! Conditions:: action */ 
   /*! Rule::       \/\/.* */ 
-   1 : 151,
+   1 : 152,
   /*! Conditions:: action */ 
   /*! Rule::       "(\\\\|\\"|[^"])*" */ 
-   3 : 151,
+   3 : 152,
   /*! Conditions:: action */ 
   /*! Rule::       '(\\\\|\\'|[^'])*' */ 
-   4 : 151,
+   4 : 152,
   /*! Conditions:: action */ 
   /*! Rule::       [/"'][^{}/"']+ */ 
-   5 : 151,
+   5 : 152,
   /*! Conditions:: action */ 
   /*! Rule::       [^{}/"']+ */ 
-   6 : 151,
+   6 : 152,
   /*! Conditions:: conditions */ 
   /*! Rule::       {NAME} */ 
-   9 : 135,
+   9 : 136,
   /*! Conditions:: conditions */ 
   /*! Rule::       , */ 
    11 : 44,
@@ -3208,28 +3228,28 @@ simpleCaseActionClusters: {
    12 : 42,
   /*! Conditions:: options */ 
   /*! Rule::       {NAME} */ 
-   18 : 135,
+   18 : 136,
   /*! Conditions:: options */ 
   /*! Rule::       = */ 
    19 : 61,
   /*! Conditions:: options */ 
   /*! Rule::       [^\s\r\n]+ */ 
-   22 : 177,
+   22 : 178,
   /*! Conditions:: start_condition */ 
   /*! Rule::       {ID} */ 
-   25 : 145,
+   25 : 146,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \| */ 
    44 : 124,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?: */ 
-   45 : 156,
+   45 : 157,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?= */ 
-   46 : 156,
+   46 : 157,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \(\?! */ 
-   47 : 156,
+   47 : 157,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \( */ 
    48 : 40,
@@ -3256,7 +3276,7 @@ simpleCaseActionClusters: {
    55 : 36,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \\([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}) */ 
-   59 : 169,
+   59 : 170,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \$ */ 
    61 : 36,
@@ -3265,13 +3285,13 @@ simpleCaseActionClusters: {
    62 : 46,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{\d+(,\s?\d+|,)?\} */ 
-   69 : 170,
+   69 : 171,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{{ID}\} */ 
-   70 : 163,
+   70 : 164,
   /*! Conditions:: set options */ 
   /*! Rule::       \{{ID}\} */ 
-   71 : 163,
+   71 : 164,
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \{ */ 
    72 : 123,
@@ -3280,16 +3300,16 @@ simpleCaseActionClusters: {
    73 : 125,
   /*! Conditions:: * */ 
   /*! Rule::       $ */ 
-   75 : 1,
+   75 : 132,
   /*! Conditions:: set */ 
   /*! Rule::       (?:\\\\|\\\]|[^\]{])+ */ 
-   76 : 168,
+   76 : 169,
   /*! Conditions:: set */ 
   /*! Rule::       \{ */ 
-   77 : 168,
+   77 : 169,
   /*! Conditions:: code */ 
   /*! Rule::       [^\r\n]*(\r|\n)+ */ 
-   79 : 182
+   79 : 183
 },
 rules: [
 /^(?:\/\*(.|\n|\r)*?\*\/)/,
