@@ -293,7 +293,7 @@ regex_set_atom
                 // treat this as part of an XRegExp `\p{...}` Unicode slug:
                 $$ = $name_expansion;
             } else {
-                $$ = '{[' + $name_expansion + ']}';
+                $$ = $name_expansion;
             }
             //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
         }
