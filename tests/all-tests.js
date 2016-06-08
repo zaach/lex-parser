@@ -38,6 +38,24 @@ exports["test lex grammar with macros"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test lex grammar with macros in regex sets"] = function () {
+    var lexgrammar = 'D [0-9]\nL [a-zA-Z]\nID [{L}_][{L}{D}_]+\n%%\n\n[{D}]"ohhai" {print(9);}\n"{" return \'{\';';
+    var expected = {
+        macros: {
+            "D": "[0-9]", 
+            "L": "[a-zA-Z]", 
+            "ID": "[{L}_][{L}{D}_]+"
+        },
+        rules: [
+            ["[{D}]ohhai", "print(9);"],
+            ["\\{", "return '{';"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test escaped chars"] = function () {
     var lexgrammar = '%%\n"\\n"+ {return \'NL\';}\n\\n+ {return \'NL2\';}\n\\s+ {/* skip */}';
     var expected = {
@@ -300,6 +318,19 @@ exports["test unicode"] = function () {
     var expected = {
         rules: [
             ["π", "return 1;"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
+exports["test unquoted lexer rule literals"] = function () {
+    var lexgrammar = '%%\nπ return 1;\n-abc return 2;';
+    var expected = {
+        rules: [
+            ["π", "return 1;"],
+            ["-abc", "return 2;"]
         ]
     };
 
