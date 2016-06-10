@@ -35,7 +35,8 @@ lex
     ;
 
 rules_and_epilogue
-    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ EOF
+    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ 
+      EOF
       {
         $$ = { rules: [] };
       }
@@ -61,7 +62,8 @@ rules_and_epilogue
       }
     ;
 
-// because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
+// because JISON doesn't support mid-rule actions, 
+// we set up `yy` using this empty rule at the start:
 init
     : %epsilon
         {
@@ -178,8 +180,9 @@ regex
     : regex_list
         {
           // Detect if the regex ends with a pure (Unicode) word;
-          // we *do* consider escaped characters which are 'alphanumeric' to be equivalent to their non-escaped version,
-          // hence these are all valid 'words' for the 'easy keyword rules' option:
+          // we *do* consider escaped characters which are 'alphanumeric' 
+          // to be equivalent to their non-escaped version, hence these are
+          // all valid 'words' for the 'easy keyword rules' option:
           //
           // - hello_kitty
           // - γεια_σου_γατούλα
@@ -187,32 +190,38 @@ regex
           //
           // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
           //
-          // As we only check the *tail*, we also accept these as 'easy keywords':
+          // As we only check the *tail*, we also accept these as
+          // 'easy keywords':
           //
           // - %options
           // - %foo-bar    
           // - +++a:b:c1
           //
-          // Note the dash in that last example: there the code will consider `bar` to be the keyword, 
-          // which is fine with us as we're only interested in the taiol boundary and patching that one
-          // for the `easy_keyword_rules` option.
+          // Note the dash in that last example: there the code will consider
+          // `bar` to be the keyword, which is fine with us as we're only
+          // interested in the taiol boundary and patching that one for
+          // the `easy_keyword_rules` option.
           $$ = $regex_list;
           if (yy.options.easy_keyword_rules) {
             try {
-              // We need to 'protect' JSON.parse here as keywords are allowed to contain double-quotes and
-              // other leading cruft.
-              // JSON.parse *does* gobble some escapes (such as `\b`) but we protect against that through
-              // a simple replace regex: we're not interested in the special escapes' exact value anyway.
-              // It will also catch escaped escapes (`\\`), which are not word characters either, 
-              // so no need to worry about JSON.parse 'correctly' converting convoluted constructs like 
-              // '\\\\\\\\\\b' in here.
+              // We need to 'protect' JSON.parse here as keywords are allowed
+              // to contain double-quotes and other leading cruft.
+              // JSON.parse *does* gobble some escapes (such as `\b`) but
+              // we protect against that through a simple replace regex: 
+              // we're not interested in the special escapes' exact value 
+              // anyway.
+              // It will also catch escaped escapes (`\\`), which are not 
+              // word characters either, so no need to worry about 
+              // `JSON.parse()` 'correctly' converting convoluted constructs
+              // like '\\\\\\\\\\b' in here.
               $$ = $$
               .replace(/"/g, '.' /* '\\"' */)
               .replace(/\\c[A-Z]/g, '.')
               .replace(/\\[^xu0-9]/g, '.');
 
               $$ = JSON.parse('"' + $$ + '"');
-              // a 'keyword' starts with an alphanumeric character, followed by zero or more alphanumerics or digits:
+              // a 'keyword' starts with an alphanumeric character, 
+              // followed by zero or more alphanumerics or digits:
               if ($$.match(/\w[\w\d]*$/u)) {
                 $$ = $regex_list + "\\b";
               } else {
@@ -289,7 +298,9 @@ regex_set_atom
     : REGEX_SET
     | name_expansion
         { 
-            if (XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) && $name_expansion.toUpperCase() !== $name_expansion) {
+            if (XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) 
+                && $name_expansion.toUpperCase() !== $name_expansion
+            ) {
                 // treat this as part of an XRegExp `\p{...}` Unicode slug:
                 $$ = $name_expansion;
             } else {

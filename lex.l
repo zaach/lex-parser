@@ -1,6 +1,8 @@
 
 ASCII_LETTER                            [a-zA-z]
-// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge with {UNICODE_LETTER}:
+// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge 
+// with {UNICODE_LETTER} (though jison has code to optimize if you *did* 
+// include the `[a-zA-Z]` anyway):
 UNICODE_LETTER                          [\p{Alphabetic}]
 ALPHA                                   [{UNICODE_LETTER}_]
 DIGIT                                   [\p{Number}]
@@ -9,8 +11,8 @@ WHITESPACE                              [\s\r\n\p{Separator}]
 NAME                                    [{ALPHA}](?:[{ALPHA}{DIGIT}-]*[{ALPHA}{DIGIT}])?
 ID                                      [{ALPHA}][{ALPHA}{DIGIT}]*
 BR                                      \r\n|\n|\r
-// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use that one directly. 
-// Instead we define the {WS} macro here:
+// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use
+// that one directly. Instead we define the {WS} macro here:
 WS                                      [^\S\r\n]
 
 
@@ -21,8 +23,8 @@ WS                                      [^\S\r\n]
 // Off Topic
 // ---------
 //
-// Do not specify the xregexp option as we want the XRegExp \p{...} regex macros converted to 
-// native regexes and used as such:
+// Do not specify the xregexp option as we want the XRegExp \p{...}
+// regex macros converted to native regexes and used as such:
 //
 // %options xregexp
 
@@ -33,13 +35,21 @@ WS                                      [^\S\r\n]
 
 <action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
 <action>"//".*                          return 'ACTION_BODY';
-<action>"/"[^ /]*?['"{}'][^ ]*?"/"      return 'ACTION_BODY'; // regexp with braces or quotes (and no spaces)
+// regexp with braces or quotes (and no spaces):
+<action>"/"[^ /]*?['"{}'][^ ]*?"/"      return 'ACTION_BODY'; 
 <action>\"("\\\\"|'\"'|[^"])*\"         return 'ACTION_BODY';
 <action>"'"("\\\\"|"\'"|[^'])*"'"       return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                  return 'ACTION_BODY';
 <action>[^{}/"']+                       return 'ACTION_BODY';
 <action>"{"                             yy.depth++; return '{';
-<action>"}"                             if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return '}';
+<action>"}"                             %{
+                                            if (yy.depth == 0) { 
+                                                this.begin('trail'); 
+                                            } else { 
+                                                yy.depth--; 
+                                            } 
+                                            return '}';
+                                        %}
 
 <conditions>{NAME}                      return 'NAME';
 <conditions>">"                         this.popState(); return '>';
@@ -100,7 +110,8 @@ WS                                      [^\S\r\n]
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
 <macro>{BR}+                            this.popState('macro');
 
-// Accept any non-regex-special character as a direct literal without the need to put quotes around it:
+// Accept any non-regex-special character as a direct literal without 
+// the need to put quotes around it:
 <macro>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
@@ -161,8 +172,9 @@ WS                                      [^\S\r\n]
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
-// in the trailing CODE block, only accept these `%include` macros when they appear at the start of a line
-// and make sure the rest of lexer regexes account for this one so it'll match that way only:
+// in the trailing CODE block, only accept these `%include` macros when 
+// they appear at the start of a line and make sure the rest of lexer 
+// regexes account for this one so it'll match that way only:
 <code>[^\r\n]*(\r|\n)+                  return 'CODE';
 <code>[^\r\n]+                          return 'CODE';      // the bit of CODE just before EOF...
 

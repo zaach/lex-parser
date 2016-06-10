@@ -10,9 +10,16 @@ A parser for lexical grammars used by [jison](http://jison.org) and jison-lex.
 
 To build the parser yourself, clone the git repo then run:
 
+    make prep
+    
+to install required packages and then run:
+
     make
+    
+to run the unit tests.
 
 This will generate `lex-parser.js`.
+
 
 ## usage
 
@@ -21,17 +28,39 @@ This will generate `lex-parser.js`.
     // parse a lexical grammar and return JSON
     lexParser.parse("%% ... ");
 
+
 ## example
 
 The parser can parse its own lexical grammar, shown below:
 
 ```
-NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
-ID                                      [a-zA-Z_][a-zA-Z0-9_]*
-BR                                      \r\n|\n|\r
 
-%s indented trail rules
+ASCII_LETTER                            [a-zA-z]
+// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge with {UNICODE_LETTER}:
+UNICODE_LETTER                          [\p{Alphabetic}]
+ALPHA                                   [{UNICODE_LETTER}_]
+DIGIT                                   [\p{Number}]
+WHITESPACE                              [\s\r\n\p{Separator}]
+
+NAME                                    [{ALPHA}](?:[{ALPHA}{DIGIT}-]*[{ALPHA}{DIGIT}])?
+ID                                      [{ALPHA}][{ALPHA}{DIGIT}]*
+BR                                      \r\n|\n|\r
+// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use that one directly. 
+// Instead we define the {WS} macro here:
+WS                                      [^\S\r\n]
+
+
+%s indented trail rules macro
 %x code start_condition options conditions action path set
+
+
+// Off Topic
+// ---------
+//
+// Do not specify the xregexp option as we want the XRegExp \p{...} regex macros converted to 
+// native regexes and used as such:
+//
+// %options xregexp
 
 %options easy_keyword_rules
 %options ranges
@@ -54,12 +83,12 @@ BR                                      \r\n|\n|\r
 <conditions>"*"                         return '*';
 
 <rules>{BR}+                            /* empty */
-<rules>\s+{BR}+                         /* empty */
+<rules>{WS}+{BR}+                       /* empty */
 <rules>\s+                              this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
-<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
-                                        %{                      
-                                            // accept any non-regex, non-lex, non-string-delim, 
+<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
+                                        %{
+                                            // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
                                             return 'CHARACTER_LIT';
                                         %}
@@ -69,23 +98,21 @@ BR                                      \r\n|\n|\r
 <options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
 <options>[^\s\r\n]+                     return 'OPTION_VALUE';
 <options>{BR}+                          this.popState(); return 'OPTIONS_END';
-<options>\s+{BR}+                       this.popState(); return 'OPTIONS_END';
-<options>\s+                            /* empty */
+<options>{WS}+                          /* skip whitespace */
 
 <start_condition>{ID}                   return 'START_COND';
 <start_condition>{BR}+                  this.popState();
-<start_condition>\s+{BR}+               this.popState();
-<start_condition>\s+                    /* empty */
+<start_condition>{WS}+                  /* empty */
 
-<trail>\s*{BR}+                         this.begin('rules');
+<trail>{WS}*{BR}+                       this.begin('rules');
 
 <indented>"{"                           yy.depth = 0; this.begin('action'); return '{';
 <indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 "%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
 <indented>"%include"                    %{
-                                            // This is an include instruction in place of an action: 
-                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate 
-                                            // the `%include` token recognition here vs. the almost-identical rule for the same 
+                                            // This is an include instruction in place of an action:
+                                            // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
+                                            // the `%include` token recognition here vs. the almost-identical rule for the same
                                             // further below.
                                             // There's no real harm as we need to do something special in this case anyway:
                                             // push 2 (two!) conditions.
@@ -96,24 +123,34 @@ BR                                      \r\n|\n|\r
                                             // and finally it hit me what the *F* went wrong, after which I saw I needed to add *this* rule!)
 
                                             // first push the 'trail' condition which will be the follow-up after we're done parsing the path parameter...
-                                            this.pushState('trail'); 
+                                            this.pushState('trail');
                                             // then push the immediate need: the 'path' condition.
-                                            this.pushState('path'); 
+                                            this.pushState('path');
                                             return 'INCLUDE';
-                                        %} 
+                                        %}
 <indented>.+                            this.begin('rules'); return 'ACTION';
 
 "/*"(.|\n|\r)*?"*/"                     /* ignore */
 "//".*                                  /* ignore */
 
+<INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
+<macro>{BR}+                            this.popState('macro');
+
+// Accept any non-regex-special character as a direct literal without the need to put quotes around it:
+<macro>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
+                                        %{
+                                            // accept any non-regex, non-lex, non-string-delim,
+                                            // non-escape-starter, non-space character as-is
+                                            return 'CHARACTER_LIT';
+                                        %}
+
 {BR}+                                   /* empty */
 \s+                                     /* empty */
-{ID}                                    return 'NAME';
+
 \"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
 "'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
 "|"                                     return '|';
-// "["("\\\\"|"\]"|[^\]])*"]"            return 'ANY_GROUP_REGEX';
 "(?:"                                   return 'SPECIAL_GROUP';
 "(?="                                   return 'SPECIAL_GROUP';
 "(?!"                                   return 'SPECIAL_GROUP';
@@ -127,7 +164,7 @@ BR                                      \r\n|\n|\r
 "<<EOF>>"                               return '$';
 "<"                                     this.begin('conditions'); return '<';
 "/!"                                    return '/!';                    // treated as `(?!atom)`
-"/"                                     return '/';                     // treated as `(?=atom)` 
+"/"                                     return '/';                     // treated as `(?=atom)`
 "\\"([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|"c"[A-Z]|"x"[0-9A-F]{2}|"u"[a-fA-F0-9]{4})
                                         return 'ESCAPE_CHAR';
 "\\".                                   yytext = yytext.replace(/^\\/g, ''); return 'ESCAPE_CHAR';
@@ -137,8 +174,8 @@ BR                                      \r\n|\n|\r
 "%s"                                    this.begin('start_condition'); return 'START_INC';
 "%x"                                    this.begin('start_condition'); return 'START_EXC';
 <INITIAL,trail,code>"%include"          this.pushState('path'); return 'INCLUDE';
-<INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+                       
-                                        %{ 
+<INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+
+                                        %{
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                             return 'UNKNOWN_DECL';
@@ -149,11 +186,14 @@ BR                                      \r\n|\n|\r
 <set,options>"{"{ID}"}"                 return 'NAME_BRACE';
 "{"                                     return '{';
 "}"                                     return '}';
+
 .                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
+
 <*><<EOF>>                              return 'EOF';
 
 
-<set>("\\\\"|"\]"|[^\]])+               return 'REGEX_SET';
+<set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
+<set>"{"                                return 'REGEX_SET';
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
@@ -163,19 +203,20 @@ BR                                      \r\n|\n|\r
 <code>[^\r\n]+                          return 'CODE';      // the bit of CODE just before EOF...
 
 
-<path>[\r\n]                            this.popState(); this.unput(yytext);
+<path>{BR}                              this.popState(); this.unput(yytext);
 <path>"'"[^\r\n]+"'"                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
 <path>'"'[^\r\n]+'"'                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
-<path>\s+                               // skip whitespace in the line
+<path>{WS}+                             // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
-<*>.                                    %{ 
+<*>.                                    %{
                                             /* ignore unrecognized decl */
                                             console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
                                         %}
 
 %%
 ```
+
 
 ## license
 
