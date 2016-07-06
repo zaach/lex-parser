@@ -34,9 +34,18 @@ lex
         }
     ;
 
+/* 
+ * WARNING: when you want to refactor this rule, you'll get into a world of hurt 
+ * as then the grammar won't be LALR(1) any longer! The shite start to happen
+ * as soon as you take away the EOF in here and move it to the top grammar rule
+ * where it really belongs. Other refactorings of this rule to reduce the code
+ * duplication in these action blocks leads to the same effect, thanks to the
+ * different refactored rules then fighting it out in reduce/reduce conflicts
+ * thanks to the epsilon rules everywhere in there. You have been warned...
+ */ 
 rules_and_epilogue
-    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ 
-      EOF
+    : EOF         
+      /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ 
       {
         $$ = { rules: [] };
       }
@@ -65,7 +74,7 @@ rules_and_epilogue
 // because JISON doesn't support mid-rule actions, 
 // we set up `yy` using this empty rule at the start:
 init
-    : %epsilon
+    : ε
         {
             yy.actionInclude = [];
             if (!yy.options) yy.options = {};
@@ -91,7 +100,7 @@ definitions
             }
           }
         }
-    | %epsilon
+    | ε
         { $$ = [null, null]; }
     ;
 
@@ -155,7 +164,7 @@ action_body
     ;
 
 action_comments_body
-    : %epsilon
+    : ε
         { $$ = ''; }
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
@@ -240,7 +249,7 @@ regex_list
     | regex_list '|'
         { $$ = $1 + '|'; }
     | regex_concat
-    | %epsilon
+    | ε
         { $$ = ''; }
     ;
 
@@ -375,7 +384,7 @@ module_code_chunk
 optional_module_code_chunk
     : module_code_chunk
         { $$ = $module_code_chunk; }
-    | %epsilon
+    | ε
         { $$ = ''; }
     ;
 
