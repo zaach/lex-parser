@@ -111,10 +111,8 @@ definition
         { $$ = $names_inclusive; }
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
-    | ACTION
-        { yy.actionInclude.push($ACTION); $$ = null; }
-    | include_macro_code
-        { yy.actionInclude.push($include_macro_code); $$ = null; }
+    | action
+        { yy.actionInclude.push($action); $$ = null; }
     | options
         { $$ = null; }
     | UNKNOWN_DECL
@@ -150,10 +148,16 @@ rule
 action
     : '{' action_body '}'
         { $$ = $action_body; }
-    | ACTION
-        { $$ = $ACTION; }
+    | unbracketed_action_body
+        { $$ = $unbracketed_action_body; }
     | include_macro_code
         { $$ = $include_macro_code; }
+    ;
+
+unbracketed_action_body
+    : ACTION
+    | unbracketed_action_body ACTION
+        { $$ = $unbracketed_action_body + '\n' + $ACTION; }
     ;
 
 action_body
@@ -186,7 +190,7 @@ name_list
     ;
 
 regex
-    : regex_list
+    : nonempty_regex_list[re]
         {
           // Detect if the regex ends with a pure (Unicode) word;
           // we *do* consider escaped characters which are 'alphanumeric' 
@@ -208,9 +212,9 @@ regex
           //
           // Note the dash in that last example: there the code will consider
           // `bar` to be the keyword, which is fine with us as we're only
-          // interested in the taiol boundary and patching that one for
+          // interested in the trailing boundary and patching that one for
           // the `easy_keyword_rules` option.
-          $$ = $regex_list;
+          $$ = $re;
           if (yy.options.easy_keyword_rules) {
             try {
               // We need to 'protect' JSON.parse here as keywords are allowed
@@ -232,23 +236,27 @@ regex
               // a 'keyword' starts with an alphanumeric character, 
               // followed by zero or more alphanumerics or digits:
               if ($$.match(/\w[\w\d]*$/u)) {
-                $$ = $regex_list + "\\b";
+                $$ = $re + "\\b";
               } else {
-                $$ = $regex_list;
+                $$ = $re;
               }
             } catch (ex) {
-              $$ = $regex_list;
+              $$ = $re;
             }
           }
         }
     ;
 
-regex_list
+nonempty_regex_list
     : regex_list '|' regex_concat
         { $$ = $1 + '|' + $3; }
     | regex_list '|'
         { $$ = $1 + '|'; }
     | regex_concat
+    ;
+
+regex_list
+    : nonempty_regex_list
     | ε
         { $$ = ''; }
     ;

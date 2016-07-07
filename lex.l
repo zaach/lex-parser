@@ -58,7 +58,7 @@ WS                                      [^\S\r\n]
 
 <rules>{BR}+                            /* empty */
 <rules>{WS}+{BR}+                       /* empty */
-<rules>\s+                              this.begin('indented');
+<rules>{WS}+                            this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
 <rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
                                         %{
@@ -102,10 +102,10 @@ WS                                      [^\S\r\n]
                                             this.pushState('path');
                                             return 'INCLUDE';
                                         %}
-<indented>.+                            this.begin('rules'); return 'ACTION';
+<indented>.*                            this.popState(); return 'ACTION';
 
 "/*"(.|\n|\r)*?"*/"                     /* ignore */
-"//".*                                  /* ignore */
+"//"[^\r\n]*                            /* ignore */
 
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
 <macro>{BR}+                            this.popState('macro');

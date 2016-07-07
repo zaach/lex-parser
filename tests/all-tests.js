@@ -171,6 +171,18 @@ exports["test multiline action with braces in regexp"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test multiline (indented) action without braces"] = function () {
+    var lexgrammar = '%%\n"["[^\\]]"]"\n  var b=/{/;\n  // { \n  return 2 / 3;\n';
+    var expected = {
+        rules: [
+            ["\\[[^\\]]\\]", "var b=/{/;\n// { \nreturn 2 / 3;"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test include"] = function () {
     var lexgrammar = '\nRULE [0-9]\n\n%{\n hi <stuff> \n%}\n%%\n"["[^\\]]"]" %{\nreturn true;\n%}\n';
     var expected = {
