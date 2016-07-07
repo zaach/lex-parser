@@ -524,6 +524,21 @@ exports["test no brace action with surplus whitespace between rules"] = function
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+`BR  \r\n|\n|\r`
+
+exports["test macro for commit SHA-1: 1246dbb75472cee8e4e91318cc5a0d4739a8fe12"] = function () {
+    var lexgrammar = 'BR  \\r\\n|\\n|\\r\n%%\r\n{BR} %{\r\nreturn true;\r\n%}\r\n';
+    var expected = {
+        macros: {"BR": "\\r\\n|\\n|\\r"},
+        rules: [
+            ["{BR}", "\r\nreturn true;\r\n"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test windows line endings"] = function () {
     var lexgrammar = '%%\r\n"["[^\\]]"]" %{\r\nreturn true;\r\n%}\r\n';
     var expected = {
