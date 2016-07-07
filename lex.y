@@ -254,13 +254,13 @@ regex_list
     ;
 
 nonempty_regex_list
-    : nonempty_regex_list '|' regex_concat
+    : regex_list '|' regex_concat
         { $$ = $1 + '|' + $3; }
-    | nonempty_regex_list '|'
+    | regex_list '|'
         { $$ = $1 + '|'; }
-    | '|' nonempty_regex_list
+    | BUGGER '|' nonempty_regex_list
         { $$ = '|' + $2; }
-    | '|' 
+    | BUGGER '|' 
         { $$ = '|'; }
     | regex_concat
     ;
