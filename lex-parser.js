@@ -627,334 +627,380 @@ performAction: function parser__PerformAction(yytext, yy, yystate /* action[1] *
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 1 : 
-/*! Production::     lex : init definitions '%%' rules_and_epilogue */
- this.$ = $$[$0];
-          if ($$[$0 - 2][0]) this.$.macros = $$[$0 - 2][0];
-          if ($$[$0 - 2][1]) this.$.startConditions = $$[$0 - 2][1];
-          if ($$[$0 - 2][2]) this.$.unknownDecls = $$[$0 - 2][2];
-          // if there are any options, add them all, otherwise set options to NULL:
-          // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
-          for (var k in yy.options) {
-            this.$.options = yy.options;
-            break;
-          }
-          if (yy.actionInclude) {
-            var asrc = yy.actionInclude.join('\n\n');
-            // Only a non-empty action code chunk should actually make it through:
-            if (asrc.trim() !== '') {
-              this.$.actionInclude = asrc; 
-            }
-          }
-          delete yy.options;
-          delete yy.actionInclude;
-          return this.$; 
-break;
-case 2 : 
-/*! Production::     rules_and_epilogue : EOF */
- this.$ = { rules: [] }; 
-break;
-case 3 : 
-/*! Production::     rules_and_epilogue : '%%' extra_lexer_module_code EOF */
- if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
-          this.$ = { rules: [], moduleInclude: $$[$0 - 1] };
-        } else {
-          this.$ = { rules: [] };
-        } 
-break;
-case 4 : 
-/*! Production::     rules_and_epilogue : rules '%%' extra_lexer_module_code EOF */
- if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
-          this.$ = { rules: $$[$0 - 3], moduleInclude: $$[$0 - 1] };
-        } else {
-          this.$ = { rules: $$[$0 - 3] };
-        } 
-break;
-case 5 : 
-/*! Production::     rules_and_epilogue : rules EOF */
- this.$ = { rules: $$[$0 - 1] }; 
-break;
-case 6 : 
-/*! Production::     init : ε */
- yy.actionInclude = [];
-            if (!yy.options) yy.options = {}; 
-break;
-case 7 : 
-/*! Production::     definitions : definition definitions */
- this.$ = $$[$0];
-          if ($$[$0 - 1] != null) {
-            if ('length' in $$[$0 - 1]) {
-              this.$[0] = this.$[0] || {};
-              this.$[0][$$[$0 - 1][0]] = $$[$0 - 1][1];
-            } else if ($$[$0 - 1].type === 'names') {
-              this.$[1] = this.$[1] || {};
-              for (var name in $$[$0 - 1].names) {
-                this.$[1][name] = $$[$0 - 1].names[name];
-              }
-            } else if ($$[$0 - 1].type === 'unknown') {
-              this.$[2] = this.$[2] || [];
-              this.$[2].push($$[$0 - 1].body);
-            }
-          } 
-break;
-case 8 : 
-/*! Production::     definitions : ε */
- this.$ = [null, null]; 
-break;
-case 9 : 
-/*! Production::     definition : NAME regex */
- this.$ = [$$[$0 - 1], $$[$0]]; 
-break;
-case 10 : 
-/*! Production::     definition : START_INC names_inclusive */
- case 11 : 
-/*! Production::     definition : START_EXC names_exclusive */
- case 24 : 
-/*! Production::     action : ACTION */
- case 25 : 
-/*! Production::     action : include_macro_code */
- case 26 : 
-/*! Production::     action_body : action_comments_body */
- case 63 : 
-/*! Production::     escape_char : ESCAPE_CHAR */
- case 64 : 
-/*! Production::     range_regex : RANGE_REGEX */
- case 73 : 
-/*! Production::     extra_lexer_module_code : optional_module_code_chunk */
- case 77 : 
-/*! Production::     module_code_chunk : CODE */
- case 79 : 
-/*! Production::     optional_module_code_chunk : module_code_chunk */
- this.$ = $$[$0]; 
-break;
-case 12 : 
-/*! Production::     definition : ACTION */
- case 13 : 
-/*! Production::     definition : include_macro_code */
- yy.actionInclude.push($$[$0]); this.$ = null; 
-break;
-case 14 : 
-/*! Production::     definition : options */
- this.$ = null; 
-break;
-case 15 : 
-/*! Production::     definition : UNKNOWN_DECL */
- this.$ = {type: 'unknown', body: $$[$0]}; 
-break;
-case 16 : 
-/*! Production::     names_inclusive : START_COND */
- this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 0; 
-break;
-case 17 : 
-/*! Production::     names_inclusive : names_inclusive START_COND */
- this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 0; 
-break;
-case 18 : 
-/*! Production::     names_exclusive : START_COND */
- this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 1; 
-break;
-case 19 : 
-/*! Production::     names_exclusive : names_exclusive START_COND */
- this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 1; 
-break;
-case 20 : 
-/*! Production::     rules : rules rule */
- this.$ = $$[$0 - 1]; this.$.push($$[$0]); 
-break;
-case 21 : 
-/*! Production::     rules : rule */
- case 33 : 
-/*! Production::     name_list : NAME */
- this.$ = [$$[$0]]; 
-break;
-case 22 : 
-/*! Production::     rule : start_conditions regex action */
- this.$ = $$[$0 - 2] ? [$$[$0 - 2], $$[$0 - 1], $$[$0]] : [$$[$0 - 1], $$[$0]]; 
-break;
-case 23 : 
-/*! Production::     action : '{' action_body '}' */
- case 30 : 
-/*! Production::     start_conditions : '<' name_list '>' */
- this.$ = $$[$0 - 1]; 
-break;
-case 27 : 
-/*! Production::     action_body : action_body '{' action_body '}' action_comments_body */
- this.$ = $$[$0 - 4] + $$[$0 - 3] + $$[$0 - 2] + $$[$0 - 1] + $$[$0]; 
-break;
-case 28 : 
-/*! Production::     action_comments_body : ε */
- case 39 : 
-/*! Production::     regex_list : ε */
- case 80 : 
-/*! Production::     optional_module_code_chunk : ε */
- this.$ = ''; 
-break;
-case 29 : 
-/*! Production::     action_comments_body : action_comments_body ACTION_BODY */
- case 40 : 
-/*! Production::     regex_concat : regex_concat regex_base */
- case 50 : 
-/*! Production::     regex_base : regex_base range_regex */
- case 59 : 
-/*! Production::     regex_set : regex_set_atom regex_set */
- case 78 : 
-/*! Production::     module_code_chunk : module_code_chunk CODE */
- this.$ = $$[$0 - 1] + $$[$0]; 
-break;
-case 31 : 
-/*! Production::     start_conditions : '<' '*' '>' */
- this.$ = ['*']; 
-break;
-case 34 : 
-/*! Production::     name_list : name_list ',' NAME */
- this.$ = $$[$0 - 2]; this.$.push($$[$0]); 
-break;
-case 35 : 
-/*! Production::     regex : regex_list */
- // Detect if the regex ends with a pure (Unicode) word;
-          // we *do* consider escaped characters which are 'alphanumeric' 
-          // to be equivalent to their non-escaped version, hence these are
-          // all valid 'words' for the 'easy keyword rules' option:
-          //
-          // - hello_kitty
-          // - γεια_σου_γατούλα
-          // - \u03B3\u03B5\u03B9\u03B1_\u03C3\u03BF\u03C5_\u03B3\u03B1\u03C4\u03BF\u03CD\u03BB\u03B1
-          //
-          // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
-          //
-          // As we only check the *tail*, we also accept these as
-          // 'easy keywords':
-          //
-          // - %options
-          // - %foo-bar    
-          // - +++a:b:c1
-          //
-          // Note the dash in that last example: there the code will consider
-          // `bar` to be the keyword, which is fine with us as we're only
-          // interested in the taiol boundary and patching that one for
-          // the `easy_keyword_rules` option.
-          this.$ = $$[$0];
-          if (yy.options.easy_keyword_rules) {
-            try {
-              // We need to 'protect' JSON.parse here as keywords are allowed
-              // to contain double-quotes and other leading cruft.
-              // JSON.parse *does* gobble some escapes (such as `\b`) but
-              // we protect against that through a simple replace regex: 
-              // we're not interested in the special escapes' exact value 
-              // anyway.
-              // It will also catch escaped escapes (`\\`), which are not 
-              // word characters either, so no need to worry about 
-              // `JSON.parse()` 'correctly' converting convoluted constructs
-              // like '\\\\\\\\\\b' in here.
-              this.$ = this.$
-              .replace(/"/g, '.' /* '\\"' */)
-              .replace(/\\c[A-Z]/g, '.')
-              .replace(/\\[^xu0-9]/g, '.');
+case 1:
+    /*! Production::    lex : init definitions '%%' rules_and_epilogue */
+    this.$ = $$[$0];
+    if ($$[$0 - 2][0]) this.$.macros = $$[$0 - 2][0];
+    if ($$[$0 - 2][1]) this.$.startConditions = $$[$0 - 2][1];
+    if ($$[$0 - 2][2]) this.$.unknownDecls = $$[$0 - 2][2];
+    // if there are any options, add them all, otherwise set options to NULL:
+    // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
+    for (var k in yy.options) {
+      this.$.options = yy.options;
+      break;
+    }
+    if (yy.actionInclude) {
+      var asrc = yy.actionInclude.join('\n\n');
+      // Only a non-empty action code chunk should actually make it through:
+      if (asrc.trim() !== '') {
+        this.$.actionInclude = asrc; 
+      }
+    }
+    delete yy.options;
+    delete yy.actionInclude;
+    return this.$;
+    break;
 
-              this.$ = JSON.parse('"' + this.$ + '"');
-              // a 'keyword' starts with an alphanumeric character, 
-              // followed by zero or more alphanumerics or digits:
-              if (this.$.match(/\w[\w\d]*$/u)) {
-                this.$ = $$[$0] + "\\b";
-              } else {
-                this.$ = $$[$0];
-              }
-            } catch (ex) {
-              this.$ = $$[$0];
-            }
-          } 
-break;
-case 36 : 
-/*! Production::     regex_list : regex_list '|' regex_concat */
- this.$ = $$[$0 - 2] + '|' + $$[$0]; 
-break;
-case 37 : 
-/*! Production::     regex_list : regex_list '|' */
- this.$ = $$[$0 - 1] + '|'; 
-break;
-case 42 : 
-/*! Production::     regex_base : '(' regex_list ')' */
- this.$ = '(' + $$[$0 - 1] + ')'; 
-break;
-case 43 : 
-/*! Production::     regex_base : SPECIAL_GROUP regex_list ')' */
- this.$ = $$[$0 - 2] + $$[$0 - 1] + ')'; 
-break;
-case 44 : 
-/*! Production::     regex_base : regex_base '+' */
- this.$ = $$[$0 - 1] + '+'; 
-break;
-case 45 : 
-/*! Production::     regex_base : regex_base '*' */
- this.$ = $$[$0 - 1] + '*'; 
-break;
-case 46 : 
-/*! Production::     regex_base : regex_base '?' */
- this.$ = $$[$0 - 1] + '?'; 
-break;
-case 47 : 
-/*! Production::     regex_base : '/' regex_base */
- this.$ = '(?=' + $$[$0] + ')'; 
-break;
-case 48 : 
-/*! Production::     regex_base : '/!' regex_base */
- this.$ = '(?!' + $$[$0] + ')'; 
-break;
-case 52 : 
-/*! Production::     regex_base : '.' */
- this.$ = '.'; 
-break;
-case 53 : 
-/*! Production::     regex_base : '^' */
- this.$ = '^'; 
-break;
-case 54 : 
-/*! Production::     regex_base : '$' */
- this.$ = '$'; 
-break;
-case 58 : 
-/*! Production::     any_group_regex : REGEX_SET_START regex_set REGEX_SET_END */
- case 74 : 
-/*! Production::     extra_lexer_module_code : optional_module_code_chunk include_macro_code extra_lexer_module_code */
- this.$ = $$[$0 - 2] + $$[$0 - 1] + $$[$0]; 
-break;
-case 62 : 
-/*! Production::     regex_set_atom : name_expansion */
- if (XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) 
-                && $$[$0].toUpperCase() !== $$[$0]
-            ) {
-                // treat this as part of an XRegExp `\p{...}` Unicode slug:
-                this.$ = $$[$0];
-            } else {
-                this.$ = $$[$0];
-            }
-            //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ }); 
-break;
-case 65 : 
-/*! Production::     string : STRING_LIT */
- this.$ = prepareString($$[$0].substr(1, $$[$0].length - 2)); 
-break;
-case 70 : 
-/*! Production::     option : NAME[option] */
- yy.options[$$[$0]] = true; 
-break;
-case 71 : 
-/*! Production::     option : NAME[option] '=' OPTION_VALUE[value] */
- case 72 : 
-/*! Production::     option : NAME[option] '=' NAME[value] */
- yy.options[$$[$0 - 2]] = $$[$0]; 
-break;
-case 75 : 
-/*! Production::     include_macro_code : INCLUDE PATH */
- var fs = require('fs');
-            var fileContent = fs.readFileSync($$[$0], { encoding: 'utf-8' });
-            // And no, we don't support nested '%include':
-            this.$ = '\n// Included by Jison: ' + $$[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $$[$0] + '\n\n'; 
-break;
-case 76 : 
-/*! Production::     include_macro_code : INCLUDE error */
- console.error("%include MUST be followed by a valid file path"); 
-break;
+case 2:
+    /*! Production::    rules_and_epilogue : EOF */
+    this.$ = { rules: [] };
+    break;
+
+case 3:
+    /*! Production::    rules_and_epilogue : '%%' extra_lexer_module_code EOF */
+    if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
+      this.$ = { rules: [], moduleInclude: $$[$0 - 1] };
+    } else {
+      this.$ = { rules: [] };
+    }
+    break;
+
+case 4:
+    /*! Production::    rules_and_epilogue : rules '%%' extra_lexer_module_code EOF */
+    if ($$[$0 - 1] && $$[$0 - 1].trim() !== '') {
+      this.$ = { rules: $$[$0 - 3], moduleInclude: $$[$0 - 1] };
+    } else {
+      this.$ = { rules: $$[$0 - 3] };
+    }
+    break;
+
+case 5:
+    /*! Production::    rules_and_epilogue : rules EOF */
+    this.$ = { rules: $$[$0 - 1] };
+    break;
+
+case 6:
+    /*! Production::    init : ε */
+    yy.actionInclude = [];
+    if (!yy.options) yy.options = {};
+    break;
+
+case 7:
+    /*! Production::    definitions : definition definitions */
+    this.$ = $$[$0];
+    if ($$[$0 - 1] != null) {
+      if ('length' in $$[$0 - 1]) {
+        this.$[0] = this.$[0] || {};
+        this.$[0][$$[$0 - 1][0]] = $$[$0 - 1][1];
+      } else if ($$[$0 - 1].type === 'names') {
+        this.$[1] = this.$[1] || {};
+        for (var name in $$[$0 - 1].names) {
+          this.$[1][name] = $$[$0 - 1].names[name];
+        }
+      } else if ($$[$0 - 1].type === 'unknown') {
+        this.$[2] = this.$[2] || [];
+        this.$[2].push($$[$0 - 1].body);
+      }
+    }
+    break;
+
+case 8:
+    /*! Production::    definitions : ε */
+    this.$ = [null, null];
+    break;
+
+case 9:
+    /*! Production::    definition : NAME regex */
+    this.$ = [$$[$0 - 1], $$[$0]];
+    break;
+
+case 10:
+    /*! Production::    definition : START_INC names_inclusive */
+case 11:
+    /*! Production::    definition : START_EXC names_exclusive */
+case 24:
+    /*! Production::    action : ACTION */
+case 25:
+    /*! Production::    action : include_macro_code */
+case 26:
+    /*! Production::    action_body : action_comments_body */
+case 63:
+    /*! Production::    escape_char : ESCAPE_CHAR */
+case 64:
+    /*! Production::    range_regex : RANGE_REGEX */
+case 73:
+    /*! Production::    extra_lexer_module_code : optional_module_code_chunk */
+case 77:
+    /*! Production::    module_code_chunk : CODE */
+case 79:
+    /*! Production::    optional_module_code_chunk : module_code_chunk */
+    this.$ = $$[$0];
+    break;
+
+case 12:
+    /*! Production::    definition : ACTION */
+case 13:
+    /*! Production::    definition : include_macro_code */
+    yy.actionInclude.push($$[$0]); this.$ = null;
+    break;
+
+case 14:
+    /*! Production::    definition : options */
+    this.$ = null;
+    break;
+
+case 15:
+    /*! Production::    definition : UNKNOWN_DECL */
+    this.$ = {type: 'unknown', body: $$[$0]};
+    break;
+
+case 16:
+    /*! Production::    names_inclusive : START_COND */
+    this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 0;
+    break;
+
+case 17:
+    /*! Production::    names_inclusive : names_inclusive START_COND */
+    this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 0;
+    break;
+
+case 18:
+    /*! Production::    names_exclusive : START_COND */
+    this.$ = {type: 'names', names: {}}; this.$.names[$$[$0]] = 1;
+    break;
+
+case 19:
+    /*! Production::    names_exclusive : names_exclusive START_COND */
+    this.$ = $$[$0 - 1]; this.$.names[$$[$0]] = 1;
+    break;
+
+case 20:
+    /*! Production::    rules : rules rule */
+    this.$ = $$[$0 - 1]; this.$.push($$[$0]);
+    break;
+
+case 21:
+    /*! Production::    rules : rule */
+case 33:
+    /*! Production::    name_list : NAME */
+    this.$ = [$$[$0]];
+    break;
+
+case 22:
+    /*! Production::    rule : start_conditions regex action */
+    this.$ = $$[$0 - 2] ? [$$[$0 - 2], $$[$0 - 1], $$[$0]] : [$$[$0 - 1], $$[$0]];
+    break;
+
+case 23:
+    /*! Production::    action : '{' action_body '}' */
+case 30:
+    /*! Production::    start_conditions : '<' name_list '>' */
+    this.$ = $$[$0 - 1];
+    break;
+
+case 27:
+    /*! Production::    action_body : action_body '{' action_body '}' action_comments_body */
+    this.$ = $$[$0 - 4] + $$[$0 - 3] + $$[$0 - 2] + $$[$0 - 1] + $$[$0];
+    break;
+
+case 28:
+    /*! Production::    action_comments_body : ε */
+case 39:
+    /*! Production::    regex_list : ε */
+case 80:
+    /*! Production::    optional_module_code_chunk : ε */
+    this.$ = '';
+    break;
+
+case 29:
+    /*! Production::    action_comments_body : action_comments_body ACTION_BODY */
+case 40:
+    /*! Production::    regex_concat : regex_concat regex_base */
+case 50:
+    /*! Production::    regex_base : regex_base range_regex */
+case 59:
+    /*! Production::    regex_set : regex_set_atom regex_set */
+case 78:
+    /*! Production::    module_code_chunk : module_code_chunk CODE */
+    this.$ = $$[$0 - 1] + $$[$0];
+    break;
+
+case 31:
+    /*! Production::    start_conditions : '<' '*' '>' */
+    this.$ = ['*'];
+    break;
+
+case 34:
+    /*! Production::    name_list : name_list ',' NAME */
+    this.$ = $$[$0 - 2]; this.$.push($$[$0]);
+    break;
+
+case 35:
+    /*! Production::    regex : regex_list */
+    // Detect if the regex ends with a pure (Unicode) word;
+    // we *do* consider escaped characters which are 'alphanumeric' 
+    // to be equivalent to their non-escaped version, hence these are
+    // all valid 'words' for the 'easy keyword rules' option:
+    //
+    // - hello_kitty
+    // - γεια_σου_γατούλα
+    // - \u03B3\u03B5\u03B9\u03B1_\u03C3\u03BF\u03C5_\u03B3\u03B1\u03C4\u03BF\u03CD\u03BB\u03B1
+    //
+    // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
+    //
+    // As we only check the *tail*, we also accept these as
+    // 'easy keywords':
+    //
+    // - %options
+    // - %foo-bar    
+    // - +++a:b:c1
+    //
+    // Note the dash in that last example: there the code will consider
+    // `bar` to be the keyword, which is fine with us as we're only
+    // interested in the taiol boundary and patching that one for
+    // the `easy_keyword_rules` option.
+    this.$ = $$[$0];
+    if (yy.options.easy_keyword_rules) {
+      try {
+        // We need to 'protect' JSON.parse here as keywords are allowed
+        // to contain double-quotes and other leading cruft.
+        // JSON.parse *does* gobble some escapes (such as `\b`) but
+        // we protect against that through a simple replace regex: 
+        // we're not interested in the special escapes' exact value 
+        // anyway.
+        // It will also catch escaped escapes (`\\`), which are not 
+        // word characters either, so no need to worry about 
+        // `JSON.parse()` 'correctly' converting convoluted constructs
+        // like '\\\\\\\\\\b' in here.
+        this.$ = this.$
+        .replace(/"/g, '.' /* '\\"' */)
+        .replace(/\\c[A-Z]/g, '.')
+        .replace(/\\[^xu0-9]/g, '.');
+    
+        this.$ = JSON.parse('"' + this.$ + '"');
+        // a 'keyword' starts with an alphanumeric character, 
+        // followed by zero or more alphanumerics or digits:
+        if (this.$.match(/\w[\w\d]*$/u)) {
+          this.$ = $$[$0] + "\\b";
+        } else {
+          this.$ = $$[$0];
+        }
+      } catch (ex) {
+        this.$ = $$[$0];
+      }
+    }
+    break;
+
+case 36:
+    /*! Production::    regex_list : regex_list '|' regex_concat */
+    this.$ = $$[$0 - 2] + '|' + $$[$0];
+    break;
+
+case 37:
+    /*! Production::    regex_list : regex_list '|' */
+    this.$ = $$[$0 - 1] + '|';
+    break;
+
+case 42:
+    /*! Production::    regex_base : '(' regex_list ')' */
+    this.$ = '(' + $$[$0 - 1] + ')';
+    break;
+
+case 43:
+    /*! Production::    regex_base : SPECIAL_GROUP regex_list ')' */
+    this.$ = $$[$0 - 2] + $$[$0 - 1] + ')';
+    break;
+
+case 44:
+    /*! Production::    regex_base : regex_base '+' */
+    this.$ = $$[$0 - 1] + '+';
+    break;
+
+case 45:
+    /*! Production::    regex_base : regex_base '*' */
+    this.$ = $$[$0 - 1] + '*';
+    break;
+
+case 46:
+    /*! Production::    regex_base : regex_base '?' */
+    this.$ = $$[$0 - 1] + '?';
+    break;
+
+case 47:
+    /*! Production::    regex_base : '/' regex_base */
+    this.$ = '(?=' + $$[$0] + ')';
+    break;
+
+case 48:
+    /*! Production::    regex_base : '/!' regex_base */
+    this.$ = '(?!' + $$[$0] + ')';
+    break;
+
+case 52:
+    /*! Production::    regex_base : '.' */
+    this.$ = '.';
+    break;
+
+case 53:
+    /*! Production::    regex_base : '^' */
+    this.$ = '^';
+    break;
+
+case 54:
+    /*! Production::    regex_base : '$' */
+    this.$ = '$';
+    break;
+
+case 58:
+    /*! Production::    any_group_regex : REGEX_SET_START regex_set REGEX_SET_END */
+case 74:
+    /*! Production::    extra_lexer_module_code : optional_module_code_chunk include_macro_code extra_lexer_module_code */
+    this.$ = $$[$0 - 2] + $$[$0 - 1] + $$[$0];
+    break;
+
+case 62:
+    /*! Production::    regex_set_atom : name_expansion */
+    if (XRegExp.isUnicodeSlug($$[$0].replace(/[{}]/g, '')) 
+        && $$[$0].toUpperCase() !== $$[$0]
+    ) {
+        // treat this as part of an XRegExp `\p{...}` Unicode slug:
+        this.$ = $$[$0];
+    } else {
+        this.$ = $$[$0];
+    }
+    //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
+    break;
+
+case 65:
+    /*! Production::    string : STRING_LIT */
+    this.$ = prepareString($$[$0].substr(1, $$[$0].length - 2));
+    break;
+
+case 70:
+    /*! Production::    option : NAME[option] */
+    yy.options[$$[$0]] = true;
+    break;
+
+case 71:
+    /*! Production::    option : NAME[option] '=' OPTION_VALUE[value] */
+case 72:
+    /*! Production::    option : NAME[option] '=' NAME[value] */
+    yy.options[$$[$0 - 2]] = $$[$0];
+    break;
+
+case 75:
+    /*! Production::    include_macro_code : INCLUDE PATH */
+    var fs = require('fs');
+    var fileContent = fs.readFileSync($$[$0], { encoding: 'utf-8' });
+    // And no, we don't support nested '%include':
+    this.$ = '\n// Included by Jison: ' + $$[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + $$[$0] + '\n\n';
+    break;
+
+case 76:
+    /*! Production::    include_macro_code : INCLUDE error */
+    console.error("%include MUST be followed by a valid file path");
+    break;
+
 }
 },
 table: bt({
@@ -2116,6 +2162,10 @@ parse: function parse(input) {
     }
 
 
+    // SHA-1: c4ea524b22935710d98252a1d9e04ddb82555e56 :: shut up error reports about non-strict mode in Chrome in the demo pages:
+    // (NodeJS doesn't care, so this semicolon is only important for the demo web pages which run the jison *GENERATOR* in a web page...)
+    ;
+
     // Produce a (more or less) human-readable list of expected tokens at the point of failure.
     // 
     // The produced list may contain token or token set descriptions instead of the tokens
@@ -2527,27 +2577,34 @@ function JisonLexerError(msg, hash) {
 
 
 var lexer = {
+    EOF: 1,
+    ERROR: 2,
 
-EOF:1,
+    // JisonLexerError: JisonLexerError,        // <-- injected by the code generator
 
-ERROR:2,
+    // options: {},                             // <-- injected by the code generator
 
-parseError:function lexer_parseError(str, hash) {
+    // yy: ...,                                 // <-- injected by setInput()
+     
+    __currentRuleSet__: null,                   // <-- internal rule set cache for the current lexer state
+
+    parseError: function lexer_parseError(str, hash) {
         if (this.yy.parser && typeof this.yy.parser.parseError === 'function') {
             return this.yy.parser.parseError(str, hash) || this.ERROR;
         } else {
             throw new this.JisonLexerError(str);
         }
     },
-
-// resets the lexer, sets new input
-setInput:function lexer_setInput(input, yy) {
+    
+    // resets the lexer, sets new input
+    setInput: function lexer_setInput(input, yy) {
         this.yy = yy || this.yy || {};
         this._input = input;
         this._more = this._backtrack = this._signaled_error_token = this.done = false;
         this.yylineno = this.yyleng = 0;
         this.yytext = this.matched = this.match = '';
         this.conditionStack = ['INITIAL'];
+        this.__currentRuleSet__ = null;
         this.yylloc = {
             first_line: 1,
             first_column: 0,
@@ -2561,8 +2618,8 @@ setInput:function lexer_setInput(input, yy) {
         return this;
     },
 
-// consumes and returns one char from the input
-input:function lexer_input() {
+    // consumes and returns one char from the input
+    input: function lexer_input() {
         if (!this._input) {
             this.done = true;
             return null;
@@ -2611,8 +2668,8 @@ input:function lexer_input() {
         return ch;
     },
 
-// unshifts one char (or a string) into the input
-unput:function lexer_unput(ch) {
+    // unshifts one char (or a string) into the input
+    unput: function lexer_unput(ch) {
         var len = ch.length;
         var lines = ch.split(/(?:\r\n?|\n)/g);
 
@@ -2642,14 +2699,14 @@ unput:function lexer_unput(ch) {
         return this;
     },
 
-// When called from action, caches matched text and appends it on next action
-more:function lexer_more() {
+    // When called from action, caches matched text and appends it on next action
+    more: function lexer_more() {
         this._more = true;
         return this;
     },
 
-// When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
-reject:function lexer_reject() {
+    // When called from action, signals the lexer that this rule fails to match the input, so the next matching rule (regex) should be tested instead.
+    reject: function lexer_reject() {
         if (this.options.backtrack_lexer) {
             this._backtrack = true;
         } else {
@@ -2667,13 +2724,13 @@ reject:function lexer_reject() {
         return this;
     },
 
-// retain first n characters of the match
-less:function lexer_less(n) {
+    // retain first n characters of the match
+    less: function lexer_less(n) {
         return this.unput(this.match.slice(n));
     },
 
-// return (part of the) already matched input, i.e. for error messages
-pastInput:function lexer_pastInput(maxSize) {
+    // return (part of the) already matched input, i.e. for error messages
+    pastInput: function lexer_pastInput(maxSize) {
         var past = this.matched.substr(0, this.matched.length - this.match.length);
         if (maxSize < 0)
             maxSize = past.length;
@@ -2682,8 +2739,8 @@ pastInput:function lexer_pastInput(maxSize) {
         return (past.length > maxSize ? '...' + past.substr(-maxSize) : past);
     },
 
-// return (part of the) upcoming input, i.e. for error messages
-upcomingInput:function lexer_upcomingInput(maxSize) {
+    // return (part of the) upcoming input, i.e. for error messages
+    upcomingInput: function lexer_upcomingInput(maxSize) {
         var next = this.match;
         if (maxSize < 0)
             maxSize = next.length + this._input.length;
@@ -2695,18 +2752,30 @@ upcomingInput:function lexer_upcomingInput(maxSize) {
         return (next.length > maxSize ? next.substr(0, maxSize) + '...' : next);
     },
 
-// return a string which displays the character position where the lexing error occurred, i.e. for error messages
-showPosition:function lexer_showPosition() {
+    // return a string which displays the character position where the lexing error occurred, i.e. for error messages
+    showPosition: function lexer_showPosition() {
         var pre = this.pastInput().replace(/\s/g, ' ');
         var c = new Array(pre.length + 1).join('-');
         return pre + this.upcomingInput().replace(/\s/g, ' ') + '\n' + c + '^';
     },
 
-// test the lexed token: return FALSE when not a match, otherwise return token
-test_match:function lexer_test_match(match, indexed_rule) {
+    // test the lexed token: return FALSE when not a match, otherwise return token.
+    //
+    // `match` is supposed to be an array coming out of a regex match, i.e. `match[0]` 
+    // contains the actually matched text string.
+    //  
+    // Also move the input cursor forward and update the match collectors:
+    // - yytext
+    // - yyleng
+    // - match
+    // - matches
+    // - yylloc
+    // - offset 
+    test_match: function lexer_test_match(match, indexed_rule) {
         var token,
             lines,
-            backup;
+            backup,
+            match_str;
 
         if (this.options.backtrack_lexer) {
             // save context
@@ -2735,7 +2804,8 @@ test_match:function lexer_test_match(match, indexed_rule) {
             }
         }
 
-        lines = match[0].match(/(?:\r\n?|\n).*/g);
+        match_str = match[0];
+        lines = match_str.match(/(?:\r\n?|\n).*/g);
         if (lines) {
             this.yylineno += lines.length;
         }
@@ -2745,20 +2815,23 @@ test_match:function lexer_test_match(match, indexed_rule) {
             first_column: this.yylloc.last_column,
             last_column: lines ?
                          lines[lines.length - 1].length - lines[lines.length - 1].match(/\r?\n?/)[0].length :
-                         this.yylloc.last_column + match[0].length
+                         this.yylloc.last_column + match_str.length
         };
-        this.yytext += match[0];
-        this.match += match[0];
+        this.yytext += match_str;
+        this.match += match_str;
         this.matches = match;
         this.yyleng = this.yytext.length;
         if (this.options.ranges) {
             this.yylloc.range = [this.offset, this.offset + this.yyleng];
         }
-        this.offset += this.yyleng;
+	// previous lex rules MAY have invoked the `more()` API rather than producing a token:
+	// those rules will already have moved this `offset` forward matching their match lengths,
+	// hence we must only add our own match length now:
+        this.offset += match_str.length;
         this._more = false;
         this._backtrack = false;
-        this._input = this._input.slice(match[0].length);
-        this.matched += match[0];
+        this._input = this._input.slice(match_str.length);
+        this.matched += match_str;
         token = this.performAction.call(this, this.yy, this, indexed_rule, this.conditionStack[this.conditionStack.length - 1]);
         if (this.done && this._input) {
             this.done = false;
@@ -2770,6 +2843,7 @@ test_match:function lexer_test_match(match, indexed_rule) {
             for (var k in backup) {
                 this[k] = backup[k];
             }
+            this.__currentRuleSet__ = null;
             return false; // rule action called reject() implying the next rule should be tested instead.
         } else if (this._signaled_error_token) {
             // produce one 'error' token as .parseError() in reject() did not guarantee a failure signal by throwing an exception!
@@ -2780,8 +2854,8 @@ test_match:function lexer_test_match(match, indexed_rule) {
         return false;
     },
 
-// return next match in input
-next:function lexer_next() {
+    // return next match in input
+    next: function lexer_next() {
         function clear() {
             this.yytext = '';
             this.yyleng = 0;
@@ -2806,8 +2880,15 @@ next:function lexer_next() {
         if (!this._more) {
             clear.call(this);
         }
-        var rules = this._currentRules();
-        for (var i = 0; i < rules.length; i++) {
+        var rules = this.__currentRuleSet__;
+        if (!rules) {
+            // Update the ruleset cache as we apparently encountered a state change or just started lexing.
+            // The cache is set up for fast lookup -- we assume a lexer will switch states much less often than it will
+            // invoke the `lex()` token-producing API and related APIs, hence caching the set for direct access helps
+            // speed up those activities a tiny bit.
+            rules = this.__currentRuleSet__ = this._currentRules();
+        }
+        for (var i = 0, len = rules.length; i < len; i++) {
             tempMatch = this._input.match(this.rules[rules[i]]);
             if (tempMatch && (!match || tempMatch[0].length > match[0].length)) {
                 match = tempMatch;
@@ -2817,7 +2898,7 @@ next:function lexer_next() {
                     if (token !== false) {
                         return token;
                     } else if (this._backtrack) {
-                        match = false;
+                        match = undefined;
                         continue; // rule action called reject() implying a rule MISmatch.
                     } else {
                         // else: this is a lexer rule which consumes input without producing a token (e.g. whitespace)
@@ -2858,8 +2939,8 @@ next:function lexer_next() {
         }
     },
 
-// return next match that has a token
-lex:function lexer_lex() {
+    // return next match that has a token
+    lex: function lexer_lex() {
         var r;
         // allow the PRE/POST handlers set/modify the return token for maximum flexibility of the generated lexer:
         if (typeof this.options.pre_lex === 'function') {
@@ -2875,32 +2956,33 @@ lex:function lexer_lex() {
         return r;
     },
 
-// activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
-begin:function lexer_begin(condition) {
+    // backwards compatible alias for `pushState()`; 
+    // the latter is symmetrical with `popState()` and we advise to use 
+    // those APIs in any modern lexer code, rather than `begin()`.
+    begin: function lexer_begin(condition) {
         return this.pushState(condition);
     },
 
-// pop the previously active lexer condition state off the condition stack
-popState:function lexer_popState() {
+    // activates a new lexer condition state (pushes the new lexer condition state onto the condition stack)
+    pushState: function lexer_pushState(condition) {
+        this.conditionStack.push(condition);
+        this.__currentRuleSet__ = null;
+        return this;
+    },
+
+    // pop the previously active lexer condition state off the condition stack
+    popState: function lexer_popState() {
         var n = this.conditionStack.length - 1;
         if (n > 0) {
+            this.__currentRuleSet__ = null;
             return this.conditionStack.pop();
         } else {
             return this.conditionStack[0];
         }
     },
 
-// produce the lexer rule set which is active for the currently active lexer condition state
-_currentRules:function lexer__currentRules() {
-        if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
-            return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
-        } else {
-            return this.conditions['INITIAL'].rules;
-        }
-    },
-
-// return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
-topState:function lexer_topState(n) {
+    // return the currently active lexer condition state; when an index argument is provided it produces the N-th previous condition state, if available
+    topState: function lexer_topState(n) {
         n = this.conditionStack.length - 1 - Math.abs(n || 0);
         if (n >= 0) {
             return this.conditionStack[n];
@@ -2909,14 +2991,17 @@ topState:function lexer_topState(n) {
         }
     },
 
-// alias for begin(condition)
-pushState:function lexer_pushState(condition) {
-        this.conditionStack.push(condition);
-        return this;
+    // (internal) determine the lexer rule set which is active for the currently active lexer condition state
+    _currentRules: function lexer__currentRules() {
+        if (this.conditionStack.length && this.conditionStack[this.conditionStack.length - 1]) {
+            return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
+        } else {
+            return this.conditions['INITIAL'].rules;
+        }
     },
 
-// return the number of states currently on the stack
-stateStackSize:function lexer_stateStackSize() {
+    // return the number of states currently on the stack
+    stateStackSize: function lexer_stateStackSize() {
         return this.conditionStack.length;
     },
 options: {
