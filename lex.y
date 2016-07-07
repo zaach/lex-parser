@@ -111,8 +111,12 @@ definition
         { $$ = $names_inclusive; }
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
-    | action
-        { yy.actionInclude.push($action); $$ = null; }
+    | '{' action_body '}'
+        { yy.actionInclude.push($action_body); $$ = null; }
+    | ACTION
+        { yy.actionInclude.push($ACTION); $$ = null; }
+    | include_macro_code
+        { yy.actionInclude.push($include_macro_code); $$ = null; }
     | options
         { $$ = null; }
     | UNKNOWN_DECL
@@ -254,14 +258,10 @@ regex_list
     ;
 
 nonempty_regex_list
-    : nonempty_regex_list '|' regex_concat
+    : regex_concat '|' regex_list
         { $$ = $1 + '|' + $3; }
-    | nonempty_regex_list '|'
-        { $$ = $1 + '|'; }
-    | '|' nonempty_regex_list
+    | '|' regex_list
         { $$ = '|' + $2; }
-    | '|' 
-        { $$ = '|'; }
     | regex_concat
     ;
 
