@@ -190,7 +190,7 @@ name_list
     ;
 
 regex
-    : regex_list[re]
+    : nonempty_regex_list[re]
         {
           // Detect if the regex ends with a pure (Unicode) word;
           // we *do* consider escaped characters which are 'alphanumeric' 
@@ -254,10 +254,14 @@ regex_list
     ;
 
 nonempty_regex_list
-    : regex_list '|' regex_concat
+    : nonempty_regex_list '|' regex_concat
         { $$ = $1 + '|' + $3; }
-    | regex_list '|'
+    | nonempty_regex_list '|'
         { $$ = $1 + '|'; }
+    | '|' nonempty_regex_list
+        { $$ = '|' + $2; }
+    | '|' 
+        { $$ = '|'; }
     | regex_concat
     ;
 
