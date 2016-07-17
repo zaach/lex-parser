@@ -437,7 +437,7 @@ exports["test options with values"] = function () {
             bool1: true,
             s1: "s1value",
             s2: "s2value",
-            "a-b-c": "d"            // %option camel-casing is done very late in the game: see Jison.Generator source code.
+            "a-b-c": "d"            // `%options camel-casing` is done very late in the game: see Jison.Generator source code.
         }
     };
 
