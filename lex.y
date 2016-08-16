@@ -319,10 +319,10 @@ regex_set_atom
     : REGEX_SET
     | name_expansion
         { 
-            if (XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) 
+            if (XRegExp._getUnicodeProperty($name_expansion.replace(/[{}]/g, '')) 
                 && $name_expansion.toUpperCase() !== $name_expansion
             ) {
-                // treat this as part of an XRegExp `\p{...}` Unicode slug:
+                // treat this as part of an XRegExp `\p{...}` Unicode 'General Category' Property cf. http://unicode.org/reports/tr18/#Categories
                 $$ = $name_expansion;
             } else {
                 $$ = $name_expansion;
