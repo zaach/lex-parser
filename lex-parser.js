@@ -3355,7 +3355,7 @@ break;
 case 74 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       . */ 
- throw new Error("unsupported input character: " + yy_.yytext + " @ " + JSON.stringify(yy_.yylloc)); /* b0rk on bad characters */ 
+ throw new Error('unsupported input character: ' + yy_.yytext + ' (line: ' + /* current line content: */ this.pastInput(-1, 1) + this.upcomingInput(-1, 1) + ' @ ' + JSON.stringify(yy_.yylloc)); /* b0rk on bad characters */ 
 break;
 case 78 : 
 /*! Conditions:: set */ 

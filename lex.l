@@ -162,7 +162,7 @@ WS                                      [^\S\r\n]
 "{"                                     return '{';
 "}"                                     return '}';
 
-.                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
+.                                       throw new Error('unsupported input character: ' + yytext + ' (line: ' + /* current line content: */ this.pastInput(-1, 1) + this.upcomingInput(-1, 1) + ' @ ' + JSON.stringify(yylloc)); /* b0rk on bad characters */
 
 <*><<EOF>>                              return 'EOF';
 
