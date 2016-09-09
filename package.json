@@ -22,6 +22,9 @@
     "jison"
   ],
   "license": "MIT",
+  "engines": {
+    "node": ">=4.0"
+  },
   "dependencies": {
     "xregexp": "GerHobbelt/xregexp#master"
   },
