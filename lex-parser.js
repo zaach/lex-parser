@@ -3355,7 +3355,12 @@ break;
 case 74 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       . */ 
- throw new Error('unsupported input character: ' + yy_.yytext + ' (line: ' + /* current line content: */ this.pastInput(-1, 1) + this.upcomingInput(-1, 1) + ' @ ' + JSON.stringify(yy_.yylloc)); /* b0rk on bad characters */ 
+ 
+                                            var l1 = Math.min(79 - 3 - 6, yy_.yylloc.first_column);
+                                            var l2 = Math.min(79 - 3 - 6 - l2, 3);
+                                            var errdsc = this.showPosition(l1, l2);
+                                            throw new Error('unsupported input character: ' + yy_.yytext + '\n' + indent(errdsc, 6) + '\n    @ ' + this.describeYYLLOC(yy_.yylloc)); /* b0rk on bad characters */
+                                         
 break;
 case 78 : 
 /*! Conditions:: set */ 
@@ -3397,7 +3402,9 @@ case 86 :
 /*! Rule::       . */ 
  
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer input: ', yy_.yytext, ' @ ' + JSON.stringify(yy_.yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            var l1 = Math.min(76 - 4, yy_.yylloc.first_column);
+                                            var l2 = Math.min(76 - 4 - l2, 3);
+                                            console.warn('ignoring unsupported lexer input: ', yy_.yytext, ' @ ' + this.describeYYLLOC(yy_.yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
                                          
 break;
 default:
@@ -3933,6 +3940,11 @@ conditions: {
 }
 };
 
+function indent(s, i) {
+    var a = s.split('\n');
+    var pf = (new Array(i + 1)).join(' ');
+    return pf + a.join('\n' + pf);
+};
 return lexer;
 })();
 parser.lexer = lexer;

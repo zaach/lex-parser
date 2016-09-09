@@ -162,7 +162,12 @@ WS                                      [^\S\r\n]
 "{"                                     return '{';
 "}"                                     return '}';
 
-.                                       throw new Error('unsupported input character: ' + yytext + ' (line: ' + /* current line content: */ this.pastInput(-1, 1) + this.upcomingInput(-1, 1) + ' @ ' + JSON.stringify(yylloc)); /* b0rk on bad characters */
+.                                       %{
+                                            var l1 = Math.min(79 - 3 - 6, yylloc.first_column);
+                                            var l2 = Math.min(79 - 3 - 6 - l2, 3);
+                                            var errdsc = this.showPosition(l1, l2);
+                                            throw new Error('unsupported input character: ' + yytext + '\n' + indent(errdsc, 6) + '\n    @ ' + this.describeYYLLOC(yylloc)); /* b0rk on bad characters */
+                                        %}
 
 <*><<EOF>>                              return 'EOF';
 
@@ -187,8 +192,15 @@ WS                                      [^\S\r\n]
 
 <*>.                                    %{
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            var l1 = Math.min(76 - 4, yylloc.first_column);
+                                            var l2 = Math.min(76 - 4 - l2, 3);
+                                            console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
                                         %}
 
 %%
 
+function indent(s, i) {
+    var a = s.split('\n');
+    var pf = (new Array(i + 1)).join(' ');
+    return pf + a.join('\n' + pf);
+}
