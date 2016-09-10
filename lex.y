@@ -219,6 +219,7 @@ regex
           // interested in the trailing boundary and patching that one for
           // the `easy_keyword_rules` option.
           $$ = $re;
+          console.warn('easy-keyword-rule active? ', yy.options);
           if (yy.options.easy_keyword_rules) {
             try {
               // We need to 'protect' JSON.parse here as keywords are allowed
