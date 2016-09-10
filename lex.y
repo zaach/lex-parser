@@ -235,8 +235,10 @@ regex
               .replace(/"/g, '.' /* '\\"' */)
               .replace(/\\c[A-Z]/g, '.')
               .replace(/\\[^xu0-9]/g, '.');
+              console.warn('easy-keyword-rule before test: ', '"' + this.$ + '"');
 
               $$ = JSON.parse('"' + $$ + '"');
+              console.warn('easy-keyword-rule after test: ', '"' + this.$ + '"', this.$.match(/\w[\w\d]*$/u));
               // a 'keyword' starts with an alphanumeric character, 
               // followed by zero or more alphanumerics or digits:
               if ($$.match(/\w[\w\d]*$/u)) {
