@@ -25,7 +25,7 @@ lex
             var asrc = yy.actionInclude.join('\n\n');
             // Only a non-empty action code chunk should actually make it through:
             if (asrc.trim() !== '') {
-              $$.actionInclude = asrc; 
+              $$.actionInclude = asrc;
             }
           }
           delete yy.options;
@@ -34,18 +34,18 @@ lex
         }
     ;
 
-/* 
- * WARNING: when you want to refactor this rule, you'll get into a world of hurt 
+/*
+ * WARNING: when you want to refactor this rule, you'll get into a world of hurt
  * as then the grammar won't be LALR(1) any longer! The shite start to happen
  * as soon as you take away the EOF in here and move it to the top grammar rule
  * where it really belongs. Other refactorings of this rule to reduce the code
  * duplication in these action blocks leads to the same effect, thanks to the
  * different refactored rules then fighting it out in reduce/reduce conflicts
  * thanks to the epsilon rules everywhere in there. You have been warned...
- */ 
+ */
 rules_and_epilogue
-    : EOF         
-      /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ 
+    : EOF
+      /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */
       {
         $$ = { rules: [] };
       }
@@ -71,7 +71,7 @@ rules_and_epilogue
       }
     ;
 
-// because JISON doesn't support mid-rule actions, 
+// because JISON doesn't support mid-rule actions,
 // we set up `yy` using this empty rule at the start:
 init
     : ε
@@ -197,7 +197,7 @@ regex
     : nonempty_regex_list[re]
         {
           // Detect if the regex ends with a pure (Unicode) word;
-          // we *do* consider escaped characters which are 'alphanumeric' 
+          // we *do* consider escaped characters which are 'alphanumeric'
           // to be equivalent to their non-escaped version, hence these are
           // all valid 'words' for the 'easy keyword rules' option:
           //
@@ -211,7 +211,7 @@ regex
           // 'easy keywords':
           //
           // - %options
-          // - %foo-bar    
+          // - %foo-bar
           // - +++a:b:c1
           //
           // Note the dash in that last example: there the code will consider
@@ -219,35 +219,38 @@ regex
           // interested in the trailing boundary and patching that one for
           // the `easy_keyword_rules` option.
           $$ = $re;
-          console.warn('easy-keyword-rule active? ', yy.options);
           if (yy.options.easy_keyword_rules) {
-            try {
-              // We need to 'protect' JSON.parse here as keywords are allowed
-              // to contain double-quotes and other leading cruft.
-              // JSON.parse *does* gobble some escapes (such as `\b`) but
-              // we protect against that through a simple replace regex: 
-              // we're not interested in the special escapes' exact value 
-              // anyway.
-              // It will also catch escaped escapes (`\\`), which are not 
-              // word characters either, so no need to worry about 
-              // `JSON.parse()` 'correctly' converting convoluted constructs
-              // like '\\\\\\\\\\b' in here.
-              $$ = $$
-              .replace(/"/g, '.' /* '\\"' */)
-              .replace(/\\c[A-Z]/g, '.')
-              .replace(/\\[^xu0-9]/g, '.');
-              console.warn('easy-keyword-rule before test: ', '"' + this.$ + '"');
+            // We need to 'protect' `eval` here as keywords are allowed
+            // to contain double-quotes and other leading cruft.
+            // `eval` *does* gobble some escapes (such as `\b`) but
+            // we protect against that through a simple replace regex:
+            // we're not interested in the special escapes' exact value
+            // anyway.
+            // It will also catch escaped escapes (`\\`), which are not
+            // word characters either, so no need to worry about
+            // `eval(str)` 'correctly' converting convoluted constructs
+            // like '\\\\\\\\\\b' in here.
+            $$ = $$
+            .replace(/\\\\/g, '.')
+            .replace(/"/g, '.')
+            .replace(/\\c[A-Z]/g, '.')
+            .replace(/\\[^xu0-9]/g, '.');
 
-              $$ = JSON.parse('"' + $$ + '"');
-              console.warn('easy-keyword-rule after test: ', '"' + this.$ + '"', this.$.match(/\w[\w\d]*$/u));
-              // a 'keyword' starts with an alphanumeric character, 
-              // followed by zero or more alphanumerics or digits:
-              if ($$.match(/\w[\w\d]*$/u)) {
-                $$ = $re + "\\b";
-              } else {
-                $$ = $re;
-              }
-            } catch (ex) {
+            try {
+              $$ = eval('"' + $$ + '"');
+            }
+            catch (ex) {
+              console.warn('easy-keyword-rule FAIL on eval: ', ex);
+
+              // make the next keyword test fail:
+              $$ = '.';
+            }
+            // a 'keyword' starts with an alphanumeric character,
+            // followed by zero or more alphanumerics or digits:
+            var re = XRegExp('\\w[\\w\\d]*$', 'u');
+            if (XRegExp.match($$, re)) {
+              $$ = $re + "\\b";
+            } else {
               $$ = $re;
             }
           }
@@ -321,8 +324,8 @@ regex_set
 regex_set_atom
     : REGEX_SET
     | name_expansion
-        { 
-            if (XRegExp._getUnicodeProperty($name_expansion.replace(/[{}]/g, '')) 
+        {
+            if (XRegExp._getUnicodeProperty($name_expansion.replace(/[{}]/g, ''))
                 && $name_expansion.toUpperCase() !== $name_expansion
             ) {
                 // treat this as part of an XRegExp `\p{...}` Unicode 'General Category' Property cf. http://unicode.org/reports/tr18/#Categories
