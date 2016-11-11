@@ -6,6 +6,7 @@
 
 %left '*' '+' '?' RANGE_REGEX
 
+
 %%
 
 lex
@@ -408,7 +409,7 @@ optional_module_code_chunk
 
 %%
 
-var XRegExp = require('xregexp');
+var XRegExp = require('xregexp');       // for helping out the `%options xregexp` in the lexer
 
 function encodeRE (s) {
     return s.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');

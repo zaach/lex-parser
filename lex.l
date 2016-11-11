@@ -20,16 +20,10 @@ WS                                      [^\S\r\n]
 %x code start_condition options conditions action path set
 
 
-// Off Topic
-// ---------
-//
-// Do not specify the xregexp option as we want the XRegExp \p{...}
-// regex macros converted to native regexes and used as such:
-//
-// %options xregexp
-
 %options easy_keyword_rules
 %options ranges
+%options xregexp
+
 
 %%
 
