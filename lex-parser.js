@@ -3672,59 +3672,50 @@ case 68 :
 /*! Rule::       %% */ 
  this.begin('rules'); return 22; 
 break;
-case 74 : 
-/*! Conditions:: indented trail rules macro INITIAL */ 
-/*! Rule::       . */ 
- 
-                                            var l1 = Math.min(79 - 3 - 6, yy_.yylloc.first_column);
-                                            var l2 = Math.min(79 - 3 - 6 - l2, 3);
-                                            var errdsc = this.showPosition(l1, l2);
-                                            throw new Error('unsupported input character: ' + yy_.yytext + '\n' + indent(errdsc, 6) + '\n    @ ' + this.describeYYLLOC(yy_.yylloc)); /* b0rk on bad characters */
-                                         
-break;
-case 78 : 
+case 76 : 
 /*! Conditions:: set */ 
 /*! Rule::       \] */ 
  this.popState('set'); return 60; 
 break;
-case 80 : 
+case 78 : 
 /*! Conditions:: code */ 
 /*! Rule::       [^\r\n]+ */ 
  return 76;      // the bit of CODE just before EOF... 
 break;
-case 81 : 
+case 79 : 
 /*! Conditions:: path */ 
 /*! Rule::       {BR} */ 
  this.popState(); this.unput(yy_.yytext); 
 break;
-case 82 : 
+case 80 : 
 /*! Conditions:: path */ 
 /*! Rule::       '[^\r\n]+' */ 
  yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 74; 
 break;
-case 83 : 
+case 81 : 
 /*! Conditions:: path */ 
 /*! Rule::       "[^\r\n]+" */ 
  yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 74; 
 break;
-case 84 : 
+case 82 : 
 /*! Conditions:: path */ 
 /*! Rule::       {WS}+ */ 
  // skip whitespace in the line 
 break;
-case 85 : 
+case 83 : 
 /*! Conditions:: path */ 
 /*! Rule::       [^\s\r\n]+ */ 
  this.popState(); return 74; 
 break;
-case 86 : 
+case 84 : 
 /*! Conditions:: * */ 
 /*! Rule::       . */ 
  
-                                            /* ignore unrecognized decl */
-                                            var l1 = Math.min(76 - 4, yy_.yylloc.first_column);
-                                            var l2 = Math.min(76 - 4 - l2, 3);
-                                            console.warn('ignoring unsupported lexer input: ', yy_.yytext, ' @ ' + this.describeYYLLOC(yy_.yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
+                                            /* b0rk on bad characters */
+                                            var l0 = Math.max(0, yy_.yylloc.last_column - yy_.yylloc.first_column);
+                                            var l2 = 3;
+                                            var l1 = Math.min(79 - 4 - l0 - l2, yy_.yylloc.first_column, 0);
+                                            throw new Error('unsupported lexer input: ', yy_.yytext, ' @ ' + this.describeYYLLOC(yy_.yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
                                          
 break;
 default:
@@ -3835,18 +3826,18 @@ simpleCaseActionClusters: {
   /*! Conditions:: indented trail rules macro INITIAL */ 
   /*! Rule::       \} */ 
    73 : 4,
-  /*! Conditions:: * */ 
-  /*! Rule::       $ */ 
-   75 : 1,
   /*! Conditions:: set */ 
   /*! Rule::       (?:\\\\|\\\]|[^\]{])+ */ 
-   76 : 62,
+   74 : 62,
   /*! Conditions:: set */ 
   /*! Rule::       \{ */ 
-   77 : 62,
+   75 : 62,
   /*! Conditions:: code */ 
   /*! Rule::       [^\r\n]*(\r|\n)+ */ 
-   79 : 76
+   77 : 76,
+  /*! Conditions:: * */ 
+  /*! Rule::       $ */ 
+   85 : 1
 },
 rules: [
 /^(?:\/\*(.|\n|\r)*?\*\/)/,
@@ -3923,8 +3914,6 @@ new XRegExp("^(?:\\{([\\p{Alphabetic}_][\\p{Alphabetic}\\p{Number}_]*)\\})", "")
 new XRegExp("^(?:\\{([\\p{Alphabetic}_][\\p{Alphabetic}\\p{Number}_]*)\\})", ""),
 /^(?:\{)/,
 /^(?:\})/,
-/^(?:.)/,
-/^(?:$)/,
 /^(?:(?:\\\\|\\\]|[^\]{])+)/,
 /^(?:\{)/,
 /^(?:\])/,
@@ -3935,17 +3924,18 @@ new XRegExp("^(?:\\{([\\p{Alphabetic}_][\\p{Alphabetic}\\p{Number}_]*)\\})", "")
 /^(?:"[^\r\n]+")/,
 /^(?:([^\S\n\r])+)/,
 /^(?:\S+)/,
-/^(?:.)/
+/^(?:.)/,
+/^(?:$)/
 ],
 conditions: {
   "code": {
     rules: [
       66,
       67,
-      75,
-      79,
-      80,
-      86
+      77,
+      78,
+      84,
+      85
     ],
     inclusive: false
   },
@@ -3954,8 +3944,8 @@ conditions: {
       25,
       26,
       27,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: false
   },
@@ -3969,8 +3959,8 @@ conditions: {
       23,
       24,
       71,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: false
   },
@@ -3980,8 +3970,8 @@ conditions: {
       10,
       11,
       12,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: false
   },
@@ -3996,31 +3986,31 @@ conditions: {
       6,
       7,
       8,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: false
   },
   "path": {
     rules: [
-      75,
+      79,
+      80,
       81,
       82,
       83,
       84,
-      85,
-      86
+      85
     ],
     inclusive: false
   },
   "set": {
     rules: [
       71,
+      74,
       75,
       76,
-      77,
-      78,
-      86
+      84,
+      85
     ],
     inclusive: false
   },
@@ -4065,9 +4055,8 @@ conditions: {
       70,
       72,
       73,
-      74,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: true
   },
@@ -4111,9 +4100,8 @@ conditions: {
       70,
       72,
       73,
-      74,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: true
   },
@@ -4160,9 +4148,8 @@ conditions: {
       70,
       72,
       73,
-      74,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: true
   },
@@ -4205,9 +4192,8 @@ conditions: {
       70,
       72,
       73,
-      74,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: true
   },
@@ -4251,9 +4237,8 @@ conditions: {
       70,
       72,
       73,
-      74,
-      75,
-      86
+      84,
+      85
     ],
     inclusive: true
   }

@@ -156,15 +156,6 @@ WS                                      [^\S\r\n]
 "{"                                     return '{';
 "}"                                     return '}';
 
-.                                       %{
-                                            var l1 = Math.min(79 - 3 - 6, yylloc.first_column);
-                                            var l2 = Math.min(79 - 3 - 6 - l2, 3);
-                                            var errdsc = this.showPosition(l1, l2);
-                                            throw new Error('unsupported input character: ' + yytext + '\n' + indent(errdsc, 6) + '\n    @ ' + this.describeYYLLOC(yylloc)); /* b0rk on bad characters */
-                                        %}
-
-<*><<EOF>>                              return 'EOF';
-
 
 <set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
 <set>"{"                                return 'REGEX_SET';
@@ -185,11 +176,14 @@ WS                                      [^\S\r\n]
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
 <*>.                                    %{
-                                            /* ignore unrecognized decl */
-                                            var l1 = Math.min(76 - 4, yylloc.first_column);
-                                            var l2 = Math.min(76 - 4 - l2, 3);
-                                            console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
+                                            /* b0rk on bad characters */
+                                            var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
+                                            var l2 = 3;
+                                            var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
+                                            throw new Error('unsupported lexer input: ', yytext, ' @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
                                         %}
+
+<*><<EOF>>                              return 'EOF';
 
 %%
 
