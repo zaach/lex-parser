@@ -542,7 +542,7 @@ symbols_: {
   "definitions": 21,
   "error": 2,
   "escape_char": 56,
-  "extra_lexer_module_code": 24,
+  "extra_lexer_module_code": 25,
   "include_macro_code": 35,
   "init": 20,
   "lex": 19,
@@ -564,7 +564,7 @@ symbols_: {
   "regex_set": 59,
   "regex_set_atom": 61,
   "rule": 39,
-  "rules": 25,
+  "rules": 24,
   "rules_and_epilogue": 23,
   "start_conditions": 40,
   "string": 55,
@@ -708,8 +708,8 @@ collect_expected_token_set: function parser_collect_expected_token_set(state, do
 productions_: bp({
   pop: u([
   19,
-  s,
-  [23, 4],
+  23,
+  23,
   20,
   21,
   21,
@@ -719,8 +719,8 @@ productions_: bp({
   30,
   32,
   32,
-  25,
-  25,
+  24,
+  24,
   39,
   s,
   [41, 3],
@@ -758,8 +758,8 @@ productions_: bp({
   68,
   s,
   [70, 3],
-  24,
-  24,
+  25,
+  25,
   35,
   35,
   75,
@@ -768,11 +768,9 @@ productions_: bp({
   72
 ]),
   rule: u([
-  4,
-  1,
+  5,
   3,
-  4,
-  2,
+  1,
   0,
   2,
   0,
@@ -785,7 +783,7 @@ productions_: bp({
   1,
   2,
   2,
-  1,
+  0,
   3,
   c,
   [12, 4],
@@ -804,8 +802,9 @@ productions_: bp({
   3,
   c,
   [24, 3],
-  c,
-  [23, 3],
+  1,
+  3,
+  3,
   s,
   [2, 5],
   c,
@@ -831,11 +830,11 @@ var yy = this.yy;
 
 switch (yystate) {
 case 1:
-    /*! Production::    lex : init definitions '%%' rules_and_epilogue */
-    this.$ = yyvstack[$0];
-    if (yyvstack[$0 - 2][0]) this.$.macros = yyvstack[$0 - 2][0];
-    if (yyvstack[$0 - 2][1]) this.$.startConditions = yyvstack[$0 - 2][1];
-    if (yyvstack[$0 - 2][2]) this.$.unknownDecls = yyvstack[$0 - 2][2];
+    /*! Production::    lex : init definitions '%%' rules_and_epilogue EOF */
+    this.$ = yyvstack[$0 - 1];
+    if (yyvstack[$0 - 3][0]) this.$.macros = yyvstack[$0 - 3][0];
+    if (yyvstack[$0 - 3][1]) this.$.startConditions = yyvstack[$0 - 3][1];
+    if (yyvstack[$0 - 3][2]) this.$.unknownDecls = yyvstack[$0 - 3][2];
     // if there are any options, add them all, otherwise set options to NULL:
     // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
     for (var k in yy.options) {
@@ -855,40 +854,26 @@ case 1:
     break;
 
 case 2:
-    /*! Production::    rules_and_epilogue : EOF */
-    this.$ = { rules: [] };
+    /*! Production::    rules_and_epilogue : rules '%%' extra_lexer_module_code */
+    if (yyvstack[$0] && yyvstack[$0].trim() !== '') {
+      this.$ = { rules: yyvstack[$0 - 2], moduleInclude: yyvstack[$0] };
+    } else {
+      this.$ = { rules: yyvstack[$0 - 2] };
+    }
     break;
 
 case 3:
-    /*! Production::    rules_and_epilogue : '%%' extra_lexer_module_code EOF */
-    if (yyvstack[$0 - 1] && yyvstack[$0 - 1].trim() !== '') {
-      this.$ = { rules: [], moduleInclude: yyvstack[$0 - 1] };
-    } else {
-      this.$ = { rules: [] };
-    }
+    /*! Production::    rules_and_epilogue : rules */
+    this.$ = { rules: yyvstack[$0] };
     break;
 
 case 4:
-    /*! Production::    rules_and_epilogue : rules '%%' extra_lexer_module_code EOF */
-    if (yyvstack[$0 - 1] && yyvstack[$0 - 1].trim() !== '') {
-      this.$ = { rules: yyvstack[$0 - 3], moduleInclude: yyvstack[$0 - 1] };
-    } else {
-      this.$ = { rules: yyvstack[$0 - 3] };
-    }
-    break;
-
-case 5:
-    /*! Production::    rules_and_epilogue : rules EOF */
-    this.$ = { rules: yyvstack[$0 - 1] };
-    break;
-
-case 6:
     /*! Production::    init : ε */
     yy.actionInclude = [];
     if (!yy.options) yy.options = {};
     break;
 
-case 7:
+case 5:
     /*! Production::    definitions : definition definitions */
     this.$ = yyvstack[$0];
     if (yyvstack[$0 - 1] != null) {
@@ -907,148 +892,151 @@ case 7:
     }
     break;
 
-case 8:
+case 6:
     /*! Production::    definitions : ε */
     this.$ = [null, null];
     break;
 
-case 9:
+case 7:
     /*! Production::    definition : NAME regex */
     this.$ = [yyvstack[$0 - 1], yyvstack[$0]];
     break;
 
-case 10:
+case 8:
     /*! Production::    definition : START_INC names_inclusive */
-case 11:
+case 9:
     /*! Production::    definition : START_EXC names_exclusive */
-case 25:
+case 23:
     /*! Production::    action : unbracketed_action_body */
-case 26:
+case 24:
     /*! Production::    action : include_macro_code */
-case 29:
+case 27:
     /*! Production::    action_body : action_comments_body */
-case 67:
+case 65:
     /*! Production::    escape_char : ESCAPE_CHAR */
-case 68:
+case 66:
     /*! Production::    range_regex : RANGE_REGEX */
-case 77:
+case 75:
     /*! Production::    extra_lexer_module_code : optional_module_code_chunk */
-case 81:
+case 79:
     /*! Production::    module_code_chunk : CODE */
-case 83:
+case 81:
     /*! Production::    optional_module_code_chunk : module_code_chunk */
     this.$ = yyvstack[$0];
     break;
 
-case 12:
+case 10:
     /*! Production::    definition : '{' action_body '}' */
     yy.actionInclude.push(yyvstack[$0 - 1]); this.$ = null;
     break;
 
-case 13:
+case 11:
     /*! Production::    definition : ACTION */
-case 14:
+case 12:
     /*! Production::    definition : include_macro_code */
     yy.actionInclude.push(yyvstack[$0]); this.$ = null;
     break;
 
-case 15:
+case 13:
     /*! Production::    definition : options */
     this.$ = null;
     break;
 
-case 16:
+case 14:
     /*! Production::    definition : UNKNOWN_DECL */
     this.$ = {type: 'unknown', body: yyvstack[$0]};
     break;
 
-case 17:
+case 15:
     /*! Production::    names_inclusive : START_COND */
     this.$ = {type: 'names', names: {}}; this.$.names[yyvstack[$0]] = 0;
     break;
 
-case 18:
+case 16:
     /*! Production::    names_inclusive : names_inclusive START_COND */
     this.$ = yyvstack[$0 - 1]; this.$.names[yyvstack[$0]] = 0;
     break;
 
-case 19:
+case 17:
     /*! Production::    names_exclusive : START_COND */
     this.$ = {type: 'names', names: {}}; this.$.names[yyvstack[$0]] = 1;
     break;
 
-case 20:
+case 18:
     /*! Production::    names_exclusive : names_exclusive START_COND */
     this.$ = yyvstack[$0 - 1]; this.$.names[yyvstack[$0]] = 1;
     break;
 
-case 21:
+case 19:
     /*! Production::    rules : rules rule */
     this.$ = yyvstack[$0 - 1]; this.$.push(yyvstack[$0]);
     break;
 
-case 22:
-    /*! Production::    rules : rule */
-case 36:
-    /*! Production::    name_list : NAME */
-    this.$ = [yyvstack[$0]];
+case 20:
+    /*! Production::    rules : ε */
+    this.$ = [];
     break;
 
-case 23:
+case 21:
     /*! Production::    rule : start_conditions regex action */
     this.$ = yyvstack[$0 - 2] ? [yyvstack[$0 - 2], yyvstack[$0 - 1], yyvstack[$0]] : [yyvstack[$0 - 1], yyvstack[$0]];
     break;
 
-case 24:
+case 22:
     /*! Production::    action : '{' action_body '}' */
-case 33:
+case 31:
     /*! Production::    start_conditions : '<' name_list '>' */
     this.$ = yyvstack[$0 - 1];
     break;
 
-case 28:
+case 26:
     /*! Production::    unbracketed_action_body : unbracketed_action_body ACTION */
     this.$ = yyvstack[$0 - 1] + '\n' + yyvstack[$0];
     break;
 
-case 30:
+case 28:
     /*! Production::    action_body : action_body '{' action_body '}' action_comments_body */
     this.$ = yyvstack[$0 - 4] + yyvstack[$0 - 3] + yyvstack[$0 - 2] + yyvstack[$0 - 1] + yyvstack[$0];
     break;
 
-case 31:
+case 29:
     /*! Production::    action_comments_body : ε */
-case 40:
+case 38:
     /*! Production::    regex_list : ε */
-case 84:
+case 82:
     /*! Production::    optional_module_code_chunk : ε */
     this.$ = '';
     break;
 
-case 32:
+case 30:
     /*! Production::    action_comments_body : action_comments_body ACTION_BODY */
-case 44:
+case 42:
     /*! Production::    regex_concat : regex_concat regex_base */
-case 54:
+case 52:
     /*! Production::    regex_base : regex_base range_regex */
-case 63:
+case 61:
     /*! Production::    regex_set : regex_set_atom regex_set */
-case 82:
+case 80:
     /*! Production::    module_code_chunk : module_code_chunk CODE */
     this.$ = yyvstack[$0 - 1] + yyvstack[$0];
     break;
 
-case 34:
+case 32:
     /*! Production::    start_conditions : '<' '*' '>' */
     this.$ = ['*'];
     break;
 
-case 37:
+case 34:
+    /*! Production::    name_list : NAME */
+    this.$ = [yyvstack[$0]];
+    break;
+
+case 35:
     /*! Production::    name_list : name_list ',' NAME */
     this.$ = yyvstack[$0 - 2]; this.$.push(yyvstack[$0]);
     break;
 
-case 38:
+case 36:
     /*! Production::    regex : nonempty_regex_list[re] */
     // Detect if the regex ends with a pure (Unicode) word;
     // we *do* consider escaped characters which are 'alphanumeric'
@@ -1110,74 +1098,74 @@ case 38:
     }
     break;
 
-case 41:
+case 39:
     /*! Production::    nonempty_regex_list : regex_concat '|' regex_list */
     this.$ = yyvstack[$0 - 2] + '|' + yyvstack[$0];
     break;
 
-case 42:
+case 40:
     /*! Production::    nonempty_regex_list : '|' regex_list */
     this.$ = '|' + yyvstack[$0];
     break;
 
-case 46:
+case 44:
     /*! Production::    regex_base : '(' regex_list ')' */
     this.$ = '(' + yyvstack[$0 - 1] + ')';
     break;
 
-case 47:
+case 45:
     /*! Production::    regex_base : SPECIAL_GROUP regex_list ')' */
     this.$ = yyvstack[$0 - 2] + yyvstack[$0 - 1] + ')';
     break;
 
-case 48:
+case 46:
     /*! Production::    regex_base : regex_base '+' */
     this.$ = yyvstack[$0 - 1] + '+';
     break;
 
-case 49:
+case 47:
     /*! Production::    regex_base : regex_base '*' */
     this.$ = yyvstack[$0 - 1] + '*';
     break;
 
-case 50:
+case 48:
     /*! Production::    regex_base : regex_base '?' */
     this.$ = yyvstack[$0 - 1] + '?';
     break;
 
-case 51:
+case 49:
     /*! Production::    regex_base : '/' regex_base */
     this.$ = '(?=' + yyvstack[$0] + ')';
     break;
 
-case 52:
+case 50:
     /*! Production::    regex_base : '/!' regex_base */
     this.$ = '(?!' + yyvstack[$0] + ')';
     break;
 
-case 56:
+case 54:
     /*! Production::    regex_base : '.' */
     this.$ = '.';
     break;
 
-case 57:
+case 55:
     /*! Production::    regex_base : '^' */
     this.$ = '^';
     break;
 
-case 58:
+case 56:
     /*! Production::    regex_base : '$' */
     this.$ = '$';
     break;
 
-case 62:
+case 60:
     /*! Production::    any_group_regex : REGEX_SET_START regex_set REGEX_SET_END */
-case 78:
+case 76:
     /*! Production::    extra_lexer_module_code : optional_module_code_chunk include_macro_code extra_lexer_module_code */
     this.$ = yyvstack[$0 - 2] + yyvstack[$0 - 1] + yyvstack[$0];
     break;
 
-case 66:
+case 64:
     /*! Production::    regex_set_atom : name_expansion */
     if (XRegExp._getUnicodeProperty(yyvstack[$0].replace(/[{}]/g, ''))
         && yyvstack[$0].toUpperCase() !== yyvstack[$0]
@@ -1190,24 +1178,24 @@ case 66:
     //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
     break;
 
-case 69:
+case 67:
     /*! Production::    string : STRING_LIT */
     this.$ = prepareString(yyvstack[$0].substr(1, yyvstack[$0].length - 2));
     break;
 
-case 74:
+case 72:
     /*! Production::    option : NAME[option] */
     yy.options[yyvstack[$0]] = true;
     break;
 
-case 75:
+case 73:
     /*! Production::    option : NAME[option] '=' OPTION_VALUE[value] */
-case 76:
+case 74:
     /*! Production::    option : NAME[option] '=' NAME[value] */
     yy.options[yyvstack[$0 - 2]] = yyvstack[$0];
     break;
 
-case 79:
+case 77:
     /*! Production::    include_macro_code : INCLUDE PATH */
     var fs = require('fs');
     var fileContent = fs.readFileSync(yyvstack[$0], { encoding: 'utf-8' });
@@ -1215,7 +1203,7 @@ case 79:
     this.$ = '\n// Included by Jison: ' + yyvstack[$0] + ':\n\n' + fileContent + '\n\n// End Of Include by Jison: ' + yyvstack[$0] + '\n\n';
     break;
 
-case 80:
+case 78:
     /*! Production::    include_macro_code : INCLUDE error */
     console.error("%include MUST be followed by a valid file path");
     break;
@@ -1237,7 +1225,7 @@ table: bt({
   [9, 4],
   2,
   3,
-  20,
+  18,
   1,
   9,
   9,
@@ -1264,12 +1252,7 @@ table: bt({
   4,
   3,
   1,
-  1,
-  6,
   18,
-  16,
-  21,
-  3,
   31,
   28,
   10,
@@ -1293,37 +1276,37 @@ table: bt({
   1,
   2,
   1,
-  s,
-  [3, 3],
   6,
-  1,
   16,
-  6,
-  2,
-  1,
-  2,
+  21,
+  3,
   c,
-  [33, 4],
+  [27, 4],
   1,
   s,
   [2, 3],
-  c,
-  [31, 3],
   1,
+  s,
+  [3, 3],
+  6,
+  2,
+  1,
+  2,
+  4,
+  6,
+  3,
   16,
   5,
   17,
   16,
   17,
   c,
-  [107, 3],
-  4,
-  1,
+  [103, 3],
+  3,
   1,
   2,
   17,
   2,
-  3,
   16
 ]),
   symbol: u([
@@ -1390,25 +1373,23 @@ table: bt({
   [73, 6],
   22,
   23,
-  25,
-  39,
-  40,
+  24,
   50,
   51,
   c,
-  [70, 5],
+  [68, 5],
   22,
   c,
-  [53, 19],
+  [51, 19],
   9,
   10,
   11,
   c,
-  [39, 5],
+  [37, 5],
   c,
   [16, 5],
   c,
-  [115, 12],
+  [113, 12],
   c,
   [28, 16],
   s,
@@ -1428,7 +1409,7 @@ table: bt({
   s,
   [64, 4, 1],
   c,
-  [197, 3],
+  [195, 3],
   c,
   [58, 5],
   c,
@@ -1436,7 +1417,7 @@ table: bt({
   c,
   [22, 22],
   c,
-  [167, 5],
+  [165, 5],
   c,
   [17, 29],
   c,
@@ -1468,7 +1449,7 @@ table: bt({
   1,
   3,
   c,
-  [554, 8],
+  [552, 8],
   c,
   [70, 10],
   c,
@@ -1484,36 +1465,23 @@ table: bt({
   18,
   27,
   69,
-  s,
-  [1, 3],
-  24,
-  72,
-  73,
-  75,
-  76,
+  1,
   c,
-  [619, 9],
+  [610, 9],
+  39,
+  40,
   c,
-  [617, 9],
+  [30, 7],
   c,
-  [18, 9],
-  c,
-  [16, 7],
-  c,
-  [724, 21],
-  7,
-  27,
-  45,
-  c,
-  [610, 59],
+  [563, 59],
   3,
   11,
   c,
-  [707, 9],
+  [660, 9],
   c,
   [10, 10],
   c,
-  [498, 134],
+  [451, 134],
   11,
   11,
   c,
@@ -1522,7 +1490,7 @@ table: bt({
   [28, 27],
   60,
   c,
-  [528, 3],
+  [481, 3],
   60,
   61,
   62,
@@ -1531,30 +1499,49 @@ table: bt({
   c,
   [3, 4],
   c,
-  [444, 27],
+  [397, 27],
   c,
-  [443, 4],
+  [396, 4],
   c,
-  [1037, 4],
+  [988, 4],
   4,
   c,
-  [1040, 10],
+  [991, 10],
   69,
   27,
   71,
   1,
   1,
+  25,
+  72,
+  73,
+  75,
+  76,
+  c,
+  [359, 9],
+  c,
+  [357, 7],
+  c,
+  [1056, 21],
+  7,
+  27,
+  45,
+  c,
+  [312, 91],
+  60,
+  3,
+  4,
+  27,
+  69,
+  c,
+  [498, 4],
   35,
   73,
   1,
   c,
-  [440, 3],
-  c,
-  [3, 3],
-  c,
-  [408, 6],
-  c,
-  [391, 16],
+  [538, 3],
+  73,
+  76,
   3,
   34,
   35,
@@ -1566,28 +1553,25 @@ table: bt({
   6,
   6,
   8,
-  c,
-  [309, 91],
-  60,
   3,
   4,
-  27,
-  69,
+  43,
+  44,
   c,
-  [542, 4],
+  [169, 7],
   c,
-  [133, 6],
+  [27, 3],
   c,
-  [142, 3],
+  [172, 15],
   c,
-  [136, 17],
-  c,
-  [189, 4],
+  [215, 5],
   c,
   [21, 9],
   34,
   c,
-  [565, 23],
+  [22, 7],
+  c,
+  [38, 16],
   c,
   [33, 17],
   c,
@@ -1597,21 +1581,15 @@ table: bt({
   27,
   c,
   [14, 13],
-  3,
+  c,
+  [691, 5],
   4,
   c,
-  [81, 3],
-  1,
-  3,
-  4,
+  [50, 17],
+  6,
+  8,
   c,
-  [52, 17],
-  c,
-  [234, 3],
-  c,
-  [739, 3],
-  c,
-  [90, 15]
+  [85, 16]
 ]),
   type: u([
   2,
@@ -1642,13 +1620,15 @@ table: bt({
   s,
   [2, 31],
   c,
-  [74, 17],
+  [74, 13],
   c,
-  [55, 39],
+  [53, 41],
   c,
-  [47, 27],
+  [113, 11],
   c,
-  [146, 15],
+  [81, 18],
+  c,
+  [144, 13],
   c,
   [64, 24],
   c,
@@ -1660,47 +1640,41 @@ table: bt({
   s,
   [2, 213],
   c,
-  [472, 3],
+  [470, 3],
   c,
   [227, 180],
   c,
-  [688, 7],
+  [686, 7],
   c,
-  [616, 5],
+  [610, 32],
   c,
-  [436, 12],
+  [563, 52],
   c,
-  [204, 30],
-  c,
-  [504, 17],
-  c,
-  [47, 15],
-  c,
-  [610, 52],
-  c,
-  [307, 171],
+  [260, 171],
   c,
   [28, 36],
   c,
-  [335, 4],
+  [298, 4],
   c,
   [227, 39],
   c,
   [294, 20],
   c,
-  [19, 9],
+  [20, 3],
   c,
-  [408, 14],
+  [62, 24],
   c,
-  [355, 13],
+  [349, 17],
   c,
-  [243, 107],
+  [330, 101],
   c,
-  [204, 26],
+  [1184, 13],
   c,
-  [135, 82],
+  [940, 13],
   c,
-  [81, 44]
+  [128, 24],
+  c,
+  [737, 121]
 ]),
   state: u([
   s,
@@ -1725,69 +1699,64 @@ table: bt({
   46,
   47,
   49,
+  50,
   52,
-  53,
+  c,
+  [13, 4],
   54,
-  57,
+  53,
   c,
-  [15, 4],
-  59,
+  [21, 6],
   58,
-  c,
-  [23, 6],
-  63,
-  59,
-  65,
+  54,
+  60,
   c,
   [9, 6],
-  59,
-  66,
+  54,
+  61,
   c,
   [8, 6],
+  62,
+  c,
+  [5, 4],
+  63,
+  c,
+  [5, 4],
   67,
-  c,
-  [5, 4],
-  68,
-  c,
-  [5, 4],
-  72,
-  69,
-  70,
-  79,
+  64,
+  65,
+  74,
   47,
-  81,
-  82,
-  83,
-  87,
+  78,
+  79,
   54,
-  88,
+  81,
   c,
-  [68, 7],
+  [42, 7],
+  58,
+  58,
+  67,
+  85,
+  65,
+  86,
+  43,
   89,
-  59,
-  92,
+  90,
+  91,
+  93,
   c,
-  [54, 7],
-  63,
-  63,
-  72,
-  96,
-  70,
-  97,
-  43,
-  101,
+  [82, 7],
+  94,
+  98,
   103,
-  82,
-  83,
-  107,
-  104,
-  106,
-  113,
-  82,
-  83,
-  115,
-  43,
-  118
+  100,
+  102,
+  108,
+  109,
+  90,
+  91,
+  110,
+  43
 ]),
   mode: u([
   s,
@@ -1803,15 +1772,13 @@ table: bt({
   s,
   [2, 39],
   c,
-  [44, 11],
-  c,
-  [51, 28],
+  [42, 39],
   c,
   [103, 7],
   c,
-  [52, 11],
+  [52, 9],
   c,
-  [13, 5],
+  [13, 7],
   c,
   [23, 24],
   c,
@@ -1839,45 +1806,43 @@ table: bt({
   c,
   [434, 4],
   c,
-  [494, 9],
+  [638, 5],
   c,
-  [567, 30],
+  [83, 15],
   c,
-  [454, 16],
+  [521, 49],
   c,
-  [556, 49],
-  c,
-  [441, 158],
+  [406, 158],
   c,
   [184, 27],
   c,
-  [767, 30],
+  [732, 30],
   c,
-  [111, 53],
+  [517, 56],
   c,
-  [56, 5],
+  [57, 17],
   c,
-  [94, 10],
+  [772, 107],
   c,
-  [362, 20],
+  [439, 9],
   c,
-  [683, 103],
+  [221, 8],
   c,
-  [436, 8],
+  [113, 11],
   c,
-  [635, 45],
+  [121, 32],
   c,
-  [689, 53],
+  [153, 54],
   c,
-  [211, 23],
+  [319, 18],
   c,
-  [22, 17]
+  [226, 37]
 ]),
   goto: u([
   s,
-  [6, 9],
+  [4, 9],
   8,
-  8,
+  6,
   5,
   6,
   7,
@@ -1904,65 +1869,60 @@ table: bt({
   39,
   41,
   s,
-  [31, 3],
+  [29, 3],
+  s,
+  [11, 9],
+  s,
+  [12, 9],
   s,
   [13, 9],
   s,
   [14, 9],
-  s,
-  [15, 9],
-  s,
-  [16, 9],
   45,
   44,
   48,
-  50,
-  55,
   s,
-  [35, 6],
+  [20, 16],
+  5,
+  s,
+  [7, 9],
+  s,
+  [36, 9],
+  41,
   51,
-  s,
-  [35, 7],
-  7,
-  s,
-  [9, 9],
-  s,
-  [38, 9],
-  43,
-  56,
   22,
-  43,
+  41,
   c,
   [94, 4],
   s,
-  [43, 6],
+  [41, 6],
   c,
   [100, 7],
-  43,
-  43,
-  40,
+  41,
+  41,
+  38,
   20,
   22,
-  40,
+  38,
   c,
   [23, 4],
   s,
-  [40, 6],
+  [38, 6],
   c,
   [23, 7],
-  40,
-  40,
-  45,
-  61,
+  38,
+  38,
+  43,
+  56,
   s,
-  [45, 3],
-  60,
-  62,
+  [43, 3],
+  55,
+  57,
   s,
-  [45, 15],
-  64,
+  [43, 15],
+  59,
   s,
-  [45, 4],
+  [43, 4],
   c,
   [49, 7],
   c,
@@ -1974,7 +1934,11 @@ table: bt({
   c,
   [12, 12],
   s,
+  [51, 27],
+  s,
   [53, 27],
+  s,
+  [54, 27],
   s,
   [55, 27],
   s,
@@ -1984,213 +1948,203 @@ table: bt({
   s,
   [58, 27],
   s,
-  [59, 27],
-  s,
-  [60, 27],
-  s,
-  [61, 29],
+  [59, 29],
   33,
-  71,
-  s,
-  [69, 27],
-  s,
-  [70, 27],
+  66,
   s,
   [67, 27],
   s,
-  [10, 7],
-  73,
-  10,
-  10,
+  [68, 27],
+  s,
+  [65, 27],
+  s,
+  [8, 7],
+  68,
+  8,
+  8,
+  s,
+  [15, 10],
+  s,
+  [9, 7],
+  69,
+  9,
+  9,
   s,
   [17, 10],
-  s,
-  [11, 7],
-  74,
-  11,
-  11,
-  s,
-  [19, 10],
-  76,
-  75,
-  29,
-  29,
-  77,
-  s,
-  [79, 25],
-  s,
-  [80, 25],
-  78,
-  48,
-  73,
-  80,
-  74,
-  74,
-  1,
-  2,
-  s,
-  [84, 3],
-  86,
-  c,
-  [567, 7],
-  85,
-  s,
-  [35, 7],
-  s,
-  [22, 16],
-  c,
-  [656, 13],
-  90,
-  91,
-  c,
-  [556, 23],
-  44,
-  61,
-  s,
-  [44, 3],
-  60,
-  62,
-  s,
-  [44, 15],
-  64,
-  s,
-  [44, 4],
-  s,
-  [42, 10],
-  s,
-  [39, 10],
-  s,
-  [48, 27],
-  s,
-  [49, 27],
-  s,
-  [50, 27],
-  s,
-  [54, 27],
-  s,
-  [68, 27],
-  93,
-  94,
-  51,
-  61,
-  s,
-  [51, 3],
-  60,
-  62,
-  s,
-  [51, 15],
-  64,
-  s,
-  [51, 4],
-  52,
-  61,
-  s,
-  [52, 3],
-  60,
-  62,
-  s,
-  [52, 15],
-  64,
-  s,
-  [52, 4],
-  95,
-  33,
-  64,
   71,
-  s,
-  [65, 3],
-  s,
-  [66, 3],
-  s,
-  [18, 10],
-  s,
-  [20, 10],
-  s,
-  [12, 9],
-  s,
-  [31, 3],
-  s,
-  [32, 3],
-  s,
-  [71, 9],
+  70,
+  27,
+  27,
   72,
-  99,
-  98,
-  100,
+  s,
+  [77, 25],
+  s,
+  [78, 25],
+  73,
+  48,
+  71,
+  75,
+  72,
+  72,
+  76,
+  3,
+  80,
+  s,
+  [33, 6],
   77,
-  13,
-  83,
-  83,
-  102,
   s,
-  [81, 3],
+  [33, 7],
+  c,
+  [521, 23],
+  42,
+  56,
   s,
-  [84, 3],
-  5,
+  [42, 3],
+  55,
+  57,
   s,
-  [21, 16],
-  105,
-  108,
-  13,
-  109,
-  110,
-  111,
-  36,
-  36,
+  [42, 15],
+  59,
   s,
-  [41, 10],
+  [42, 4],
+  s,
+  [40, 10],
+  s,
+  [37, 10],
   s,
   [46, 27],
   s,
   [47, 27],
   s,
-  [62, 27],
-  63,
-  76,
+  [48, 27],
+  s,
+  [52, 27],
+  s,
+  [66, 27],
+  82,
+  83,
+  49,
+  56,
+  s,
+  [49, 3],
+  55,
+  57,
+  s,
+  [49, 15],
+  59,
+  s,
+  [49, 4],
+  50,
+  56,
+  s,
+  [50, 3],
+  55,
+  57,
+  s,
+  [50, 15],
+  59,
+  s,
+  [50, 4],
+  84,
+  33,
+  62,
+  66,
+  s,
+  [63, 3],
+  s,
+  [64, 3],
+  s,
+  [16, 10],
+  s,
+  [18, 10],
+  s,
+  [10, 9],
+  s,
+  [29, 3],
+  s,
+  [30, 3],
+  s,
+  [69, 9],
+  70,
+  88,
+  87,
+  1,
+  82,
+  82,
+  92,
+  s,
+  [19, 16],
+  c,
+  [974, 13],
+  95,
+  96,
+  s,
+  [39, 10],
+  s,
+  [44, 27],
+  s,
+  [45, 27],
+  s,
+  [60, 27],
+  61,
+  71,
+  97,
+  73,
+  73,
+  74,
+  74,
+  2,
+  75,
+  13,
+  81,
+  81,
+  99,
+  s,
+  [79, 3],
+  101,
+  104,
+  13,
+  105,
+  106,
+  107,
+  34,
+  34,
+  s,
+  [29, 3],
+  c,
+  [152, 3],
+  s,
+  [80, 3],
+  s,
+  [21, 16],
+  s,
+  [29, 3],
+  s,
+  [23, 9],
+  111,
+  s,
+  [23, 7],
+  s,
+  [24, 16],
+  s,
+  [25, 17],
+  s,
+  [31, 13],
   112,
-  75,
-  75,
+  s,
+  [32, 13],
+  28,
+  28,
+  72,
   76,
-  76,
-  3,
+  71,
+  113,
   s,
-  [84, 3],
+  [26, 17],
+  35,
+  35,
   s,
-  [82, 3],
-  114,
-  s,
-  [23, 16],
-  s,
-  [31, 3],
-  s,
-  [25, 9],
-  116,
-  s,
-  [25, 7],
-  s,
-  [26, 16],
-  s,
-  [27, 17],
-  s,
-  [33, 13],
-  117,
-  s,
-  [34, 13],
-  s,
-  [31, 3],
-  78,
-  4,
-  76,
-  119,
-  s,
-  [28, 17],
-  37,
-  37,
-  30,
-  30,
-  77,
-  s,
-  [24, 16]
+  [22, 16]
 ])
 }),
 defaultActions: bda({
@@ -2198,9 +2152,8 @@ defaultActions: bda({
   0,
   s,
   [8, 5, 1],
-  16,
-  17,
-  18,
+  s,
+  [15, 4, 1],
   s,
   [26, 8, 1],
   35,
@@ -2210,95 +2163,89 @@ defaultActions: bda({
   41,
   44,
   45,
-  49,
-  50,
-  53,
   s,
-  [58, 7, 1],
+  [53, 7, 1],
   s,
-  [71, 9, 1],
-  84,
-  86,
+  [66, 9, 1],
+  76,
+  78,
+  s,
+  [81, 5, 1],
   87,
-  s,
-  [91, 6, 1],
-  98,
+  88,
+  89,
+  92,
+  96,
+  97,
   99,
   100,
-  102,
+  101,
+  103,
   104,
-  105,
-  107,
-  108,
-  109,
   s,
-  [111, 4, 1],
-  116,
-  117,
-  119
+  [105, 4, 2],
+  112,
+  113
 ]),
   goto: u([
-  6,
-  31,
+  4,
+  29,
   s,
-  [13, 4, 1],
+  [11, 4, 1],
+  20,
+  5,
   7,
-  9,
-  38,
-  53,
+  36,
+  51,
   s,
-  [55, 7, 1],
-  69,
-  70,
+  [53, 7, 1],
   67,
-  17,
-  19,
-  79,
-  80,
-  1,
-  2,
-  22,
-  42,
-  39,
-  48,
-  49,
-  50,
-  54,
   68,
   65,
-  66,
-  18,
-  20,
-  12,
-  31,
-  32,
-  71,
-  72,
-  81,
-  5,
-  21,
-  36,
-  41,
+  15,
+  17,
+  77,
+  78,
+  40,
+  37,
   46,
   47,
-  62,
+  48,
+  52,
+  66,
   63,
-  75,
-  76,
-  3,
-  82,
-  23,
-  31,
-  26,
-  27,
-  33,
+  64,
+  16,
+  18,
+  10,
+  29,
+  30,
+  69,
+  70,
+  1,
+  19,
+  39,
+  44,
+  45,
+  60,
+  61,
+  73,
+  74,
+  2,
+  79,
   34,
+  29,
+  80,
+  21,
+  29,
+  24,
+  25,
   31,
-  78,
-  4,
-  28,
-  37,
-  24
+  32,
+  76,
+  26,
+  35,
+  22
 ])
 }),
 parseError: function parseError(str, hash) {
