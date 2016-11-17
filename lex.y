@@ -37,7 +37,7 @@ lex
 
 /*
  * WARNING: when you want to refactor this rule, you'll get into a world of hurt
- * as then the grammar won't be LALR(1) any longer! The shite start to happen
+ * as then the grammar won't be LALR(1) any longer! The shite starts to happen
  * as soon as you take away the EOF in here and move it to the top grammar rule
  * where it really belongs. Other refactorings of this rule to reduce the code
  * duplication in these action blocks leads to the same effect, thanks to the
