@@ -6,6 +6,7 @@
 
 %left '*' '+' '?' RANGE_REGEX
 
+
 %%
 
 lex
@@ -25,7 +26,7 @@ lex
             var asrc = yy.actionInclude.join('\n\n');
             // Only a non-empty action code chunk should actually make it through:
             if (asrc.trim() !== '') {
-              $$.actionInclude = asrc; 
+              $$.actionInclude = asrc;
             }
           }
           delete yy.options;
@@ -34,8 +35,18 @@ lex
         }
     ;
 
+/*
+ * WARNING: when you want to refactor this rule, you'll get into a world of hurt
+ * as then the grammar won't be LALR(1) any longer! The shite start to happen
+ * as soon as you take away the EOF in here and move it to the top grammar rule
+ * where it really belongs. Other refactorings of this rule to reduce the code
+ * duplication in these action blocks leads to the same effect, thanks to the
+ * different refactored rules then fighting it out in reduce/reduce conflicts
+ * thanks to the epsilon rules everywhere in there. You have been warned...
+ */
 rules_and_epilogue
-    : /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */ EOF
+    : EOF
+      /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */
       {
         $$ = { rules: [] };
       }
@@ -61,9 +72,10 @@ rules_and_epilogue
       }
     ;
 
-// because JISON doesn't support mid-rule actions, we set up `yy` using this empty rule at the start:
+// because JISON doesn't support mid-rule actions,
+// we set up `yy` using this empty rule at the start:
 init
-    :
+    : ε
         {
             yy.actionInclude = [];
             if (!yy.options) yy.options = {};
@@ -89,7 +101,7 @@ definitions
             }
           }
         }
-    |
+    | ε
         { $$ = [null, null]; }
     ;
 
@@ -100,6 +112,8 @@ definition
         { $$ = $names_inclusive; }
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
+    | '{' action_body '}'
+        { yy.actionInclude.push($action_body); $$ = null; }
     | ACTION
         { yy.actionInclude.push($ACTION); $$ = null; }
     | include_macro_code
@@ -165,10 +179,16 @@ rule
 action
     : '{' action_body '}'
         { $$ = $action_body; }
-    | ACTION
-        { $$ = $ACTION; }
+    | unbracketed_action_body
+        { $$ = $unbracketed_action_body; }
     | include_macro_code
         { $$ = $include_macro_code; }
+    ;
+
+unbracketed_action_body
+    : ACTION
+    | unbracketed_action_body ACTION
+        { $$ = $unbracketed_action_body + '\n' + $ACTION; }
     ;
 
 action_body
@@ -179,7 +199,7 @@ action_body
     ;
 
 action_comments_body
-    :
+    : ε
         { $$ = ''; }
     | action_comments_body ACTION_BODY
         { $$ = $action_comments_body + $ACTION_BODY; }
@@ -201,23 +221,81 @@ name_list
     ;
 
 regex
-    : regex_list
+    : nonempty_regex_list[re]
         {
-          $$ = $regex_list;
-          if (yy.options.easy_keyword_rules && $$.match(/[\w\d]$/) && !$$.match(/\\(r|f|n|t|v|s|b|c[A-Z]|x[0-9A-F]{2}|u[a-fA-F0-9]{4}|[0-7]{1,3})$/)) {
-              $$ += "\\b";
+          // Detect if the regex ends with a pure (Unicode) word;
+          // we *do* consider escaped characters which are 'alphanumeric'
+          // to be equivalent to their non-escaped version, hence these are
+          // all valid 'words' for the 'easy keyword rules' option:
+          //
+          // - hello_kitty
+          // - γεια_σου_γατούλα
+          // - \u03B3\u03B5\u03B9\u03B1_\u03C3\u03BF\u03C5_\u03B3\u03B1\u03C4\u03BF\u03CD\u03BB\u03B1
+          //
+          // http://stackoverflow.com/questions/7885096/how-do-i-decode-a-string-with-escaped-unicode#12869914
+          //
+          // As we only check the *tail*, we also accept these as
+          // 'easy keywords':
+          //
+          // - %options
+          // - %foo-bar
+          // - +++a:b:c1
+          //
+          // Note the dash in that last example: there the code will consider
+          // `bar` to be the keyword, which is fine with us as we're only
+          // interested in the trailing boundary and patching that one for
+          // the `easy_keyword_rules` option.
+          $$ = $re;
+          if (yy.options.easy_keyword_rules) {
+            // We need to 'protect' `eval` here as keywords are allowed
+            // to contain double-quotes and other leading cruft.
+            // `eval` *does* gobble some escapes (such as `\b`) but
+            // we protect against that through a simple replace regex:
+            // we're not interested in the special escapes' exact value
+            // anyway.
+            // It will also catch escaped escapes (`\\`), which are not
+            // word characters either, so no need to worry about
+            // `eval(str)` 'correctly' converting convoluted constructs
+            // like '\\\\\\\\\\b' in here.
+            $$ = $$
+            .replace(/\\\\/g, '.')
+            .replace(/"/g, '.')
+            .replace(/\\c[A-Z]/g, '.')
+            .replace(/\\[^xu0-9]/g, '.');
+
+            try {
+              $$ = eval('"' + $$ + '"');
+            }
+            catch (ex) {
+              console.warn('easy-keyword-rule FAIL on eval: ', ex);
+
+              // make the next keyword test fail:
+              $$ = '.';
+            }
+            // a 'keyword' starts with an alphanumeric character,
+            // followed by zero or more alphanumerics or digits:
+            var re = XRegExp('\\w[\\w\\d]*$', 'u');
+            if (XRegExp.match($$, re)) {
+              $$ = $re + "\\b";
+            } else {
+              $$ = $re;
+            }
           }
         }
     ;
 
 regex_list
-    : regex_list '|' regex_concat
-        { $$ = $1 + '|' + $3; }
-    | regex_list '|'
-        { $$ = $1 + '|'; }
-    | regex_concat
-    |
+    : nonempty_regex_list
+    | ε
         { $$ = ''; }
+    ;
+
+nonempty_regex_list
+    : regex_concat '|' regex_list
+        { $$ = $1 + '|' + $3; }
+    | '|' regex_list
+        { $$ = '|' + $2; }
+    | regex_concat
     ;
 
 regex_concat
@@ -273,13 +351,16 @@ regex_set
 regex_set_atom
     : REGEX_SET
     | name_expansion
-        { 
-            if (XRegExp.isUnicodeSlug($name_expansion.replace(/[{}]/g, '')) && $name_expansion.toUpperCase() !== $name_expansion) {
-                // treat this as part of an XRegExp `\p{...}` Unicode slug:
+        {
+            if (XRegExp._getUnicodeProperty($name_expansion.replace(/[{}]/g, ''))
+                && $name_expansion.toUpperCase() !== $name_expansion
+            ) {
+                // treat this as part of an XRegExp `\p{...}` Unicode 'General Category' Property cf. http://unicode.org/reports/tr18/#Categories
                 $$ = $name_expansion;
             } else {
-                $$ = '{[' + $name_expansion + ']}';
+                $$ = $name_expansion;
             }
+            //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
         }
     ;
 
@@ -348,13 +429,13 @@ module_code_chunk
 optional_module_code_chunk
     : module_code_chunk
         { $$ = $module_code_chunk; }
-    | /* nil */
+    | ε
         { $$ = ''; }
     ;
 
 %%
 
-var XRegExp = require('xregexp');
+var XRegExp = require('xregexp');       // for helping out the `%options xregexp` in the lexer
 
 function encodeRE (s) {
     return s.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');

@@ -38,6 +38,24 @@ exports["test lex grammar with macros"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test lex grammar with macros in regex sets"] = function () {
+    var lexgrammar = 'D [0-9]\nL [a-zA-Z]\nID [{L}_][{L}{D}_]+\n%%\n\n[{D}]"ohhai" {print(9);}\n"{" return \'{\';';
+    var expected = {
+        macros: {
+            "D": "[0-9]", 
+            "L": "[a-zA-Z]", 
+            "ID": "[{L}_][{L}{D}_]+"
+        },
+        rules: [
+            ["[{D}]ohhai", "print(9);"],
+            ["\\{", "return '{';"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test escaped chars"] = function () {
     var lexgrammar = '%%\n"\\n"+ {return \'NL\';}\n\\n+ {return \'NL2\';}\n\\s+ {/* skip */}';
     var expected = {
@@ -146,6 +164,18 @@ exports["test multiline action with braces in regexp"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b=/{/; // { \nreturn 2 / 3;\n"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
+exports["test multiline (indented) action without braces"] = function () {
+    var lexgrammar = '%%\n"["[^\\]]"]"\n  var b=/{/;\n  // { \n  return 2 / 3;\n';
+    var expected = {
+        rules: [
+            ["\\[[^\\]]\\]", "var b=/{/;\n// { \nreturn 2 / 3;"]
         ]
     };
 
@@ -307,6 +337,19 @@ exports["test unicode"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test unquoted lexer rule literals"] = function () {
+    var lexgrammar = '%%\nπ return 1;\n-abc return 2;';
+    var expected = {
+        rules: [
+            ["π", "return 1;"],
+            ["-abc", "return 2;"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test bugs"] = function () {
     var lexgrammar = '%%\n\\\'([^\\\\\']+|\\\\(\\n|.))*?\\\' return 1;';
     var expected = {
@@ -394,7 +437,7 @@ exports["test options with values"] = function () {
             bool1: true,
             s1: "s1value",
             s2: "s2value",
-            "a-b-c": "d"            // %option camel-casing is done very late in the game: see Jison.Generator source code.
+            "a-b-c": "d"            // `%options camel-casing` is done very late in the game: see Jison.Generator source code.
         }
     };
 
@@ -481,6 +524,21 @@ exports["test no brace action with surplus whitespace between rules"] = function
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+`BR  \r\n|\n|\r`
+
+exports["test macro for commit SHA-1: 1246dbb75472cee8e4e91318cc5a0d4739a8fe12"] = function () {
+    var lexgrammar = 'BR  \\r\\n|\\n|\\r\n%%\r\n{BR} %{\r\nreturn true;\r\n%}\r\n';
+    var expected = {
+        macros: {"BR": "\\r\\n|\\n|\\r"},
+        rules: [
+            ["{BR}", "\r\nreturn true;\r\n"]
+        ]
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+};
+
 exports["test windows line endings"] = function () {
     var lexgrammar = '%%\r\n"["[^\\]]"]" %{\r\nreturn true;\r\n%}\r\n';
     var expected = {
@@ -510,6 +568,7 @@ exports["test %options easy_keyword_rules"] = function () {
     var lexgrammar = '%options easy_keyword_rules\n'+
                      '%s TEST TEST2\n%x EAT\n%%\n'+
                      '"enter-test" {this.begin(\'TEST\');}\n'+
+                     '"enter_test" {this.begin(\'TEST\');}\n'+
                      '<TEST,EAT>"x" {return \'T\';}\n'+
                      '<*>"z" {return \'Z\';}\n'+
                      '<TEST>"y" {this.begin(\'INITIAL\'); return \'TY\';}\n'+
@@ -523,11 +582,12 @@ exports["test %options easy_keyword_rules"] = function () {
             "EAT": 1,
         },
         rules: [
-            ["enter-test\\b", "this.begin('TEST');" ],
+            ["enter-test\\b", "this.begin('TEST');" ],                 // '-' dash is accepted as it's *followed* by a word, hence the *tail* is an 'easy keyword', hence it merits an automatic `\b` word-boundary check added!
+            ["enter_test\\b", "this.begin('TEST');" ],
             [["TEST","EAT"], "x\\b", "return 'T';" ],
             [["*"], "z\\b", "return 'Z';" ],
             [["TEST"], "y\\b", "this.begin('INITIAL'); return 'TY';" ],
-            ["\"'a\\b", "return 1;"],
+            ["\"'a\\b", "return 1;"],                                  // keywords *with any non-keyword prefix*, i.e. keywords 'at the tail end', get the special 'easy keyword' treatment too!
             ["\"'\\\\\\*i\\b", "return 1;"],
             ["a\\b", "return 2;"],
             ["\\cA", ""],

@@ -1,29 +1,49 @@
 
-NAME                                    [a-zA-Z_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?
-ID                                      [a-zA-Z_][a-zA-Z0-9_]*
+ASCII_LETTER                            [a-zA-z]
+// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge 
+// with {UNICODE_LETTER} (though jison has code to optimize if you *did* 
+// include the `[a-zA-Z]` anyway):
+UNICODE_LETTER                          [\p{Alphabetic}]
+ALPHA                                   [{UNICODE_LETTER}_]
+DIGIT                                   [\p{Number}]
+WHITESPACE                              [\s\r\n\p{Separator}]
+
+NAME                                    [{ALPHA}](?:[{ALPHA}{DIGIT}-]*[{ALPHA}{DIGIT}])?
+ID                                      [{ALPHA}][{ALPHA}{DIGIT}]*
 BR                                      \r\n|\n|\r
-// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use that one directly. 
-// Instead we define the {WS} macro here:
+// WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use
+// that one directly. Instead we define the {WS} macro here:
 WS                                      [^\S\r\n]
 
 
 %s indented trail rules macro
 %x code start_condition options conditions action path set
 
+
 %options easy_keyword_rules
 %options ranges
+%options xregexp
+
 
 %%
 
 <action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
 <action>"//".*                          return 'ACTION_BODY';
-<action>"/"[^ /]*?['"{}'][^ ]*?"/"      return 'ACTION_BODY'; // regexp with braces or quotes (and no spaces)
+// regexp with braces or quotes (and no spaces):
+<action>"/"[^ /]*?['"{}'][^ ]*?"/"      return 'ACTION_BODY'; 
 <action>\"("\\\\"|'\"'|[^"])*\"         return 'ACTION_BODY';
 <action>"'"("\\\\"|"\'"|[^'])*"'"       return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                  return 'ACTION_BODY';
 <action>[^{}/"']+                       return 'ACTION_BODY';
 <action>"{"                             yy.depth++; return '{';
-<action>"}"                             if (yy.depth == 0) { this.begin('trail'); } else { yy.depth--; } return '}';
+<action>"}"                             %{
+                                            if (yy.depth == 0) { 
+                                                this.begin('trail'); 
+                                            } else { 
+                                                yy.depth--; 
+                                            } 
+                                            return '}';
+                                        %}
 
 <conditions>{NAME}                      return 'NAME';
 <conditions>">"                         this.popState(); return '>';
@@ -32,7 +52,7 @@ WS                                      [^\S\r\n]
 
 <rules>{BR}+                            /* empty */
 <rules>{WS}+{BR}+                       /* empty */
-<rules>\s+                              this.begin('indented');
+<rules>{WS}+                            this.begin('indented');
 <rules>"%%"                             this.begin('code'); return '%%';
 <rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
                                         %{
@@ -76,15 +96,16 @@ WS                                      [^\S\r\n]
                                             this.pushState('path');
                                             return 'INCLUDE';
                                         %}
-<indented>.+                            this.begin('rules'); return 'ACTION';
+<indented>.*                            this.popState(); return 'ACTION';
 
 "/*"(.|\n|\r)*?"*/"                     /* ignore */
-"//".*                                  /* ignore */
+"//"[^\r\n]*                            /* ignore */
 
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
 <macro>{BR}+                            this.popState('macro');
 
-// Accept any non-regex-special character as a direct literal without the need to put quotes around it:
+// Accept any non-regex-special character as a direct literal without 
+// the need to put quotes around it:
 <macro>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
@@ -135,18 +156,24 @@ WS                                      [^\S\r\n]
 "{"                                     return '{';
 "}"                                     return '}';
 
-.                                       throw new Error("unsupported input character: " + yytext + " @ " + JSON.stringify(yylloc)); /* b0rk on bad characters */
+.                                       %{
+                                            var l1 = Math.min(79 - 3 - 6, yylloc.first_column);
+                                            var l2 = Math.min(79 - 3 - 6 - l2, 3);
+                                            var errdsc = this.showPosition(l1, l2);
+                                            throw new Error('unsupported input character: ' + yytext + '\n' + indent(errdsc, 6) + '\n    @ ' + this.describeYYLLOC(yylloc)); /* b0rk on bad characters */
+                                        %}
 
 <*><<EOF>>                              return 'EOF';
 
 
-<set>("\\\\"|"\]"|[^\]{])+              return 'REGEX_SET';
+<set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
 <set>"{"                                return 'REGEX_SET';
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
-// in the trailing CODE block, only accept these `%include` macros when they appear at the start of a line
-// and make sure the rest of lexer regexes account for this one so it'll match that way only:
+// in the trailing CODE block, only accept these `%include` macros when 
+// they appear at the start of a line and make sure the rest of lexer 
+// regexes account for this one so it'll match that way only:
 <code>[^\r\n]*(\r|\n)+                  return 'CODE';
 <code>[^\r\n]+                          return 'CODE';      // the bit of CODE just before EOF...
 
@@ -159,8 +186,15 @@ WS                                      [^\S\r\n]
 
 <*>.                                    %{
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + JSON.stringify(yylloc) + 'while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            var l1 = Math.min(76 - 4, yylloc.first_column);
+                                            var l2 = Math.min(76 - 4 - l2, 3);
+                                            console.warn('ignoring unsupported lexer input: ', yytext, ' @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
                                         %}
 
 %%
 
+function indent(s, i) {
+    var a = s.split('\n');
+    var pf = (new Array(i + 1)).join(' ');
+    return pf + a.join('\n' + pf);
+}
