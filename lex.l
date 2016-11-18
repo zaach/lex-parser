@@ -29,8 +29,8 @@ WS                                      [^\S\r\n]
 
 <action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
 <action>"//".*                          return 'ACTION_BODY';
-// regexp with braces or quotes (and no spaces):
-<action>"/"[^ /]*?['"{}'][^ ]*?"/"      return 'ACTION_BODY'; 
+// regexp with braces or quotes (and no spaces, so we don't mistake a *division operator* `/` for a regex delimiter here in most circumstances):
+<action>"/"[^ /]*?['"{}][^ ]*?"/"       return 'ACTION_BODY'; 
 <action>\"("\\\\"|'\"'|[^"])*\"         return 'ACTION_BODY';
 <action>"'"("\\\\"|"\'"|[^'])*"'"       return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                  return 'ACTION_BODY';
