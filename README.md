@@ -94,8 +94,8 @@ WS                                      [^\S\r\n]
                                         %}
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
-<options>\"("\\\\"|'\"'|[^"])*\"        yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
-<options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
+<options>\"("\\\\"|'\"'|[^"])*\"        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
+<options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
 <options>[^\s\r\n]+                     return 'OPTION_VALUE';
 <options>{BR}+                          this.popState(); return 'OPTIONS_END';
 <options>{WS}+                          /* skip whitespace */
@@ -107,8 +107,8 @@ WS                                      [^\S\r\n]
 <trail>{WS}*{BR}+                       this.begin('rules');
 
 <indented>"{"                           yy.depth = 0; this.begin('action'); return '{';
-<indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
-"%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
+<indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+"%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 <indented>"%include"                    %{
                                             // This is an include instruction in place of an action:
                                             // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
