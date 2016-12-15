@@ -7,13 +7,20 @@ UNICODE_LETTER                          [\p{Alphabetic}]
 ALPHA                                   [{UNICODE_LETTER}_]
 DIGIT                                   [\p{Number}]
 WHITESPACE                              [\s\r\n\p{Separator}]
+ALNUM                                   [{ALPHA}{DIGIT}]
 
-NAME                                    [{ALPHA}](?:[{ALPHA}{DIGIT}-]*[{ALPHA}{DIGIT}])?
-ID                                      [{ALPHA}][{ALPHA}{DIGIT}]*
+NAME                                    [{ALPHA}](?:[{ALNUM}-]*{ALNUM})?
+ID                                      [{ALPHA}]{ALNUM}*
+DECIMAL_NUMBER                          [1-9][0-9]*
+HEX_NUMBER                              "0"[xX][0-9a-fA-F]+
 BR                                      \r\n|\n|\r
 // WhiteSpace MUST NOT match CR/LF and the regex `\s` DOES, so we cannot use
 // that one directly. Instead we define the {WS} macro here:
 WS                                      [^\S\r\n]
+
+// Quoted string content: support *escaped* quotes inside strings:
+QUOTED_STRING_CONTENT                   (?:\\\'|\\[^\']|[^\\\'])*
+DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 
 
 %s indented trail rules macro
@@ -23,6 +30,7 @@ WS                                      [^\S\r\n]
 %options easy_keyword_rules
 %options ranges
 %options xregexp
+
 
 
 %%
@@ -62,8 +70,10 @@ WS                                      [^\S\r\n]
                                         %}
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
-<options>\"("\\\\"|'\"'|[^"])*\"        yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
-<options>"'"("\\\\"|"\'"|[^'])*"'"      yytext = yytext.substr(1, yytext.length - 2); return 'OPTION_VALUE';
+<options>\"{DOUBLEQUOTED_STRING_CONTENT}\"
+                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
+<options>\'{QUOTED_STRING_CONTENT}\'
+                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
 <options>[^\s\r\n]+                     return 'OPTION_VALUE';
 <options>{BR}+                          this.popState(); return 'OPTIONS_END';
 <options>{WS}+                          /* skip whitespace */
@@ -75,8 +85,8 @@ WS                                      [^\S\r\n]
 <trail>{WS}*{BR}+                       this.begin('rules');
 
 <indented>"{"                           yy.depth = 0; this.begin('action'); return '{';
-<indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
-"%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yytext.length - 4); return 'ACTION';
+<indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+"%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 <indented>"%include"                    %{
                                             // This is an include instruction in place of an action:
                                             // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
@@ -116,8 +126,10 @@ WS                                      [^\S\r\n]
 {BR}+                                   /* empty */
 \s+                                     /* empty */
 
-\"("\\\\"|'\"'|[^"])*\"                 yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
-"'"("\\\\"|"\'"|[^'])*"'"               yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
+\"{DOUBLEQUOTED_STRING_CONTENT}\"
+                                        yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
+\'{QUOTED_STRING_CONTENT}\'
+                                        yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
 "|"                                     return '|';
 "(?:"                                   return 'SPECIAL_GROUP';
@@ -170,8 +182,10 @@ WS                                      [^\S\r\n]
 
 
 <path>{BR}                              this.popState(); this.unput(yytext);
-<path>"'"[^\r\n]+"'"                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
-<path>'"'[^\r\n]+'"'                    yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
+<path>\"{DOUBLEQUOTED_STRING_CONTENT}\"
+                                        yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
+<path>\'{QUOTED_STRING_CONTENT}\'
+                                        yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
 <path>{WS}+                             // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
