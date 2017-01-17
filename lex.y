@@ -6,20 +6,32 @@
 
 %left '*' '+' '?' RANGE_REGEX
 
+%{
+function extendLexerDefinitions(base, $definitions, $epilogue, yy) {
+  if ($definitions[0]) base.macros = $definitions[0];
+  if ($definitions[1]) base.startConditions = $definitions[1];
+  if ($definitions[2]) base.unknownDecls = $definitions[2];
+  if ($epilogue) base.moduleInclude = $epilogue;
+  if (yy.options) base.options = yy.options;
+  if (yy.actionInclude) base.actionInclude = yy.actionInclude;
+  delete yy.options;
+  delete yy.actionInclude;
+}
+%}
+
 %%
 
 lex
-    : definitions '%%' rules epilogue
+    : definitions EOF
+        {
+          $$ = { rules: [] };
+          extendLexerDefinitions($$, $definitions, null, yy);
+          return $$;
+        }
+    | definitions '%%' rules epilogue
         {
           $$ = { rules: $rules };
-          if ($definitions[0]) $$.macros = $definitions[0];
-          if ($definitions[1]) $$.startConditions = $definitions[1];
-          if ($definitions[2]) $$.unknownDecls = $definitions[2];
-          if ($epilogue) $$.moduleInclude = $epilogue;
-          if (yy.options) $$.options = yy.options;
-          if (yy.actionInclude) $$.actionInclude = yy.actionInclude;
-          delete yy.options;
-          delete yy.actionInclude;
+          extendLexerDefinitions($$, $definitions, $epilogue, yy);
           return $$;
         }
     ;
