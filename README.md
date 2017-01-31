@@ -66,7 +66,7 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 // Off Topic
 // ---------
 //
-// Do not specify the xregexp option as we want the XRegExp \p{...} regex macros converted to 
+// Do NOT specify the xregexp option as we want the XRegExp \p{...} regex macros converted to 
 // native regexes and used as such:
 //
 // %options xregexp
@@ -91,7 +91,7 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 <action>"{"                             yy.depth++; return '{';
 <action>"}"                             %{
                                             if (yy.depth == 0) { 
-                                                this.begin('trail'); 
+                                                this.pushState('trail'); 
                                             } else { 
                                                 yy.depth--; 
                                             } 
@@ -105,8 +105,8 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 
 <rules>{BR}+                            /* empty */
 <rules>{WS}+{BR}+                       /* empty */
-<rules>{WS}+                            this.begin('indented');
-<rules>"%%"                             this.begin('code'); return '%%';
+<rules>{WS}+                            this.pushState('indented');
+<rules>"%%"                             this.pushState('code'); return '%%';
 <rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
@@ -127,10 +127,10 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 <start_condition>{BR}+                  this.popState();
 <start_condition>{WS}+                  /* empty */
 
-<trail>{WS}*{BR}+                       this.begin('rules');
+<trail>{WS}*{BR}+                       this.pushState('rules');
 
-<indented>"{"                           yy.depth = 0; this.begin('action'); return '{';
-<indented>"%{"(.|{BR})*?"%}"            this.begin('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+<indented>"{"                           yy.depth = 0; this.pushState('action'); return '{';
+<indented>"%{"(.|{BR})*?"%}"            this.pushState('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 "%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 <indented>"%include"                    %{
                                             // This is an include instruction in place of an action:
@@ -188,7 +188,7 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 "^"                                     return '^';
 ","                                     return ',';
 "<<EOF>>"                               return '$';
-"<"                                     this.begin('conditions'); return '<';
+"<"                                     this.pushState('conditions'); return '<';
 "/!"                                    return '/!';                    // treated as `(?!atom)`
 "/"                                     return '/';                     // treated as `(?=atom)`
 "\\"([0-7]{1,3}|[rfntvsSbBwWdD\\*+()${}|[\]\/.^?]|"c"[A-Z]|"x"[0-9A-F]{2}|"u"[a-fA-F0-9]{4})
@@ -196,17 +196,22 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 "\\".                                   yytext = yytext.replace(/^\\/g, ''); return 'ESCAPE_CHAR';
 "$"                                     return '$';
 "."                                     return '.';
-"%options"                              this.begin('options'); return 'OPTIONS';
-"%s"                                    this.begin('start_condition'); return 'START_INC';
-"%x"                                    this.begin('start_condition'); return 'START_EXC';
+"%options"                              this.pushState('options'); return 'OPTIONS';
+"%s"                                    this.pushState('start_condition'); return 'START_INC';
+"%x"                                    this.pushState('start_condition'); return 'START_EXC';
 <INITIAL,trail,code>"%include"          this.pushState('path'); return 'INCLUDE';
-<INITIAL,rules,trail,code>"%"{NAME}[^\r\n]+
+<INITIAL,rules,trail,code>"%"{NAME}([^\r\n]*)
                                         %{
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            console.warn('LEX: ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            // this.pushState('options');
+                                            yytext = [
+                                                this.matches[1],            // {NAME}
+                                                this.matches[2].trim()      // optional value/parameters
+                                            ];
                                             return 'UNKNOWN_DECL';
                                         %}
-"%%"                                    this.begin('rules'); return '%%';
+"%%"                                    this.pushState('rules'); return '%%';
 "{"\d+(","\s?\d+|",")?"}"               return 'RANGE_REGEX';
 "{"{ID}"}"                              return 'NAME_BRACE';
 <set,options>"{"{ID}"}"                 return 'NAME_BRACE';

@@ -3596,7 +3596,7 @@ case 8 :
 /*! Rule::       \} */ 
  
                                             if (yy.depth == 0) { 
-                                                this.begin('trail'); 
+                                                this.pushState('trail'); 
                                             } else { 
                                                 yy.depth--; 
                                             } 
@@ -3621,12 +3621,12 @@ break;
 case 15 : 
 /*! Conditions:: rules */ 
 /*! Rule::       {WS}+ */ 
- this.begin('indented'); 
+ this.pushState('indented'); 
 break;
 case 16 : 
 /*! Conditions:: rules */ 
 /*! Rule::       %% */ 
- this.begin('code'); return 19; 
+ this.pushState('code'); return 19; 
 break;
 case 17 : 
 /*! Conditions:: rules */ 
@@ -3670,17 +3670,17 @@ break;
 case 28 : 
 /*! Conditions:: trail */ 
 /*! Rule::       {WS}*{BR}+ */ 
- this.begin('rules'); 
+ this.pushState('rules'); 
 break;
 case 29 : 
 /*! Conditions:: indented */ 
 /*! Rule::       \{ */ 
- yy.depth = 0; this.begin('action'); return 3; 
+ yy.depth = 0; this.pushState('action'); return 3; 
 break;
 case 30 : 
 /*! Conditions:: indented */ 
 /*! Rule::       %\{(.|{BR})*?%\} */ 
- this.begin('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yyleng - 4); return 23; 
+ this.pushState('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yyleng - 4); return 23; 
 break;
 case 31 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
@@ -3772,7 +3772,7 @@ break;
 case 56 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       < */ 
- this.begin('conditions'); return 5; 
+ this.pushState('conditions'); return 5; 
 break;
 case 57 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
@@ -3792,17 +3792,17 @@ break;
 case 63 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %options\b */ 
- this.begin('options'); return 37; 
+ this.pushState('options'); return 37; 
 break;
 case 64 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %s\b */ 
- this.begin('start_condition'); return 21; 
+ this.pushState('start_condition'); return 21; 
 break;
 case 65 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %x\b */ 
- this.begin('start_condition'); return 22; 
+ this.pushState('start_condition'); return 22; 
 break;
 case 66 : 
 /*! Conditions:: INITIAL trail code */ 
@@ -3811,17 +3811,22 @@ case 66 :
 break;
 case 67 : 
 /*! Conditions:: INITIAL rules trail code */ 
-/*! Rule::       %{NAME}[^\r\n]+ */ 
+/*! Rule::       %{NAME}([^\r\n]*) */ 
  
                                             /* ignore unrecognized decl */
-                                            console.warn('ignoring unsupported lexer option: ', yy_.yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            console.warn('LEX: ignoring unsupported lexer option: ', yy_.yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            // this.pushState('options');
+                                            yy_.yytext = [
+                                                this.matches[1],            // {NAME}
+                                                this.matches[2].trim()      // optional value/parameters
+                                            ];
                                             return 24;
                                          
 break;
 case 68 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
 /*! Rule::       %% */ 
- this.begin('rules'); return 19; 
+ this.pushState('rules'); return 19; 
 break;
 case 76 : 
 /*! Conditions:: set */ 
@@ -4058,7 +4063,7 @@ new XRegExp("^(?:([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*))", ""),
 /^(?:%s\b)/,
 /^(?:%x\b)/,
 /^(?:%include\b)/,
-new XRegExp("^(?:%([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}\\-_]*(?:[\\p{Alphabetic}\\p{Number}_]))?)[^\\n\\r]+)", ""),
+new XRegExp("^(?:%([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}\\-_]*(?:[\\p{Alphabetic}\\p{Number}_]))?)([^\\n\\r]*))", ""),
 /^(?:%%)/,
 /^(?:\{\d+(,\s?\d+|,)?\})/,
 new XRegExp("^(?:\\{([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*)\\})", ""),
