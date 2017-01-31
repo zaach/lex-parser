@@ -10,7 +10,7 @@
 %%
 
 lex
-    : init definitions '%%' rules_and_epilogue EOF
+    : init definitions rules_and_epilogue EOF
         {
           $$ = $rules_and_epilogue;
           if ($definitions[0]) $$.macros = $definitions[0];
@@ -36,7 +36,7 @@ lex
     ;
 
 rules_and_epilogue
-    : rules '%%' extra_lexer_module_code
+    : '%%' rules '%%' extra_lexer_module_code
       {
         if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
           $$ = { rules: $rules, moduleInclude: $extra_lexer_module_code };
@@ -44,10 +44,15 @@ rules_and_epilogue
           $$ = { rules: $rules };
         }
       }
-    | rules
+    | '%%' rules
       /* Note: an empty rules set is allowed when you are setting up an `%options custom_lexer` */
       {
         $$ = { rules: $rules };
+      }
+    | ε
+      /* Note: an empty rules set is allowed when you are setting up an `%options custom_lexer` */
+      {
+        $$ = { rules: [] };
       }
     ;
 
