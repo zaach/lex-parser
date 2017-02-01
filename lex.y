@@ -232,7 +232,7 @@ regex
             }
             // a 'keyword' starts with an alphanumeric character,
             // followed by zero or more alphanumerics or digits:
-            var re = XRegExp('\\w[\\w\\d]*$', 'u');
+            var re = new XRegExp('\\w[\\w\\d]*$', XRegExp._registeredFlags()['u'] ? 'u' : '');
             if (XRegExp.match($$, re)) {
               $$ = $re + "\\b";
             } else {
