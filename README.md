@@ -1,5 +1,9 @@
 # lex-parser
 
+
+[![build status](https://secure.travis-ci.org/GerHobbelt/lex-parser.png)](http://travis-ci.org/GerHobbelt/lex-parser)
+
+
 A parser for lexical grammars used by [jison](http://jison.org) and jison-lex.
 
 ## install
