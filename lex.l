@@ -22,6 +22,10 @@ WS                                      [^\S\r\n]
 QUOTED_STRING_CONTENT                   (?:\\\'|\\[^\']|[^\\\'])*
 DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 
+// Accept any non-regex-special character as a direct literal without 
+// the need to put quotes around it:
+ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
+
 
 %s indented trail rules macro
 %x code start_condition options conditions action path set
@@ -63,7 +67,9 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 <rules>{WS}+{BR}+                       /* empty */
 <rules>{WS}+                            this.pushState('indented');
 <rules>"%%"                             this.pushState('code'); return '%%';
-<rules>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]+
+// Accept any non-regex-special character as a direct literal without 
+// the need to put quotes around it:
+<rules>{ANY_LITERAL_CHAR}+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
@@ -117,7 +123,7 @@ DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 
 // Accept any non-regex-special character as a direct literal without 
 // the need to put quotes around it:
-<macro>[^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,'""]+
+<macro>{ANY_LITERAL_CHAR}+
                                         %{
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
