@@ -194,7 +194,7 @@ start_conditions
         { $$ = $name_list; }
     | '<' '*' '>'
         { $$ = ['*']; }
-    |
+    | ε
     ;
 
 name_list
