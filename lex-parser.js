@@ -1101,7 +1101,7 @@ case 37:
       }
       // a 'keyword' starts with an alphanumeric character,
       // followed by zero or more alphanumerics or digits:
-      var re = new XRegExp('\\w[\\w\\d]*$', XRegExp._registeredFlags()['u'] ? 'u' : '');
+      var re = new XRegExp('\\w[\\w\\d]*$');
       if (XRegExp.match(this.$, re)) {
         this.$ = yyvstack[$0] + "\\b";
       } else {
