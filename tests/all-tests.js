@@ -56,6 +56,16 @@ exports["test lex grammar with macros in regex sets"] = function () {
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
 
+exports["test rule-less grammar"] = function () {
+    var lexgrammar = '%export { D }\nD [0-9]';
+    var expected = {
+      macros: { D: '[0-9]' },
+      unknownDecls: [['export', '{ D }']],
+      rules: []
+    };
+    assert.deepEqual(lex.parse(lexgrammar), expected, 'grammar should be parsed correctly');
+};
+
 exports["test escaped chars"] = function () {
     var lexgrammar = '%%\n"\\n"+ {return \'NL\';}\n\\n+ {return \'NL2\';}\n\\s+ {/* skip */}';
     var expected = {
@@ -260,9 +270,9 @@ exports["test unknown declarations"] = function () {
     var lexgrammar = '%a b c\n%foo[bar] baz qux\n%a b c\n%%\n. //';
     var expected = {
         unknownDecls: [
-            '%a b c',
-            '%foo[bar] baz qux',
-            '%a b c'
+            ['a', 'b c'],
+            ['foo', '[bar] baz qux'],
+            ['a', 'b c']
         ],
         rules: [
             ['.', '//']

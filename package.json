@@ -5,7 +5,7 @@
     "url": "http://zaa.ch"
   },
   "name": "lex-parser",
-  "version": "0.1.4-157",
+  "version": "0.1.4-171",
   "description": "A parser for lexical grammars used by jison",
   "main": "lex-parser.js",
   "scripts": {
@@ -26,10 +26,10 @@
     "node": ">=4.0"
   },
   "dependencies": {
-    "xregexp": "GerHobbelt/xregexp#master"
+    "xregexp": "github:GerHobbelt/xregexp#master"
   },
   "devDependencies": {
-    "jison": "GerHobbelt/jison#master",
-    "test": ">=0.6.0"
+    "jison-gho": "github:GerHobbelt/jison#master",
+    "test": "0.6.0"
   }
 }

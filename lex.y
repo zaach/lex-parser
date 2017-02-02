@@ -10,7 +10,7 @@
 %%
 
 lex
-    : init definitions '%%' rules_and_epilogue
+    : init definitions rules_and_epilogue EOF
         {
           $$ = $rules_and_epilogue;
           if ($definitions[0]) $$.macros = $definitions[0];
@@ -35,30 +35,8 @@ lex
         }
     ;
 
-/*
- * WARNING: when you want to refactor this rule, you'll get into a world of hurt
- * as then the grammar won't be LALR(1) any longer! The shite start to happen
- * as soon as you take away the EOF in here and move it to the top grammar rule
- * where it really belongs. Other refactorings of this rule to reduce the code
- * duplication in these action blocks leads to the same effect, thanks to the
- * different refactored rules then fighting it out in reduce/reduce conflicts
- * thanks to the epsilon rules everywhere in there. You have been warned...
- */
 rules_and_epilogue
-    : EOF
-      /* an empty rules set is allowed when you are setting up an `%options custom_lexer` */
-      {
-        $$ = { rules: [] };
-      }
-    | '%%' extra_lexer_module_code EOF
-      {
-        if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
-          $$ = { rules: [], moduleInclude: $extra_lexer_module_code };
-        } else {
-          $$ = { rules: [] };
-        }
-      }
-    | rules '%%' extra_lexer_module_code EOF
+    : '%%' rules '%%' extra_lexer_module_code
       {
         if ($extra_lexer_module_code && $extra_lexer_module_code.trim() !== '') {
           $$ = { rules: $rules, moduleInclude: $extra_lexer_module_code };
@@ -66,9 +44,15 @@ rules_and_epilogue
           $$ = { rules: $rules };
         }
       }
-    | rules EOF
+    | '%%' rules
+      /* Note: an empty rules set is allowed when you are setting up an `%options custom_lexer` */
       {
         $$ = { rules: $rules };
+      }
+    | ε
+      /* Note: an empty rules set is allowed when you are setting up an `%options custom_lexer` */
+      {
+        $$ = { rules: [] };
       }
     ;
 
@@ -167,8 +151,8 @@ rules_collective
 rule_block
     : rule_block rule
         { $$ = $rules; $$.push($rule); }
-    | rule
-        { $$ = [$rule]; }
+    | ε
+        { $$ = []; }
     ;
 
 rule
@@ -274,7 +258,7 @@ regex
             }
             // a 'keyword' starts with an alphanumeric character,
             // followed by zero or more alphanumerics or digits:
-            var re = XRegExp('\\w[\\w\\d]*$', 'u');
+            var re = new XRegExp('\\w[\\w\\d]*$', XRegExp._registeredFlags()['u'] ? 'u' : '');
             if (XRegExp.match($$, re)) {
               $$ = $re + "\\b";
             } else {
