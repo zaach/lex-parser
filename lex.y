@@ -125,8 +125,8 @@ names_exclusive
 rules
     : rules rules_collective
         { $$ = $rules.concat($rules_collective); }
-    | rules_collective
-        { $$ = $rules_collective; }
+    | ε
+        { $$ = []; }
     ;
 
 rules_collective
