@@ -26,5 +26,8 @@
         ["%\\{(.|\\n)*?\\}%", "yytext = yytext.substr(2, yyleng-4);return 'ACTION';"],
         [".", "/* ignore bad characters */"],
         ["$", "return 'EOF';"]
-    ]
+    ],
+    "macros": {},
+    "startConditions": {},
+    "unknownDecls": []
 }

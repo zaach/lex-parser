@@ -31,7 +31,9 @@ exports["test lex grammar with macros"] = function () {
         rules: [
             ["{D}ohhai", "print(9);"],
             ["\\{", "return '{';"]
-        ]
+        ],
+        startConditions: {},
+        unknownDecls: []    
     };
 
     lexer_reset();
@@ -49,7 +51,9 @@ exports["test lex grammar with macros in regex sets"] = function () {
         rules: [
             ["[{D}]ohhai", "print(9);"],
             ["\\{", "return '{';"]
-        ]
+        ],
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -61,7 +65,8 @@ exports["test rule-less grammar"] = function () {
     var expected = {
       macros: { D: '[0-9]' },
       unknownDecls: [['export', '{ D }']],
-      rules: []
+      rules: [],
+      startConditions: {},
     };
     assert.deepEqual(lex.parse(lexgrammar), expected, 'grammar should be parsed correctly');
 };
@@ -73,7 +78,10 @@ exports["test escaped chars"] = function () {
             ["\\\\n+", "return 'NL';"],
             ["\\n+", "return 'NL2';"],
             ["\\s+", "/* skip */"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -88,7 +96,10 @@ exports["test advanced"] = function () {
             [".", "/* skip */"],
             ["stuff*(?=(\\{|;))", "/* ok */"],
             ["(.+)[a-z]{1,2}hi*?", "/* skip */"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -102,7 +113,10 @@ exports["test [^\\]]"] = function () {
             ["\\[[^\\]]\\]", "return true;"],
             ["f\"oo'bar", "return 'baz2';"],
             ['fo"obar', "return 'baz';"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -114,7 +128,10 @@ exports["test multiline action"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nreturn true;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -126,7 +143,10 @@ exports["test multiline action with single braces"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b={};return true;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -138,7 +158,10 @@ exports["test multiline action with brace in a multi-line-comment"] = function (
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b={}; /* { */ return true;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -150,7 +173,10 @@ exports["test multiline action with brace in a single-line-comment"] = function 
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b={}; // { \nreturn 2 / 3;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -162,7 +188,10 @@ exports["test multiline action with braces in strings"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b='{' + \"{\"; // { \nreturn 2 / 3;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -174,7 +203,10 @@ exports["test multiline action with braces in regexp"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\nvar b=/{/; // { \nreturn 2 / 3;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -186,7 +218,10 @@ exports["test multiline (indented) action without braces"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "var b=/{/;\n// { \nreturn 2 / 3;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -200,7 +235,9 @@ exports["test include"] = function () {
         actionInclude: "\n hi <stuff> \n",
         rules: [
             ["\\[[^\\]]\\]", "\nreturn true;\n"]
-        ]
+        ],
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -235,7 +272,10 @@ exports["test advanced"] = function () {
     var expected = {
         rules: [
             ["stuff*(?!(\\{|;))", "/* ok */"],
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -259,7 +299,9 @@ exports["test start conditions"] = function () {
             [["TEST","EAT"], "x", "return 'T';" ],
             [["*"], "z", "return 'Z';" ],
             [["TEST"], "y", "this.begin('INITIAL'); return 'TY';" ]
-        ]
+        ],
+        macros: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -276,7 +318,9 @@ exports["test unknown declarations"] = function () {
         ],
         rules: [
             ['.', '//']
-        ]
+        ],
+        macros: {},
+        startConditions: {}
     };
 
     assert.deepEqual(lex.parse(lexgrammar), expected, "unknown declarations should be parsed correctly");
@@ -288,7 +332,10 @@ exports["test no brace action"] = function () {
         rules: [
             ["\\[[^\\]]\\]", "return true;"],
             ["x", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -300,7 +347,10 @@ exports["test quote escape"] = function () {
     var expected = {
         rules: [
             ["\"'x", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -316,7 +366,10 @@ exports["test escape things"] = function () {
             ["\\cA", ""],
             ["\\012", ""],
             ["\\xFF", ""]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -328,7 +381,10 @@ exports["test unicode encoding"] = function () {
     var expected = {
         rules: [
             ["\\u03c0", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -340,7 +396,10 @@ exports["test unicode"] = function () {
     var expected = {
         rules: [
             ["π", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -353,7 +412,10 @@ exports["test unquoted lexer rule literals"] = function () {
         rules: [
             ["π", "return 1;"],
             ["-abc", "return 2;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -365,7 +427,10 @@ exports["test bugs"] = function () {
     var expected = {
         rules: [
             ["'([^\\\\']+|\\\\(\\n|.))*?'", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -377,7 +442,10 @@ exports["test special groupings"] = function () {
     var expected = {
         rules: [
             ["(?:foo|bar)\\(\\)", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -390,7 +458,10 @@ exports["test trailing code include"] = function () {
         rules: [
             ['foo', "return bar;"]
         ],
-        moduleInclude: " var bar = 1;"
+        moduleInclude: " var bar = 1;",
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -402,7 +473,10 @@ exports["test empty or regex"] = function () {
     var expected = {
         rules: [
             ["(|bar)(foo|)(|)", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -415,7 +489,10 @@ exports["test options"] = function () {
         rules: [
             ["foo", "return 1;"]
         ],
-        options: {flex: true}
+        options: {flex: true},
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -428,7 +505,10 @@ exports["test if %options names with a hyphen are correctly recognized"] = funct
         rules: [
             ["foo", "return 1;"]
         ],
-        options: {"token-stack": true}
+        options: {"token-stack": true},
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -448,7 +528,10 @@ exports["test options with values"] = function () {
             s1: "s1value",
             s2: "s2value",
             "a-b-c": "d"            // `%options camel-casing` is done very late in the game: see Jison.Generator source code.
-        }
+        },
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -464,7 +547,10 @@ exports["test options with string values which have embedded quotes"] = function
         options: {
             s1: "s1\\\"val'ue",
             s2: "s2\\\\x\\'val\"ue"
-        }
+        },
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -476,7 +562,10 @@ exports["test unquoted string rules"] = function () {
     var expected = {
         rules: [
             ["foo*", "return 1"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -490,7 +579,10 @@ exports["test [^\\\\]"] = function () {
             ["\\[[^\\\\]\\]", "return true;"],
             ["f\"oo'bar", "return 'baz2';"],
             ['fo"obar', "return 'baz';"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -502,7 +594,10 @@ exports["test comments"] = function () {
     var expected = {
         rules: [
             ["foo*", "return 1"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -514,7 +609,10 @@ exports["test rules with trailing escapes"] = function () {
     var expected = {
         rules: [
             ["#[^\\n]*\\n", "/* ok */"],
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -527,14 +625,15 @@ exports["test no brace action with surplus whitespace between rules"] = function
         rules: [
             ["a", "return true;"],
             ["b", "return 1;"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
 };
-
-`BR  \r\n|\n|\r`
 
 exports["test macro for commit SHA-1: 1246dbb75472cee8e4e91318cc5a0d4739a8fe12"] = function () {
     var lexgrammar = 'BR  \\r\\n|\\n|\\r\n%%\r\n{BR} %{\r\nreturn true;\r\n%}\r\n';
@@ -542,7 +641,9 @@ exports["test macro for commit SHA-1: 1246dbb75472cee8e4e91318cc5a0d4739a8fe12"]
         macros: {"BR": "\\r\\n|\\n|\\r"},
         rules: [
             ["{BR}", "\r\nreturn true;\r\n"]
-        ]
+        ],
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -554,7 +655,10 @@ exports["test windows line endings"] = function () {
     var expected = {
         rules: [
             ["\\[[^\\]]\\]", "\r\nreturn true;\r\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -567,7 +671,10 @@ exports["test braced action with surplus whitespace between rules"] = function (
         rules: [
             ["a", "  \nreturn true;\n"],
             ["b", "    return 1;\n"]
-        ]
+        ],
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
     };
 
     lexer_reset();
@@ -609,7 +716,9 @@ exports["test %options easy_keyword_rules"] = function () {
         ],
         options: {
             "easy_keyword_rules": true
-        }
+        },
+        macros: {},
+        unknownDecls: []
     };
 
     lexer_reset();

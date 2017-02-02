@@ -13,9 +13,9 @@ lex
     : init definitions rules_and_epilogue EOF
         {
           $$ = $rules_and_epilogue;
-          if ($definitions[0]) $$.macros = $definitions[0];
-          if ($definitions[1]) $$.startConditions = $definitions[1];
-          if ($definitions[2]) $$.unknownDecls = $definitions[2];
+          $$.macros = $definitions.macros;
+          $$.startConditions = $definitions.startConditions;
+          $$.unknownDecls = $definitions.unknownDecls;
           // if there are any options, add them all, otherwise set options to NULL:
           // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
           for (var k in yy.options) {
@@ -72,21 +72,24 @@ definitions
           $$ = $definitions;
           if ($definition != null) {
             if ('length' in $definition) {
-              $$[0] = $$[0] || {};
-              $$[0][$definition[0]] = $definition[1];
+              $$.macros[$definition[0]] = $definition[1];
             } else if ($definition.type === 'names') {
-              $$[1] = $$[1] || {};
               for (var name in $definition.names) {
-                $$[1][name] = $definition.names[name];
+                $$.startConditions[name] = $definition.names[name];
               }
             } else if ($definition.type === 'unknown') {
-              $$[2] = $$[2] || [];
-              $$[2].push($definition.body);
+              $$.unknownDecls.push($definition.body);
             }
           }
         }
     | ε
-        { $$ = [null, null]; }
+        { 
+          $$ = {
+            macros: {},           // { hash table }
+            startConditions: {},  // { hash table }
+            unknownDecls: []      // [ array of [key,value] pairs }
+          };
+        }
     ;
 
 definition
