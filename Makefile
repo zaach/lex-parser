@@ -14,7 +14,7 @@ lex-parser.js: lex.y lex.l
 	sh node_modules/.bin/jison -o lex-parser.js lex.y lex.l
 
 test:
-	node tests/all-tests.js
+	node_modules/.bin/mocha tests/
 
 
 # increment the XXX <prelease> number in the package.json file: version <major>.<minor>.<patch>-<prelease>
