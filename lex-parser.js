@@ -180,19 +180,20 @@
  *        pastInput: function(n),
  *        upcomingInput: function(n),
  *        showPosition: function(),
- *        test_match: function(regex_match_array, rule_index),
- *        next: function(),
- *        lex: function(),
+ *        test_match: function(regex_match_array, rule_index, ...),
+ *        next: function(...),
+ *        lex: function(...),
  *        begin: function(condition),
  *        pushState: function(condition),
  *        popState: function(),
  *        topState: function(),
  *        _currentRules: function(),
  *        stateStackSize: function(),
+ *        cleanupAfterLex: function()
  *
  *        options: { ... lexer %options ... },
  *
- *        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START),
+ *        performAction: function(yy, yy_, $avoiding_name_collisions, YY_START, ...),
  *        rules: [...],
  *        conditions: {associative list: name ==> set},
  *    }
@@ -250,24 +251,24 @@
  *
  * while `this` will reference the current parser instance.
  *
- *  When `parseError` is invoked by the lexer, `this` will still reference the related *parser*
- *  instance, while these additional `hash` fields will also be provided:
+ * When `parseError` is invoked by the lexer, `this` will still reference the related *parser*
+ * instance, while these additional `hash` fields will also be provided:
  *
  *  {
  *    lexer:       (reference to the current lexer instance which reported the error)
  *  }
  *
- *  When `parseError` is invoked by the parser due to a **JavaScript exception** being fired
- *  from either the parser or lexer, `this` will still reference the related *parser*
- *  instance, while these additional `hash` fields will also be provided:
+ * When `parseError` is invoked by the parser due to a **JavaScript exception** being fired
+ * from either the parser or lexer, `this` will still reference the related *parser*
+ * instance, while these additional `hash` fields will also be provided:
  *
  *  {
  *    exception:   (reference to the exception thrown)
  *  }
  *
- *  Please do note that in the latter situation, the `expected` field will be omitted as
- *  type of failure is assumed not to be due to *parse errors* but rather due to user
- *  action code in either parser or lexer failing unexpectedly.
+ * Please do note that in the latter situation, the `expected` field will be omitted as
+ * type of failure is assumed not to be due to *parse errors* but rather due to user
+ * action code in either parser or lexer failing unexpectedly.
  *
  * ---
  *
@@ -837,7 +838,7 @@ productions_: bp({
   0
 ])
 }),
-performAction: function parser__PerformAction(yytext, yystate /* action[1] */, $0, yyvstack) {
+performAction: function parser__PerformAction(yystate /* action[1] */, $0, yyvstack) {
 /* this == yyval */
 var yy = this.yy;
 
@@ -2402,7 +2403,7 @@ parse: function parse(input) {
     if (typeof lexer.yytext === 'undefined') {
         lexer.yytext = '';
     }
-    var yytext = lexer.yytext;
+
     if (typeof lexer.yylineno === 'undefined') {
         lexer.yylineno = 0;
     }
@@ -2700,7 +2701,7 @@ parse: function parse(input) {
 
                         // discard current lookahead and grab another
 
-                        yytext = lexer.yytext;
+
 
 
 
@@ -2760,7 +2761,7 @@ parse: function parse(input) {
                 if (!preErrorSymbol) { // normal execution / no error
                     // Pick up the lexer details for the current symbol as that one is not 'look-ahead' any more:
 
-                    yytext = lexer.yytext;
+
 
 
 
@@ -2821,7 +2822,7 @@ parse: function parse(input) {
 
 
 
-                r = this.performAction.call(yyval, yytext, newState, sp - 1, vstack);
+                r = this.performAction.call(yyval, newState, sp - 1, vstack);
 
                 if (typeof r !== 'undefined') {
                     retval = r;
