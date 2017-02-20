@@ -1,7 +1,7 @@
 
 ASCII_LETTER                            [a-zA-z]
-// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge 
-// with {UNICODE_LETTER} (though jison has code to optimize if you *did* 
+// \p{Alphabetic} already includes [a-zA-z], hence we don't need to merge
+// with {UNICODE_LETTER} (though jison has code to optimize if you *did*
 // include the `[a-zA-Z]` anyway):
 UNICODE_LETTER                          [\p{Alphabetic}]
 ALPHA                                   [{UNICODE_LETTER}_]
@@ -22,7 +22,7 @@ WS                                      [^\S\r\n]
 QUOTED_STRING_CONTENT                   (?:\\\'|\\[^\']|[^\\\'])*
 DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
 
-// Accept any non-regex-special character as a direct literal without 
+// Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
 ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
@@ -41,20 +41,20 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
 <action>"//".*                          return 'ACTION_BODY';
-// regexp with braces or quotes (and no spaces, so we don't mistake 
+// regexp with braces or quotes (and no spaces, so we don't mistake
 // a *division operator* `/` for a regex delimiter here in most circumstances):
-<action>"/"[^ /]*?['"{}][^ ]*?"/"       return 'ACTION_BODY'; 
+<action>"/"[^ /]*?['"{}][^ ]*?"/"       return 'ACTION_BODY';
 <action>\"("\\\\"|'\"'|[^"])*\"         return 'ACTION_BODY';
 <action>"'"("\\\\"|"\'"|[^'])*"'"       return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                  return 'ACTION_BODY';
 <action>[^{}/"']+                       return 'ACTION_BODY';
 <action>"{"                             yy.depth++; return '{';
 <action>"}"                             %{
-                                            if (yy.depth == 0) { 
-                                                this.pushState('trail'); 
-                                            } else { 
-                                                yy.depth--; 
-                                            } 
+                                            if (yy.depth == 0) {
+                                                this.pushState('trail');
+                                            } else {
+                                                yy.depth--;
+                                            }
                                             return '}';
                                         %}
 
@@ -67,7 +67,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <rules>{WS}+{BR}+                       /* empty */
 <rules>{WS}+                            this.pushState('indented');
 <rules>"%%"                             this.pushState('code'); return '%%';
-// Accept any non-regex-special character as a direct literal without 
+// Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
 <rules>{ANY_LITERAL_CHAR}+
                                         %{
@@ -126,7 +126,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
 <macro>{BR}+                            this.popState('macro');
 
-// Accept any non-regex-special character as a direct literal without 
+// Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
 <macro>{ANY_LITERAL_CHAR}+
                                         %{
@@ -170,7 +170,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <INITIAL,rules,trail,code>"%"{NAME}([^\r\n]*)
                                         %{
                                             /* ignore unrecognized decl */
-                                            console.warn('LEX: ignoring unsupported lexer option: ', yytext + ' while lexing in ' + this.topState() + ' state:', this._input, ' /////// ', this.matched);
+                                            console.warn('LEX: ignoring unsupported lexer option: ', yytext, ' while lexing in ', this.topState(), ' state:', this._input, ' /////// ', this.matched);
                                             // this.pushState('options');
                                             yytext = [
                                                 this.matches[1],            // {NAME}
@@ -191,8 +191,8 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <set>"]"                                this.popState('set'); return 'REGEX_SET_END';
 
 
-// in the trailing CODE block, only accept these `%include` macros when 
-// they appear at the start of a line and make sure the rest of lexer 
+// in the trailing CODE block, only accept these `%include` macros when
+// they appear at the start of a line and make sure the rest of lexer
 // regexes account for this one so it'll match that way only:
 <code>[^\r\n]*(\r|\n)+                  return 'CODE';
 <code>[^\r\n]+                          return 'CODE';      // the bit of CODE just before EOF...
@@ -211,7 +211,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                             var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
                                             var l2 = 3;
                                             var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
-                                            throw new Error('unsupported lexer input: ', yytext, ' @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n', indent(this.showPosition(l1, l2), 4));
+                                            throw new Error('unsupported lexer input: "' + yytext + '" @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n' + indent(this.showPosition(l1, l2), 4));
                                         %}
 
 <*><<EOF>>                              return 'EOF';

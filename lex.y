@@ -1,3 +1,4 @@
+
 %start lex
 
 /* Jison lexer file format grammar */
@@ -435,7 +436,7 @@ function prepareString (s) {
     s = s.replace(/\\\\/g, "\\");
     s = encodeRE(s);
     return s;
-};
+}
 
 // convert string value to number or boolean value, when possible
 // (and when this is more or less obviously the intent)
