@@ -78,11 +78,19 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
 <options>\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
+                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_STRING_VALUE';   // value is always a string type
 <options>\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_VALUE';
+                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_STRING_VALUE';   // value is always a string type
+
+// Comments should be gobbled and discarded anywhere *except* the code/action blocks:
+<INITIAL,start_condition,trail,rules,macro,path,options>"//"[^\r\n]*
+                                        /* skip single-line comment */
+<INITIAL,start_condition,trail,rules,macro,path,options>"/*"(.|\n|\r)*?"*/"
+                                        /* skip multi-line comment */
+
 <options>[^\s\r\n]+                     return 'OPTION_VALUE';
-<options>{BR}+                          this.popState(); return 'OPTIONS_END';
+<options>{BR}{WS}+(?=\S)                /* skip leading whitespace on the next line of input, when followed by more options */
+<options>{BR}                           this.popState(); return 'OPTIONS_END';
 <options>{WS}+                          /* skip whitespace */
 
 <start_condition>{ID}                   return 'START_COND';
@@ -114,9 +122,6 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                             return 'INCLUDE';
                                         %}
 <indented>.*                            this.popState(); return 'ACTION';
-
-"/*"(.|\n|\r)*?"*/"                     /* ignore */
-"//"[^\r\n]*                            /* ignore */
 
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
 <macro>{BR}+                            this.popState('macro');

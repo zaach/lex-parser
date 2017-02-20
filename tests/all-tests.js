@@ -517,17 +517,44 @@ describe("LEX Parser", function () {
   });
 
   it("test options with values", function () {
-    var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\' a-b-c="d"\n%%\n"foo" return 1;';
+    var lexgrammar = '%options ping=666 bla=blub bool1 s1="s1value" s2=\'s2value\' s3=false s4="false" a-b-c="d"\n%%\n"foo" return 1;';
     var expected = {
         rules: [
             ["foo", "return 1;"]
         ],
         options: {
-            ping: "666",
+            ping: 666,
             bla: "blub",
             bool1: true,
             s1: "s1value",
             s2: "s2value",
+            s3: false,
+            s4: "false",
+            "a-b-c": "d"            // `%options camel-casing` is done very late in the game: see Jison.Generator source code.
+        },
+        macros: {},
+        startConditions: {},
+        unknownDecls: []
+    };
+
+    lexer_reset();
+    assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
+  });
+
+  it("test options spread across multiple lines", function () {
+    var lexgrammar = '%options ping=666\n bla=blub\n bool1\n s1="s1value"\n s2=\'s2value\'\n s3=false\n s4="false"\n a-b-c="d"\n%%\n"foo" return 1;';
+    var expected = {
+        rules: [
+            ["foo", "return 1;"]
+        ],
+        options: {
+            ping: 666,
+            bla: "blub",
+            bool1: true,
+            s1: "s1value",
+            s2: "s2value",
+            s3: false,
+            s4: "false",
             "a-b-c": "d"            // `%options camel-casing` is done very late in the game: see Jison.Generator source code.
         },
         macros: {},
