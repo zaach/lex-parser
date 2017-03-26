@@ -78,9 +78,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
 <options>\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_STRING_VALUE';   // value is always a string type
+                                        yytext = this.matches[1]; return 'OPTION_STRING_VALUE';   // value is always a string type
 <options>\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = yytext.substr(1, yyleng - 2); return 'OPTION_STRING_VALUE';   // value is always a string type
+                                        yytext = this.matches[1]; return 'OPTION_STRING_VALUE';   // value is always a string type
 
 // Comments should be gobbled and discarded anywhere *except* the code/action blocks:
 <INITIAL,start_condition,trail,rules,macro,path,options>"//"[^\r\n]*
@@ -100,8 +100,8 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <trail>{WS}*{BR}+                       this.pushState('rules');
 
 <indented>"{"                           yy.depth = 0; this.pushState('action'); return '{';
-<indented>"%{"(.|{BR})*?"%}"            this.pushState('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
-"%{"(.|{BR})*?"%}"                      yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+<indented>"%{"(?:.|{BR})*?"%}"          this.pushState('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+"%{"(?:.|{BR})*?"%}"                    yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 <indented>"%include"                    %{
                                             // This is an include instruction in place of an action:
                                             // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
@@ -200,9 +200,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <path>{BR}                              this.popState(); this.unput(yytext);
 <path>\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
+                                        yytext = this.matches[1]; this.popState(); return 'PATH';
 <path>\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = yytext.substr(1, yyleng - 2); this.popState(); return 'PATH';
+                                        yytext = this.matches[1]; this.popState(); return 'PATH';
 <path>{WS}+                             // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
