@@ -3949,12 +3949,12 @@ break;
 case 20 : 
 /*! Conditions:: options */ 
 /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); return 39;   // value is always a string type 
+ yy_.yytext = this.matches[1]; return 39;   // value is always a string type 
 break;
 case 21 : 
 /*! Conditions:: options */ 
 /*! Rule::       '{QUOTED_STRING_CONTENT}' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); return 39;   // value is always a string type 
+ yy_.yytext = this.matches[1]; return 39;   // value is always a string type 
 break;
 case 22 : 
 /*! Conditions:: INITIAL start_condition trail rules macro path options */ 
@@ -4003,12 +4003,12 @@ case 32 :
 break;
 case 33 : 
 /*! Conditions:: indented */ 
-/*! Rule::       %\{(.|{BR})*?%\} */ 
+/*! Rule::       %\{(?:.|{BR})*?%\} */ 
  this.pushState('trail'); yy_.yytext = yy_.yytext.substr(2, yy_.yyleng - 4); return 23; 
 break;
 case 34 : 
 /*! Conditions:: indented trail rules macro INITIAL */ 
-/*! Rule::       %\{(.|{BR})*?%\} */ 
+/*! Rule::       %\{(?:.|{BR})*?%\} */ 
  yy_.yytext = yy_.yytext.substr(2, yy_.yyleng - 4); return 23; 
 break;
 case 35 : 
@@ -4160,12 +4160,12 @@ break;
 case 81 : 
 /*! Conditions:: path */ 
 /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 42; 
+ yy_.yytext = this.matches[1]; this.popState(); return 42; 
 break;
 case 82 : 
 /*! Conditions:: path */ 
 /*! Rule::       '{QUOTED_STRING_CONTENT}' */ 
- yy_.yytext = yy_.yytext.substr(1, yy_.yyleng - 2); this.popState(); return 42; 
+ yy_.yytext = this.matches[1]; this.popState(); return 42; 
 break;
 case 83 : 
 /*! Conditions:: path */ 
@@ -4343,8 +4343,8 @@ new XRegExp("^(?:([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*))", ""),
 /^(?:([^\S\n\r])+)/,
 /^(?:([^\S\n\r])*(\r\n|\n|\r)+)/,
 /^(?:\{)/,
-/^(?:%\{(.|(\r\n|\n|\r))*?%\})/,
-/^(?:%\{(.|(\r\n|\n|\r))*?%\})/,
+/^(?:%\{(?:.|(\r\n|\n|\r))*?%\})/,
+/^(?:%\{(?:.|(\r\n|\n|\r))*?%\})/,
 /^(?:%include\b)/,
 /^(?:.*)/,
 new XRegExp("^(?:([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*))", ""),
