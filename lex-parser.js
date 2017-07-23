@@ -3552,7 +3552,7 @@ var lexer = {
             // when the `parseError()` call returns, we MUST ensure that the error is registered.
             // We accomplish this by signaling an 'error' token to be produced for the current
             // `.lex()` run.
-            var p = this.constructLexErrorInfo('Lexical error on line ' + (this.yylineno + 1) + ': You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), false);
+            var p = this.constructLexErrorInfo('Lexical error on line ' + (this.yylineno + 1) + '. You can only invoke reject() in the lexer when the lexer is of the backtracking persuasion (options.backtrack_lexer = true).\n' + this.showPosition(), false);
             this._signaled_error_token = (this.parseError(p.errStr, p, this.JisonLexerError) || this.ERROR);
         }
         return this;
@@ -3830,7 +3830,7 @@ var lexer = {
             // Check whether a *sane* condition has been pushed before: this makes the lexer robust against
             // user-programmer bugs such as https://github.com/zaach/jison-lex/issues/19
             if (!spec || !spec.rules) {
-                var p = this.constructLexErrorInfo('Internal lexer engine error on line ' + (this.yylineno + 1) + ': The lex grammar programmer pushed a non-existing condition name "' + this.topState() + '"; this is a fatal error and should be reported to the application programmer team!\n', false);
+                var p = this.constructLexErrorInfo('Internal lexer engine error on line ' + (this.yylineno + 1) + '. The lex grammar programmer pushed a non-existing condition name "' + this.topState() + '"; this is a fatal error and should be reported to the application programmer team!\n', false);
                 // produce one 'error' token until this situation has been resolved, most probably by parse termination!
                 return (this.parseError(p.errStr, p, this.JisonLexerError) || this.ERROR);
             }
@@ -3888,7 +3888,7 @@ var lexer = {
             this.done = true;
             return this.EOF;
         } else {
-            var p = this.constructLexErrorInfo('Lexical error on line ' + (this.yylineno + 1) + ': Unrecognized text.\n' + this.showPosition(), this.options.lexer_errors_are_recoverable);
+            var p = this.constructLexErrorInfo('Lexical error on line ' + (this.yylineno + 1) + '. Unrecognized text.\n' + this.showPosition(), this.options.lexer_errors_are_recoverable);
             token = (this.parseError(p.errStr, p, this.JisonLexerError) || this.ERROR);
             if (token === this.ERROR) {
                 // we can try to recover from a lexer error that `parseError()` did not 'recover' for us
