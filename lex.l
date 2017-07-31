@@ -170,7 +170,10 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <INITIAL,rules,trail,code>"%"{NAME}([^\r\n]*)
                                         %{
                                             /* ignore unrecognized decl */
-                                            console.warn('LEX: ignoring unsupported lexer option: ', yytext, ' while lexing in ', this.topState(), ' state:', this._input, ' /////// ', this.matched);
+                                            var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
+                                            var l2 = 19;
+                                            var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
+                                            console.warn('LEX: ignoring unsupported lexer option ' + dquote(yytext) + ' while lexing in ' + this.topState() + ' state:\n' + indent(this.showPosition(l1, l2), 4), this._input, ' /////// ', this.matched);
                                             // this.pushState('options');
                                             yytext = [
                                                 this.matches[1],            // {NAME}
@@ -206,12 +209,29 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <path>{WS}+                             // skip whitespace in the line
 <path>[^\s\r\n]+                        this.popState(); return 'PATH';
 
+<macro,rules>.                          %{
+                                            /* b0rk on bad characters */
+                                            var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
+                                            var l2 = 39;
+                                            var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
+                                            var rules = (this.topState() === 'macro' ? 'macro\'s' : this.topState());
+                                            var pos_str = this.showPosition(l1, l2);
+                                            if (pos_str && pos_str[0] !== '\n') {
+                                                pos_str = '\n\n       Offending input:\n' + indent(pos_str, 4);
+                                            }
+                                            yyerror('unsupported lexer input: ' + dquote(yytext) + ' while lexing ' + rules + '\n       (i.e. jison lex regexes).\n\n       NOTE: When you want the input ' + dquote(yytext) + ' to be interpreted as a literal part\n       of a lex rule regex, you MUST enclose it in double or single quotes,\n       e.g. as shown in this error message just before. If not, then know\n       that this is not accepted as a regex operator here in\n       jison-lex ' + rules + '.' + pos_str);
+                                        %}
+
 <*>.                                    %{
                                             /* b0rk on bad characters */
                                             var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
-                                            var l2 = 3;
+                                            var l2 = 39;
                                             var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
-                                            throw new Error('unsupported lexer input: "' + yytext + '" @ ' + this.describeYYLLOC(yylloc) + ' while lexing in ' + this.topState() + ' state:\n' + indent(this.showPosition(l1, l2), 4));
+                                            var pos_str = this.showPosition(l1, l2);
+                                            if (pos_str && pos_str[0] !== '\n') {
+                                                pos_str = '\n\n       Offending input:\n' + indent(pos_str, 4);
+                                            }
+                                            yyerror('unsupported lexer input: ' + dquote(yytext) + ' while lexing in ' + dquote(this.topState()) + ' state.' + pos_str);
                                         %}
 
 <*><<EOF>>                              return 'EOF';
@@ -222,4 +242,21 @@ function indent(s, i) {
     var a = s.split('\n');
     var pf = (new Array(i + 1)).join(' ');
     return pf + a.join('\n' + pf);
+}
+
+// properly quote and escape the given input string
+function dquote(s) {
+    var sq = (s.indexOf('\'') >= 0);
+    var dq = (s.indexOf('"') >= 0);
+    if (sq && dq) {
+        s = s.replace(/"/g, '\\"');
+        dq = false;
+    }
+    if (dq) {
+        s = '\'' + s + '\'';
+    }
+    else {
+        s = '"' + s + '"';
+    }
+    return s;
 }
