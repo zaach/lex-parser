@@ -34,6 +34,10 @@ lex
           delete yy.actionInclude;
           return $$;
         }
+    | init definitions error EOF
+        {
+            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:  definitions  %%  rules  [%%  extra_module_code]");
+        }
     ;
 
 rules_and_epilogue
@@ -102,6 +106,12 @@ definition
         { $$ = $names_exclusive; }
     | '{' action_body '}'
         { yy.actionInclude.push($action_body); $$ = null; }
+    | '{' action_body error
+        {
+            var l = $action_body.split('\n');
+            var ab = l.slice(0, 10).join('\n');
+            yyerror("Seems you did not correctly bracket the lexer 'preparatory' action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+        }
     | ACTION
         { yy.actionInclude.push($ACTION); $$ = null; }
     | include_macro_code
@@ -150,6 +160,15 @@ rules_collective
             }
             $$ = $rule_block;
         }
+    | start_conditions '{' rule_block error
+        {
+            if ($start_conditions) {
+                $rule_block.forEach(function (d) {
+                    d.unshift($start_conditions);
+                });
+            }
+            yyerror("Seems you did not correctly bracket a lexer rule set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.", $rule_block);
+        }
     ;
 
 rule_block
@@ -167,6 +186,12 @@ rule
 action
     : '{' action_body '}'
         { $$ = $action_body; }
+    | '{' action_body error
+        {
+            var l = $action_body.split('\n');
+            var ab = l.slice(0, 10).join('\n');
+            yyerror("Seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+        }
     | unbracketed_action_body
         { $$ = $unbracketed_action_body; }
     | include_macro_code
@@ -184,6 +209,12 @@ action_body
         { $$ = $action_comments_body; }
     | action_body '{' action_body '}' action_comments_body
         { $$ = $1 + $2 + $3 + $4 + $5; }
+    | action_body '{' action_body error
+        {
+            var l = $action_body2.split('\n');
+            var ab = l.slice(0, 10).join('\n');
+            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block. Offending action body part:\n" + ab);
+        }
     ;
 
 action_comments_body
@@ -196,6 +227,12 @@ action_comments_body
 start_conditions
     : '<' name_list '>'
         { $$ = $name_list; }
+    | '<' name_list error
+        {
+            var l = $name_list;
+            var ab = l.slice(0, 10).join(',').replace(/[\s\r\n]/g, ' ');
+            yyerror("Seems you did not correctly terminate the start condition set <" + ab + ",???> with a terminating '>'");
+        }
     | '<' '*' '>'
         { $$ = ['*']; }
     | ε
@@ -252,6 +289,9 @@ regex
             .replace(/\\[^xu0-9]/g, '.');
 
             try {
+              // Convert Unicode escapes and other escapes to their literal characters
+              // BEFORE we go and check whether this item is subject to the 
+              // `easy_keyword_rules` option.  
               $$ = eval('"' + $$ + '"');
             }
             catch (ex) {
@@ -297,6 +337,18 @@ regex_base
         { $$ = '(' + $regex_list + ')'; }
     | SPECIAL_GROUP regex_list ')'
         { $$ = $SPECIAL_GROUP + $regex_list + ')'; }
+    | '(' regex_list error
+        {
+            var l = $regex_list;
+            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces. Unterminated regex part: (" + ab, $regex_list);
+        }
+    | SPECIAL_GROUP regex_list error
+        {
+            var l = $regex_list;
+            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces. Unterminated regex part: " + $SPECIAL_GROUP + ab, $regex_list);
+        }
     | regex_base '+'
         { $$ = $regex_base + '+'; }
     | regex_base '*'
@@ -328,6 +380,12 @@ name_expansion
 any_group_regex
     : REGEX_SET_START regex_set REGEX_SET_END
         { $$ = $REGEX_SET_START + $regex_set + $REGEX_SET_END; }
+    | REGEX_SET_START regex_set error
+        {
+            var l = $regex_set;
+            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
+            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets. Unterminated regex set: " + $REGEX_SET_START + ab, $regex_set);
+        }
     ;
 
 regex_set
@@ -405,7 +463,7 @@ include_macro_code
         }
     | INCLUDE error
         {
-            console.error("%include MUST be followed by a valid file path");
+            yyerror("%include MUST be followed by a valid file path");
         }
     ;
 
