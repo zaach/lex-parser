@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/zaach/lex-parser.git"
+    "url": "https://github.com/GerHobbelt/lex-parser.git"
   },
   "keywords": [
     "lexical",
@@ -31,6 +31,6 @@
   "devDependencies": {
     "chai": "4.1.0",
     "jison-gho": "github:GerHobbelt/jison#master",
-    "mocha": "3.4.2"
+    "mocha": "3.5.0"
   }
 }
