@@ -39,6 +39,7 @@ git-tag:
 clean:
 	-rm -f lex-parser.js
 	-rm -rf node_modules/
+	-rm -f package-lock.json
 
 superclean: clean
 	-find . -type d -name 'node_modules' -exec rm -rf "{}" \;
