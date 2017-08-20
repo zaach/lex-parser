@@ -173,7 +173,13 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                             var l0 = Math.max(0, yylloc.last_column - yylloc.first_column);
                                             var l2 = 19;
                                             var l1 = Math.min(79 - 4 - l0 - l2, yylloc.first_column, 0);
-                                            console.warn('LEX: ignoring unsupported lexer option ' + dquote(yytext) + ' while lexing in ' + this.topState() + ' state:\n' + indent(this.showPosition(l1, l2), 4), this._input, ' /////// ', this.matched);
+                                            this.warn('LEX: ignoring unsupported lexer option', dquote(yytext), 'while lexing in', this.topState(), 'state:\n' + indent(this.showPosition(l1, l2), 4)
+                                                // , '\n', {
+                                                //     remaining_input: this._input, 
+                                                //     matched: this.matched,
+                                                //     matches: this.matches
+                                                // }
+                                            );
                                             // this.pushState('options');
                                             yytext = [
                                                 this.matches[1],            // {NAME}
@@ -260,3 +266,19 @@ function dquote(s) {
     }
     return s;
 }
+
+lexer.warn = function l_warn() {
+    if (this.yy.parser && typeof this.yy.parser.warn === 'function') {
+        return this.yy.parser.warn.apply(this, arguments);
+    } else {
+        console.warn.apply(console, arguments);
+    }
+};
+
+lexer.log = function l_log() {
+    if (this.yy.parser && typeof this.yy.parser.log === 'function') {
+        return this.yy.parser.log.apply(this, arguments);
+    } else {
+        console.log.apply(console, arguments);
+    }
+};

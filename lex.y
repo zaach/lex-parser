@@ -295,7 +295,7 @@ regex
               $$ = eval('"' + $$ + '"');
             }
             catch (ex) {
-              console.warn('easy-keyword-rule FAIL on eval: ', ex);
+              this.warn('easy-keyword-rule FAIL on eval: ', ex);
 
               // make the next keyword test fail:
               $$ = '.';
@@ -406,7 +406,7 @@ regex_set_atom
             } else {
                 $$ = $name_expansion;
             }
-            //console.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
+            //this.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
         }
     ;
 
@@ -516,4 +516,12 @@ function parseValue(v) {
     }
     return v;
 }
+
+parser.warn = function p_warn() {
+    console.warn.apply(console, arguments);
+};
+
+parser.log = function p_log() {
+    console.log.apply(console, arguments);
+};
 
