@@ -19,6 +19,27 @@ function lexer_reset() {
     }
 
     lex.parser.yy = {};
+
+    var debug = 0;
+
+    if (!debug) {
+        // silence warn+log messages from the test internals:
+        lex.warn = function tl_warn() {
+            // console.warn("TEST WARNING: ", arguments);
+        };
+
+        lex.log = function tl_log() {
+            // console.warn("TEST LOG: ", arguments);
+        };
+
+        lex.parser.warn = function tl_warn() {
+            // console.warn("TEST WARNING: ", arguments);
+        };
+
+        lex.parser.log = function tl_log() {
+            // console.warn("TEST LOG: ", arguments);
+        };
+    }
 }
 
 describe("LEX Parser", function () {
@@ -69,6 +90,8 @@ describe("LEX Parser", function () {
       rules: [],
       startConditions: {},
     };
+
+    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, 'grammar should be parsed correctly');
   });
 
@@ -246,25 +269,25 @@ describe("LEX Parser", function () {
   });
 
   it("test bnf lex grammar", function () {
+    lexer_reset();
     var lexgrammar = lex.parse(read('lex', 'bnf.jisonlex'));
     var expected = JSON.parse(read('lex', 'bnf.lex.json'));
 
-    lexer_reset();
     assert.deepEqual(lexgrammar, expected, "grammar should be parsed correctly");
   });
 
   it("test lex grammar bootstrap", function () {
+    lexer_reset();
     var lexgrammar = lex.parse(read('lex', 'lex_grammar.jisonlex'));
     var expected = JSON.parse(read('lex', 'lex_grammar.lex.json'));
 
-    lexer_reset();
     assert.deepEqual(lexgrammar, expected, "grammar should be parsed correctly");
   });
 
   it("test ANSI C lexical grammar", function () {
+    lexer_reset();
     var lexgrammar = lex.parse(read('lex','ansic.jisonlex'));
 
-    lexer_reset();
     assert.ok(lexgrammar, "grammar should be parsed correctly");
   });
 
@@ -324,6 +347,7 @@ describe("LEX Parser", function () {
         startConditions: {}
     };
 
+    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "unknown declarations should be parsed correctly");
   });
 
