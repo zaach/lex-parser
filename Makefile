@@ -18,9 +18,7 @@ prep: npm-install
 npm-install:
 	npm install
 
-build: lex-parser.js
-
-lex-parser.js: lex.y lex.l
+build:
 	$(JISON) -o lex-parser.js lex.y lex.l
 
 test:
