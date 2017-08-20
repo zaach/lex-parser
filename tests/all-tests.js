@@ -43,6 +43,10 @@ function lexer_reset() {
 }
 
 describe("LEX Parser", function () {
+  beforeEach(function beforeEachTest() {
+    lexer_reset();
+  });
+
   it("test lex grammar with macros", function () {
     var lexgrammar = 'D [0-9]\nID [a-zA-Z_][a-zA-Z0-9_]+\n%%\n\n{D}"ohhai" {print(9);}\n"{" return \'{\';';
     var expected = {
@@ -58,7 +62,6 @@ describe("LEX Parser", function () {
         unknownDecls: []    
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -78,7 +81,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -91,7 +93,6 @@ describe("LEX Parser", function () {
       startConditions: {},
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, 'grammar should be parsed correctly');
   });
 
@@ -108,7 +109,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -126,7 +126,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -143,7 +142,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -158,7 +156,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -173,7 +170,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -188,7 +184,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -203,7 +198,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -218,7 +212,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -233,7 +226,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -248,7 +240,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -264,12 +255,10 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
   it("test bnf lex grammar", function () {
-    lexer_reset();
     var lexgrammar = lex.parse(read('lex', 'bnf.jisonlex'));
     var expected = JSON.parse(read('lex', 'bnf.lex.json'));
 
@@ -277,7 +266,6 @@ describe("LEX Parser", function () {
   });
 
   it("test lex grammar bootstrap", function () {
-    lexer_reset();
     var lexgrammar = lex.parse(read('lex', 'lex_grammar.jisonlex'));
     var expected = JSON.parse(read('lex', 'lex_grammar.lex.json'));
 
@@ -285,7 +273,6 @@ describe("LEX Parser", function () {
   });
 
   it("test ANSI C lexical grammar", function () {
-    lexer_reset();
     var lexgrammar = lex.parse(read('lex','ansic.jisonlex'));
 
     assert.ok(lexgrammar, "grammar should be parsed correctly");
@@ -302,7 +289,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -328,7 +314,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -347,7 +332,6 @@ describe("LEX Parser", function () {
         startConditions: {}
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "unknown declarations should be parsed correctly");
   });
 
@@ -363,7 +347,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -378,7 +361,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -397,7 +379,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -412,7 +393,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -427,7 +407,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -443,7 +422,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -458,7 +436,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -473,7 +450,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -489,7 +465,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -504,7 +479,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -520,7 +494,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -536,7 +509,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -561,7 +533,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -586,7 +557,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -605,7 +575,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -620,7 +589,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -637,7 +605,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -652,7 +619,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -667,7 +633,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -683,7 +648,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -698,7 +662,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -713,7 +676,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -729,7 +691,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 
@@ -773,7 +734,6 @@ describe("LEX Parser", function () {
         unknownDecls: []
     };
 
-    lexer_reset();
     assert.deepEqual(lex.parse(lexgrammar), expected, "grammar should be parsed correctly");
   });
 });
