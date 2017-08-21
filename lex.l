@@ -51,6 +51,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <action>"{"                             yy.depth++; return '{';
 <action>"}"                             %{
                                             if (yy.depth == 0) {
+                                                this.popState();
                                                 this.pushState('trail');
                                             } else {
                                                 yy.depth--;
@@ -66,7 +67,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <rules>{BR}+                            /* empty */
 <rules>{WS}+{BR}+                       /* empty */
 <rules>{WS}+                            this.pushState('indented');
-<rules>"%%"                             this.pushState('code'); return '%%';
+<rules>"%%"                             this.popState(); this.pushState('code'); return '%%';
 // Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
 <rules>{ANY_LITERAL_CHAR}+
@@ -97,8 +98,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <start_condition>{BR}+                  this.popState();
 <start_condition>{WS}+                  /* empty */
 
-<trail>{WS}*{BR}+                       this.pushState('rules');
+<trail>{WS}*{BR}+                       this.popState(); this.unput(yytext); /*  this.unput(yytext); can be used here instead of this.reject(); which would only work when we set the backtrack_lexer option */ 
 
+<indented>{WS}*{BR}+                    this.popState();
 <indented>"{"                           yy.depth = 0; this.pushState('action'); return '{';
 <indented>"%{"(?:.|{BR})*?"%}"          this.pushState('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
 "%{"(?:.|{BR})*?"%}"                    yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
@@ -124,7 +126,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <indented>.*                            this.popState(); return 'ACTION';
 
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
-<macro>{BR}+                            this.popState('macro');
+<macro>{BR}+                            this.popState();
 
 // Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
@@ -180,7 +182,6 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                                 //     matches: this.matches
                                                 // }
                                             );
-                                            // this.pushState('options');
                                             yytext = [
                                                 this.matches[1],            // {NAME}
                                                 this.matches[2].trim()      // optional value/parameters
@@ -197,7 +198,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
 <set>"{"                                return 'REGEX_SET';
-<set>"]"                                this.popState('set'); return 'REGEX_SET_END';
+<set>"]"                                this.popState(); return 'REGEX_SET_END';
 
 
 // in the trailing CODE block, only accept these `%include` macros when
@@ -268,7 +269,7 @@ function dquote(s) {
 }
 
 lexer.warn = function l_warn() {
-    if (this.yy.parser && typeof this.yy.parser.warn === 'function') {
+    if (this.yy && this.yy.parser && typeof this.yy.parser.warn === 'function') {
         return this.yy.parser.warn.apply(this, arguments);
     } else {
         console.warn.apply(console, arguments);
@@ -276,7 +277,7 @@ lexer.warn = function l_warn() {
 };
 
 lexer.log = function l_log() {
-    if (this.yy.parser && typeof this.yy.parser.log === 'function') {
+    if (this.yy && this.yy.parser && typeof this.yy.parser.log === 'function') {
         return this.yy.parser.log.apply(this, arguments);
     } else {
         console.log.apply(console, arguments);
