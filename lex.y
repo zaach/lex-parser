@@ -173,7 +173,7 @@ rules_collective
 
 rule_block
     : rule_block rule
-        { $$ = $rules; $$.push($rule); }
+        { $$ = $rule_block; $$.push($rule); }
     | ε
         { $$ = []; }
     ;
