@@ -36,7 +36,7 @@ lex
         }
     | init definitions error EOF
         {
-            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:  definitions  %%  rules  [%%  extra_module_code]");
+            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:  definitions  %%  rules  [%%  extra_module_code]", @error);
         }
     ;
 
@@ -160,14 +160,13 @@ rules_collective
             }
             $$ = $rule_block;
         }
-    | start_conditions '{' rule_block error
+    | start_conditions '{' error '}'
         {
-            if ($start_conditions) {
-                $rule_block.forEach(function (d) {
-                    d.unshift($start_conditions);
-                });
-            }
-            yyerror("Seems you did not correctly bracket a lexer rule set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.", $rule_block);
+            yyerror("Seems you made a mistake while specifying one of the lexer rules inside the start condition <" + $start_conditions.join(',') + "> { rules... } block.", @error);
+        }
+    | start_conditions '{' error
+        {
+            yyerror("Seems you did not correctly bracket a lexer rules set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.", @error, $rule_block);
         }
     ;
 
@@ -181,6 +180,11 @@ rule_block
 rule
     : regex action
         { $$ = [$regex, $action]; }
+    | regex error
+        { 
+	    $$ = [$regex, $error]; 
+            yyerror("lexer rule regex action code declaration error?", @error);
+	}
     ;
 
 action
