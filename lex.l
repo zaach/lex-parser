@@ -102,8 +102,8 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <indented>{WS}*{BR}+                    this.popState();
 <indented>"{"                           yy.depth = 0; this.pushState('action'); return '{';
-<indented>"%{"(?:.|{BR})*?"%}"          this.pushState('trail'); yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
-"%{"(?:.|{BR})*?"%}"                    yytext = yytext.substr(2, yyleng - 4); return 'ACTION';
+<indented>"%{"((?:.|{BR})*?)"%}"        this.pushState('trail'); yytext = this.matches[1]; return 'ACTION';
+"%{"((?:.|{BR})*?)"%}"                  yytext = this.matches[1]; return 'ACTION';
 <indented>"%include"                    %{
                                             // This is an include instruction in place of an action:
                                             // thanks to the `<indented>.+` rule immediately below we need to semi-duplicate
@@ -140,10 +140,16 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 {BR}+                                   /* empty */
 \s+                                     /* empty */
 
-\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = yytext.replace(/\\"/g,'"'); return 'STRING_LIT';
-\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = yytext.replace(/\\'/g,"'"); return 'STRING_LIT';
+\"{DOUBLEQUOTED_STRING_CONTENT}\"       %{
+                                            yytext = this.matches[1]; 
+                                            yytext = yytext.replace(/\\"/g,'"');
+                                            return 'STRING_LIT';
+                                        %}
+\'{QUOTED_STRING_CONTENT}\'             %{
+                                            yytext = this.matches[1]; 
+                                            yytext = yytext.replace(/\\'/g,"'");
+                                            return 'STRING_LIT';
+                                        %}
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
 "|"                                     return '|';
 "(?:"                                   return 'SPECIAL_GROUP';

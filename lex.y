@@ -422,7 +422,7 @@ range_regex
 
 string
     : STRING_LIT
-        { $$ = prepareString($STRING_LIT.substr(1, $STRING_LIT.length - 2)); }
+        { $$ = prepareString($STRING_LIT); }
     | CHARACTER_LIT
     ;
 
@@ -485,11 +485,11 @@ optional_module_code_chunk
 
 var XRegExp = require('xregexp');       // for helping out the `%options xregexp` in the lexer
 
-function encodeRE (s) {
+function encodeRE(s) {
     return s.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
 }
 
-function prepareString (s) {
+function prepareString(s) {
     // unescape slashes
     s = s.replace(/\\\\/g, "\\");
     s = encodeRE(s);
