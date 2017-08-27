@@ -3465,7 +3465,7 @@ yyError: 1
 parser.originalParseError = parser.parseError;
 parser.originalQuoteName = parser.quoteName;
 
-var XRegExp = require('xregexp');       // for helping out the `%options xregexp` in the lexer
+var XRegExp = require('@gerhobbelt/xregexp');       // for helping out the `%options xregexp` in the lexer
 
 function encodeRE(s) {
     return s.replace(/([.*+?^${}()|\[\]\/\\])/g, '\\$1').replace(/\\\\u([a-fA-F0-9]{4})/g, '\\u$1');
