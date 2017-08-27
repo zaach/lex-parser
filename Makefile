@@ -19,6 +19,9 @@ prep: npm-install
 npm-install:
 	npm install
 
+npm-update:
+	ncu -a --packageFile=package.json
+
 build:
 	$(JISON) -o lex-parser.js lex.y lex.l
 
