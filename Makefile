@@ -32,6 +32,10 @@ bump:
 git-tag:
 	node -e 'var pkg = require("./package.json"); console.log(pkg.version);' | xargs git tag
 
+publish: 
+	npm run pub 
+
+
 
 
 
@@ -48,4 +52,4 @@ superclean: clean
 
 
 
-.PHONY: all prep npm-install build test clean superclean bump git-tag
+.PHONY: all prep npm-install build test clean superclean bump git-tag publish
