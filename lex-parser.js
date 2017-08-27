@@ -1083,7 +1083,7 @@ case 13:
     /*! Production::    definition : "{" action_body error */
     var l = yyvstack[yysp - 1].split('\n');
     var ab = l.slice(0, 10).join('\n');
-    yyparser.yyError("Seems you did not correctly bracket the lexer 'preparatory' action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+    yyparser.yyError("Seems you did not correctly bracket the lexer preparatory action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
     break;
 
 case 14:
@@ -1170,7 +1170,7 @@ case 28:
 
 case 31:
     /*! Production::    rule : regex error */
-    this.$ = [yyvstack[yysp - 1], yyvstack[yysp]]; 
+    this.$ = [yyvstack[yysp - 1], yyvstack[yysp]];
     yyparser.yyError("lexer rule regex action code declaration error?", yylstack[yysp]);
     break;
 
@@ -1331,8 +1331,8 @@ case 49:
     
       try {
         // Convert Unicode escapes and other escapes to their literal characters
-        // BEFORE we go and check whether this item is subject to the 
-        // `easy_keyword_rules` option.  
+        // BEFORE we go and check whether this item is subject to the
+        // `easy_keyword_rules` option.
         this.$ = eval('"' + this.$ + '"');
       }
       catch (ex) {

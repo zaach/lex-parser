@@ -88,7 +88,7 @@ definitions
           }
         }
     | ε
-        { 
+        {
           $$ = {
             macros: {},           // { hash table }
             startConditions: {},  // { hash table }
@@ -110,7 +110,7 @@ definition
         {
             var l = $action_body.split('\n');
             var ab = l.slice(0, 10).join('\n');
-            yyerror("Seems you did not correctly bracket the lexer 'preparatory' action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+            yyerror("Seems you did not correctly bracket the lexer preparatory action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
         }
     | ACTION
         { yy.actionInclude.push($ACTION); $$ = null; }
@@ -145,14 +145,14 @@ rules
 
 rules_collective
     : start_conditions rule
-        { 
+        {
             if ($start_conditions) {
                 $rule.unshift($start_conditions);
             }
             $$ = [$rule];
         }
     | start_conditions '{' rule_block '}'
-        { 
+        {
             if ($start_conditions) {
                 $rule_block.forEach(function (d) {
                     d.unshift($start_conditions);
@@ -181,10 +181,10 @@ rule
     : regex action
         { $$ = [$regex, $action]; }
     | regex error
-        { 
-	    $$ = [$regex, $error]; 
+        {
+            $$ = [$regex, $error];
             yyerror("lexer rule regex action code declaration error?", @error);
-	}
+        }
     ;
 
 action
@@ -294,8 +294,8 @@ regex
 
             try {
               // Convert Unicode escapes and other escapes to their literal characters
-              // BEFORE we go and check whether this item is subject to the 
-              // `easy_keyword_rules` option.  
+              // BEFORE we go and check whether this item is subject to the
+              // `easy_keyword_rules` option.
               $$ = eval('"' + $$ + '"');
             }
             catch (ex) {
