@@ -4,7 +4,7 @@
     "email": "zach@carter.name",
     "url": "http://zaa.ch"
   },
-  "name": "lex-parser",
+  "name": "@gerhobbelt/lex-parser",
   "version": "0.6.0-186",
   "description": "A parser for lexical grammars used by jison",
   "main": "lex-parser.js",
@@ -26,11 +26,11 @@
     "node": ">=4.0"
   },
   "dependencies": {
-    "xregexp": "github:GerHobbelt/xregexp#master"
+    "@gerhobbelt/xregexp": "3.2.0-21"
   },
   "devDependencies": {
     "chai": "4.1.1",
-    "jison-gho": "0.4.18-184",
+    "jison-gho": "0.4.18-186",
     "mocha": "3.5.0"
   }
 }
