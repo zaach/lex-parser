@@ -36,7 +36,7 @@ lex
         }
     | init definitions error EOF
         {
-            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:  definitions  %%  rules  [%%  extra_module_code]", @error);
+            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:\n  definitions  %%  rules  [%%  extra_module_code]\n\nErroneous code:\n" + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -108,9 +108,7 @@ definition
         { yy.actionInclude.push($action_body); $$ = null; }
     | '{' action_body error
         {
-            var l = $action_body.split('\n');
-            var ab = l.slice(0, 10).join('\n');
-            yyerror("Seems you did not correctly bracket the lexer preparatory action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+            yyerror("Seems you did not correctly bracket the lexer preparatory action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @error, @action_body));
         }
     | ACTION
         { yy.actionInclude.push($ACTION); $$ = null; }
@@ -162,11 +160,11 @@ rules_collective
         }
     | start_conditions '{' error '}'
         {
-            yyerror("Seems you made a mistake while specifying one of the lexer rules inside the start condition <" + $start_conditions.join(',') + "> { rules... } block.", @error);
+            yyerror("Seems you made a mistake while specifying one of the lexer rules inside the start condition <" + $start_conditions.join(',') + "> { rules... } block.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
         }
     | start_conditions '{' error
         {
-            yyerror("Seems you did not correctly bracket a lexer rules set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.", @error, $rule_block);
+            yyerror("Seems you did not correctly bracket a lexer rules set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @start_conditions));
         }
     ;
 
@@ -183,7 +181,7 @@ rule
     | regex error
         {
             $$ = [$regex, $error];
-            yyerror("lexer rule regex action code declaration error?", @error);
+            yyerror("lexer rule regex action code declaration error?\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @regex));
         }
     ;
 
@@ -192,9 +190,7 @@ action
         { $$ = $action_body; }
     | '{' action_body error
         {
-            var l = $action_body.split('\n');
-            var ab = l.slice(0, 10).join('\n');
-            yyerror("Seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'. Offending action body:\n" + ab);
+            yyerror("Seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @error, @1));
         }
     | unbracketed_action_body
         { $$ = $unbracketed_action_body; }
@@ -215,9 +211,7 @@ action_body
         { $$ = $1 + $2 + $3 + $4 + $5; }
     | action_body '{' action_body error
         {
-            var l = $action_body2.split('\n');
-            var ab = l.slice(0, 10).join('\n');
-            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block. Offending action body part:\n" + ab);
+            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + prettyPrintRange(yylexer, @error, @action_body1));
         }
     ;
 
@@ -233,9 +227,7 @@ start_conditions
         { $$ = $name_list; }
     | '<' name_list error
         {
-            var l = $name_list;
-            var ab = l.slice(0, 10).join(',').replace(/[\s\r\n]/g, ' ');
-            yyerror("Seems you did not correctly terminate the start condition set <" + ab + ",???> with a terminating '>'");
+            yyerror("Seems you did not correctly terminate the start condition set <" + $name_list.join(',') + ",???> with a terminating '>'\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @1));
         }
     | '<' '*' '>'
         { $$ = ['*']; }
@@ -343,15 +335,11 @@ regex_base
         { $$ = $SPECIAL_GROUP + $regex_list + ')'; }
     | '(' regex_list error
         {
-            var l = $regex_list;
-            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces. Unterminated regex part: (" + ab, $regex_list);
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + prettyPrintRange(yylexer, @error, @1));
         }
     | SPECIAL_GROUP regex_list error
         {
-            var l = $regex_list;
-            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces. Unterminated regex part: " + $SPECIAL_GROUP + ab, $regex_list);
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + prettyPrintRange(yylexer, @error, @SPECIAL_GROUP));
         }
     | regex_base '+'
         { $$ = $regex_base + '+'; }
@@ -386,9 +374,7 @@ any_group_regex
         { $$ = $REGEX_SET_START + $regex_set + $REGEX_SET_END; }
     | REGEX_SET_START regex_set error
         {
-            var l = $regex_set;
-            var ab = l.replace(/[\s\r\n]/g, ' ').substring(0, 32);
-            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets. Unterminated regex set: " + $REGEX_SET_START + ab, $regex_set);
+            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets.\n\n  Unterminated regex set:\n" + prettyPrintRange(yylexer, @error, @REGEX_SET_START));
         }
     ;
 
@@ -432,11 +418,14 @@ string
 
 options
     : OPTIONS option_list OPTIONS_END
+        { $$ = null; }
     ;
 
 option_list
     : option option_list
+        { $$ = null; }
     | option
+        { $$ = null; }
     ;
 
 option
@@ -467,7 +456,7 @@ include_macro_code
         }
     | INCLUDE error
         {
-            yyerror("%include MUST be followed by a valid file path");
+            yyerror("%include MUST be followed by a valid file path\n\n  Erroneous path:\n" + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -519,6 +508,50 @@ function parseValue(v) {
         }
     }
     return v;
+}
+
+// pretty-print the erroneous section of the input, with line numbers and everything...
+function prettyPrintRange(lexer, loc, context_loc) {
+    assert(loc);
+    var error_size = loc.last_line - loc.first_line;
+    const CONTEXT = 3;
+    var input = lexer.matched;
+    var lines = input.split('\n');
+    var show_context = (error_size < 5 || context_loc);
+    var l0 = (!show_context ? loc.first_line : context_loc ? context_loc.first_line : loc.first_line - CONTEXT);
+    var l1 = loc.last_line;
+    var lineno_display_width = (1 + Math.log10(l1 | 1) | 0);
+    var ws_prefix = new Array(lineno_display_width).join(' ');
+    var rv = lines.slice(l0 - 1, l1 + 1).map(function injectLineNumber(line, index) {
+        var lno = index + l0;
+        var lno_pfx = (ws_prefix + lno).substr(-lineno_display_width);
+        line = lno_pfx + ': ' + line;
+        if (show_context) {
+            var errpfx = (new Array(lineno_display_width + 1)).join('^');
+            if (lno === loc.first_line) {
+                var offset = loc.first_column + 2;
+                var len = (lno === loc_last_line ? loc.last_column : line.length) - loc.first_column + 1;
+                var lead = (new Array(offset)).join(' ');
+                var mark = (new Array(len)).join('^');
+                line += '\n' + errpfx + lead + mark;
+            } else if (lno === loc_last_line) {
+                var offset = 2 + 1;
+                var len = loc.last_column + 1;
+                var lead = (new Array(offset)).join(' ');
+                var mark = (new Array(len)).join('^');
+                line += '\n' + errpfx + lead + mark;
+            } else if (lno > loc.first_line && lno < loc_last_line) {
+                var offset = 2 + 1;
+                var len = line.length + 1;
+                var lead = (new Array(offset)).join(' ');
+                var mark = (new Array(len)).join('^');
+                line += '\n' + errpfx + lead + mark;
+            }
+        }
+        line = line.replace(/\t/g, ' ');
+        return line;
+    });
+    return rv.join('\n');
 }
 
 parser.warn = function p_warn() {
