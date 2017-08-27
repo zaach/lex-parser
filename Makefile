@@ -1,14 +1,12 @@
 
 JISON_VERSION := $(shell node ../../lib/cli.js -V 2> /dev/null )
+
 ifndef JISON_VERSION 
-	ifeq ($(wildcard ./node_modules/.bin/jison),) 
-		echo "### FAILURE: Make sure you have run 'make prep' before as the jison compiler is unavailable! ###"
-	else
-		JISON = sh node_modules/.bin/jison
-	endif
+	JISON = sh node_modules/.bin/jison
 else 
 	JISON = node ../../lib/cli.js
 endif 
+
 
 
 
@@ -23,6 +21,9 @@ npm-update:
 	ncu -a --packageFile=package.json
 
 build:
+ifeq ($(wildcard ./node_modules/.bin/jison),) 
+	$(error "### FAILURE: Make sure you have run 'make prep' before as the jison compiler is unavailable! ###")
+endif
 	$(JISON) -o lex-parser.js lex.y lex.l
 
 test:
@@ -56,4 +57,5 @@ superclean: clean
 
 
 
-.PHONY: all prep npm-install build test clean superclean bump git-tag publish
+.PHONY: all prep npm-install build test clean superclean bump git-tag publish npm-update
+
