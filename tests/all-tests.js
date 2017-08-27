@@ -567,8 +567,8 @@ describe("LEX Parser", function () {
             ["foo", "return 1;"]
         ],
         options: {
-            s1: "s1\\\"val'ue",
-            s2: "s2\\\\x\\'val\"ue"
+            s1: "s1\"val'ue",
+            s2: "s2\\\\x'val\"ue"
         },
         macros: {},
         startConditions: {},

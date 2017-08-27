@@ -4942,14 +4942,14 @@ var lexer = function() {
       case 20:
         /*! Conditions:: options */
         /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
         return 39;   // value is always a string type 
         break;
       case 21:
         /*! Conditions:: options */
         /*! Rule::       '{QUOTED_STRING_CONTENT}' */
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
         return 39;   // value is always a string type 
         break;
@@ -5096,18 +5096,16 @@ var lexer = function() {
         /*! Conditions:: indented trail rules macro INITIAL */
         /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */
 
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
-        yy_.yytext = yy_.yytext.replace(/\\"/g, '"');
         return 35;
         break;
       case 44:
         /*! Conditions:: indented trail rules macro INITIAL */
         /*! Rule::       '{QUOTED_STRING_CONTENT}' */
 
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
-        yy_.yytext = yy_.yytext.replace(/\\'/g, '\'');
         return 35;
         break;
       case 45:
@@ -5230,7 +5228,7 @@ var lexer = function() {
       case 82:
         /*! Conditions:: path */
         /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
         this.popState();
         return 42;
@@ -5238,7 +5236,7 @@ var lexer = function() {
       case 83:
         /*! Conditions:: path */
         /*! Rule::       '{QUOTED_STRING_CONTENT}' */
-        yy_.yytext = this.matches[1];
+        yy_.yytext = unescQuote(this.matches[1]);
 
         this.popState();
         return 42;
@@ -5303,7 +5301,7 @@ var lexer = function() {
 
     simpleCaseActionClusters: {
       /*! Conditions:: action */
-      /*! Rule::       \/\*(.|\n|\r)*?\*\/ */
+      /*! Rule::       \/\*[^]*?\*\/ */
       0: 26,
 
       /*! Conditions:: action */
@@ -5311,15 +5309,15 @@ var lexer = function() {
       1: 26,
 
       /*! Conditions:: action */
-      /*! Rule::       \/[^ /]*?['"{}][^ ]*?\/ */
+      /*! Rule::       \/[^\s/]*?['"{}][^\s]*?\/ */
       2: 26,
 
       /*! Conditions:: action */
-      /*! Rule::       "(\\\\|\\"|[^"])*" */
+      /*! Rule::       "{DOUBLEQUOTED_STRING_CONTENT}" */
       3: 26,
 
       /*! Conditions:: action */
-      /*! Rule::       '(\\\\|\\'|[^'])*' */
+      /*! Rule::       '{QUOTED_STRING_CONTENT}' */
       4: 26,
 
       /*! Conditions:: action */
@@ -5419,7 +5417,7 @@ var lexer = function() {
       64: 15,
 
       /*! Conditions:: indented trail rules macro INITIAL */
-      /*! Rule::       \{\d+(,\s?\d+|,)?\} */
+      /*! Rule::       \{\d+(,\s*\d+|,)?\} */
       71: 34,
 
       /*! Conditions:: indented trail rules macro INITIAL */
@@ -5456,11 +5454,11 @@ var lexer = function() {
     },
 
     rules: [
-      /*  0: */  /^(?:\/\*(.|\n|\r)*?\*\/)/,
+      /*  0: */  new XRegExp('^(?:\\/\\*[^]*?\\*\\/)', ''),
       /*  1: */  /^(?:\/\/.*)/,
-      /*  2: */  /^(?:\/[^ \/]*?['"{}][^ ]*?\/)/,
-      /*  3: */  /^(?:"(\\\\|\\"|[^"])*")/,
-      /*  4: */  /^(?:'(\\\\|\\'|[^'])*')/,
+      /*  2: */  /^(?:\/[^\s\/]*?["'{}]\S*?\/)/,
+      /*  3: */  /^(?:"((?:\\"|\\[^"]|[^"\\])*)")/,
+      /*  4: */  /^(?:'((?:\\'|\\[^']|[^'\\])*)')/,
       /*  5: */  /^(?:[\/"'][^{}\/"']+)/,
       /*  6: */  /^(?:[^{}\/"']+)/,
       /*  7: */  /^(?:\{)/,
@@ -5536,7 +5534,7 @@ var lexer = function() {
         ''
       ),
       /* 70: */  /^(?:%%)/,
-      /* 71: */  /^(?:\{\d+(,\s?\d+|,)?\})/,
+      /* 71: */  /^(?:\{\d+(,\s*\d+|,)?\})/,
       /* 72: */  new XRegExp('^(?:\\{([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*)\\})', ''),
       /* 73: */  new XRegExp('^(?:\\{([\\p{Alphabetic}_](?:[\\p{Alphabetic}\\p{Number}_])*)\\})', ''),
       /* 74: */  /^(?:\{)/,
@@ -5837,6 +5835,19 @@ var lexer = function() {
     var a = s.split('\n');
     var pf = new Array(i + 1).join(' ');
     return pf + a.join('\n' + pf);
+  }
+
+  // unescape a string value which is wrapped in quotes/doublequotes 
+  function unescQuote(str) {
+    str = '' + str;
+    var a = str.split('\\\\');
+
+    a = a.map(function(s) {
+      return s.replace(/\\'/g, '\'').replace(/\\"/g, '"');
+    });
+
+    str = a.join('\\\\');
+    return str;
   }
 
   // properly quote and escape the given input string

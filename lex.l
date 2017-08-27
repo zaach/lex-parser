@@ -39,13 +39,15 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 %%
 
-<action>"/*"(.|\n|\r)*?"*/"             return 'ACTION_BODY';
+<action>"/*"[^]*?"*/"                   return 'ACTION_BODY';
 <action>"//".*                          return 'ACTION_BODY';
 // regexp with braces or quotes (and no spaces, so we don't mistake
 // a *division operator* `/` for a regex delimiter here in most circumstances):
-<action>"/"[^ /]*?['"{}][^ ]*?"/"       return 'ACTION_BODY';
-<action>\"("\\\\"|'\"'|[^"])*\"         return 'ACTION_BODY';
-<action>"'"("\\\\"|"\'"|[^'])*"'"       return 'ACTION_BODY';
+<action>"/"[^\s/]*?['"{}][^\s]*?"/"     return 'ACTION_BODY';
+<action>\"{DOUBLEQUOTED_STRING_CONTENT}\"
+                                        return 'ACTION_BODY';
+<action>\'{QUOTED_STRING_CONTENT}\'    
+                                        return 'ACTION_BODY';
 <action>[/"'][^{}/"']+                  return 'ACTION_BODY';
 <action>[^{}/"']+                       return 'ACTION_BODY';
 <action>"{"                             yy.depth++; return '{';
@@ -79,9 +81,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <options>{NAME}                         return 'NAME';
 <options>"="                            return '=';
 <options>\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = this.matches[1]; return 'OPTION_STRING_VALUE';   // value is always a string type
+                                        yytext = unescQuote(this.matches[1]); return 'OPTION_STRING_VALUE';   // value is always a string type
 <options>\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = this.matches[1]; return 'OPTION_STRING_VALUE';   // value is always a string type
+                                        yytext = unescQuote(this.matches[1]); return 'OPTION_STRING_VALUE';   // value is always a string type
 
 // Comments should be gobbled and discarded anywhere *except* the code/action blocks:
 <INITIAL,start_condition,trail,rules,macro,path,options>"//"[^\r\n]*
@@ -130,8 +132,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 // Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
-<macro>{ANY_LITERAL_CHAR}+
-                                        %{
+<macro>{ANY_LITERAL_CHAR}+              %{
                                             // accept any non-regex, non-lex, non-string-delim,
                                             // non-escape-starter, non-space character as-is
                                             return 'CHARACTER_LIT';
@@ -141,13 +142,11 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 \s+                                     /* empty */
 
 \"{DOUBLEQUOTED_STRING_CONTENT}\"       %{
-                                            yytext = this.matches[1]; 
-                                            yytext = yytext.replace(/\\"/g,'"');
+                                            yytext = unescQuote(this.matches[1]); 
                                             return 'STRING_LIT';
                                         %}
 \'{QUOTED_STRING_CONTENT}\'             %{
-                                            yytext = this.matches[1]; 
-                                            yytext = yytext.replace(/\\'/g,"'");
+                                            yytext = unescQuote(this.matches[1]); 
                                             return 'STRING_LIT';
                                         %}
 "["                                     this.pushState('set'); return 'REGEX_SET_START';
@@ -195,7 +194,7 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                             return 'UNKNOWN_DECL';
                                         %}
 "%%"                                    this.pushState('rules'); return '%%';
-"{"\d+(","\s?\d+|",")?"}"               return 'RANGE_REGEX';
+"{"\d+(","\s*\d+|",")?"}"               return 'RANGE_REGEX';
 "{"{ID}"}"                              return 'NAME_BRACE';
 <set,options>"{"{ID}"}"                 return 'NAME_BRACE';
 "{"                                     return '{';
@@ -204,7 +203,8 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <set>(?:"\\\\"|"\\]"|[^\]{])+           return 'REGEX_SET';
 <set>"{"                                return 'REGEX_SET';
-<set>"]"                                this.popState(); return 'REGEX_SET_END';
+<set>"]"                                this.popState(); 
+                                        return 'REGEX_SET_END';
 
 
 // in the trailing CODE block, only accept these `%include` macros when
@@ -216,11 +216,16 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 <path>{BR}                              this.popState(); this.unput(yytext);
 <path>\"{DOUBLEQUOTED_STRING_CONTENT}\"
-                                        yytext = this.matches[1]; this.popState(); return 'PATH';
+                                        yytext = unescQuote(this.matches[1]); 
+					this.popState(); 
+					return 'PATH';
 <path>\'{QUOTED_STRING_CONTENT}\'
-                                        yytext = this.matches[1]; this.popState(); return 'PATH';
+                                        yytext = unescQuote(this.matches[1]); 
+					this.popState(); 
+					return 'PATH';
 <path>{WS}+                             // skip whitespace in the line
-<path>[^\s\r\n]+                        this.popState(); return 'PATH';
+<path>[^\s\r\n]+                        this.popState(); 
+                                        return 'PATH';
 
 <macro,rules>.                          %{
                                             /* b0rk on bad characters */
@@ -255,6 +260,17 @@ function indent(s, i) {
     var a = s.split('\n');
     var pf = (new Array(i + 1)).join(' ');
     return pf + a.join('\n' + pf);
+}
+
+// unescape a string value which is wrapped in quotes/doublequotes 
+function unescQuote(str) {
+    str = '' + str;
+    var a = str.split('\\\\');
+    a = a.map(function (s) {
+        return s.replace(/\\'/g, "'").replace(/\\"/g, '"');
+    });
+    str = a.join('\\\\');
+    return str;
 }
 
 // properly quote and escape the given input string
