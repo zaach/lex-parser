@@ -19,8 +19,10 @@ BR                                      \r\n|\n|\r
 WS                                      [^\S\r\n]
 
 // Quoted string content: support *escaped* quotes inside strings:
-QUOTED_STRING_CONTENT                   (?:\\\'|\\[^\']|[^\\\'])*
-DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"])*
+QUOTED_STRING_CONTENT                   (?:\\\'|\\[^\']|[^\\\'\r\n])*
+DOUBLEQUOTED_STRING_CONTENT             (?:\\\"|\\[^\"]|[^\\\"\r\n])*
+// backquoted ES6/ES2017 string templates MAY span multiple lines:
+ES2017_STRING_CONTENT                   (?:\\\`|\\[^\`]|[^\\\`])*
 
 // Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
