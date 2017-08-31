@@ -452,7 +452,10 @@ option
     | NAME[option] '=' error
         {
             // TODO ...
-            yyerror(`internal error: option ${$option} value assignment failure.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @option));
+            yyerror(`internal error: option "${$option}" value assignment failure.
+
+  Erroneous area:
+` + prettyPrintRange(yylexer, @error, @option));
         }
     | error
         {
