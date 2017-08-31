@@ -36,7 +36,7 @@ lex
         }
     | init definitions error EOF
         {
-            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:\n  definitions  %%  rules  [%%  extra_module_code]\n\nErroneous code:\n" + prettyPrintRange(yylexer, @error));
+            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:\n  definitions  %%  rules  [%%  extra_module_code]\n\n  Erroneous code:\n" + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -456,7 +456,7 @@ include_macro_code
         }
     | INCLUDE error
         {
-            yyerror("%include MUST be followed by a valid file path\n\n  Erroneous path:\n" + prettyPrintRange(yylexer, @error));
+            yyerror("%include MUST be followed by a valid file path.\n\n  Erroneous path:\n" + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -465,6 +465,11 @@ module_code_chunk
         { $$ = $CODE; }
     | module_code_chunk CODE
         { $$ = $module_code_chunk + $CODE; }
+    | error
+        {
+            // TODO ...
+            yyerror("module code declaration error?\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error));
+        }
     ;
 
 optional_module_code_chunk
@@ -512,7 +517,6 @@ function parseValue(v) {
 
 // pretty-print the erroneous section of the input, with line numbers and everything...
 function prettyPrintRange(lexer, loc, context_loc) {
-    assert(loc);
     var error_size = loc.last_line - loc.first_line;
     const CONTEXT = 3;
     var input = lexer.matched;
@@ -530,17 +534,17 @@ function prettyPrintRange(lexer, loc, context_loc) {
             var errpfx = (new Array(lineno_display_width + 1)).join('^');
             if (lno === loc.first_line) {
                 var offset = loc.first_column + 2;
-                var len = (lno === loc_last_line ? loc.last_column : line.length) - loc.first_column + 1;
+                var len = (lno === loc.last_line ? loc.last_column : line.length) - loc.first_column + 1;
                 var lead = (new Array(offset)).join(' ');
                 var mark = (new Array(len)).join('^');
                 line += '\n' + errpfx + lead + mark;
-            } else if (lno === loc_last_line) {
+            } else if (lno === loc.last_line) {
                 var offset = 2 + 1;
                 var len = loc.last_column + 1;
                 var lead = (new Array(offset)).join(' ');
                 var mark = (new Array(len)).join('^');
                 line += '\n' + errpfx + lead + mark;
-            } else if (lno > loc.first_line && lno < loc_last_line) {
+            } else if (lno > loc.first_line && lno < loc.last_line) {
                 var offset = 2 + 1;
                 var len = line.length + 1;
                 var lead = (new Array(offset)).join(' ');
@@ -553,6 +557,7 @@ function prettyPrintRange(lexer, loc, context_loc) {
     });
     return rv.join('\n');
 }
+
 
 parser.warn = function p_warn() {
     console.warn.apply(console, arguments);
