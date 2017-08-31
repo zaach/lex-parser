@@ -17,12 +17,14 @@ lex
           $$.macros = $definitions.macros;
           $$.startConditions = $definitions.startConditions;
           $$.unknownDecls = $definitions.unknownDecls;
+
           // if there are any options, add them all, otherwise set options to NULL:
           // can't check for 'empty object' by `if (yy.options) ...` so we do it this way:
           for (var k in yy.options) {
             $$.options = yy.options;
             break;
           }
+          
           if (yy.actionInclude) {
             var asrc = yy.actionInclude.join('\n\n');
             // Only a non-empty action code chunk should actually make it through:
@@ -30,13 +32,23 @@ lex
               $$.actionInclude = asrc;
             }
           }
+
           delete yy.options;
           delete yy.actionInclude;
           return $$;
         }
     | init definitions error EOF
         {
-            yyerror("Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:\n  definitions  %%  rules  [%%  extra_module_code]\n\n  Erroneous code:\n" + prettyPrintRange(yylexer, @error));
+            yyerror(`Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:
+
+        definitions
+        %%
+        rules
+        %%                  // <-- optional!
+        extra_module_code   // <-- optional!
+
+  Erroneous code:
+` + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -437,6 +449,16 @@ option
         { yy.options[$option] = parseValue($value); }
     | NAME[option] '=' NAME[value]
         { yy.options[$option] = parseValue($value); }
+    | NAME[option] '=' error
+        {
+            // TODO ...
+            yyerror(`internal error: option ${$option} value assignment failure.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @option));
+        }
+    | error
+        {
+            // TODO ...
+            yyerror("expected a valid option name (with optional value assignment).\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error));
+        }
     ;
 
 extra_lexer_module_code
