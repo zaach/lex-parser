@@ -149,7 +149,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]" %{\nreturn true;\n%}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nreturn true;\n"]
+            ["\\[[^\\]]\\]", "return true;"]
         ],
         macros: {},
         startConditions: {},
@@ -163,7 +163,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b={};return true;\n}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nvar b={};return true;\n"]
+            ["\\[[^\\]]\\]", "{\nvar b={};return true;\n}"]
         ],
         macros: {},
         startConditions: {},
@@ -174,10 +174,10 @@ describe("LEX Parser", function () {
   });
 
   it("test multiline action with brace in a multi-line-comment", function () {
-    var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b={}; /* { */ return true;\n}\n';
+    var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b=7; /* { */ return true;\n}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nvar b={}; /* { */ return true;\n"]
+            ["\\[[^\\]]\\]", "var b=7; /* { */ return true;"]
         ],
         macros: {},
         startConditions: {},
@@ -191,7 +191,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b={}; // { \nreturn 2 / 3;\n}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nvar b={}; // { \nreturn 2 / 3;\n"]
+            ["\\[[^\\]]\\]", "{\nvar b={}; // { \nreturn 2 / 3;\n}"]
         ],
         macros: {},
         startConditions: {},
@@ -205,7 +205,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b=\'{\' + "{"; // { \nreturn 2 / 3;\n}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nvar b='{' + \"{\"; // { \nreturn 2 / 3;\n"]
+            ["\\[[^\\]]\\]", "var b='{' + \"{\"; // { \nreturn 2 / 3;"]
         ],
         macros: {},
         startConditions: {},
@@ -219,7 +219,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]" {\nvar b=/{/; // { \nreturn 2 / 3;\n}\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\nvar b=/{/; // { \nreturn 2 / 3;\n"]
+            ["\\[[^\\]]\\]", "var b=/{/; // { \nreturn 2 / 3;"]
         ],
         macros: {},
         startConditions: {},
@@ -233,7 +233,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"["[^\\]]"]"\n  var b=/{/;\n  // { \n  return 2 / 3;\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "var b=/{/;\n// { \nreturn 2 / 3;"]
+            ["\\[[^\\]]\\]", "var b=/{/;\n  // { \n  return 2 / 3;"]
         ],
         macros: {},
         startConditions: {},
@@ -247,9 +247,9 @@ describe("LEX Parser", function () {
     var lexgrammar = '\nRULE [0-9]\n\n%{\n hi <stuff> \n%}\n%%\n"["[^\\]]"]" %{\nreturn true;\n%}\n';
     var expected = {
         macros: {"RULE": "[0-9]"},
-        actionInclude: "\n hi <stuff> \n",
+        actionInclude: "hi <stuff>",
         rules: [
-            ["\\[[^\\]]\\]", "\nreturn true;\n"]
+            ["\\[[^\\]]\\]", "return true;"]
         ],
         startConditions: {},
         unknownDecls: []
@@ -656,7 +656,7 @@ describe("LEX Parser", function () {
     var expected = {
         macros: {"BR": "\\r\\n|\\n|\\r"},
         rules: [
-            ["{BR}", "\r\nreturn true;\r\n"]
+            ["{BR}", "return true;"]
         ],
         startConditions: {},
         unknownDecls: []
@@ -669,7 +669,7 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\r\n"["[^\\]]"]" %{\r\nreturn true;\r\n%}\r\n';
     var expected = {
         rules: [
-            ["\\[[^\\]]\\]", "\r\nreturn true;\r\n"]
+            ["\\[[^\\]]\\]", "return true;"]
         ],
         macros: {},
         startConditions: {},
@@ -683,8 +683,8 @@ describe("LEX Parser", function () {
     var lexgrammar = '%%\n"a" %{  \nreturn true;\n%}  \n  \n"b" %{    return 1;\n%}  \n   \n';
     var expected = {
         rules: [
-            ["a", "  \nreturn true;\n"],
-            ["b", "    return 1;\n"]
+            ["a", "return true;"],
+            ["b", "return 1;"]
         ],
         macros: {},
         startConditions: {},

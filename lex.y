@@ -6,6 +6,8 @@
 %nonassoc '/' '/!'
 
 %left '*' '+' '?' RANGE_REGEX
+%left '|'
+%left '('
 
 
 %%
@@ -24,7 +26,7 @@ lex
             $$.options = yy.options;
             break;
           }
-          
+
           if (yy.actionInclude) {
             var asrc = yy.actionInclude.join('\n\n');
             // Only a non-empty action code chunk should actually make it through:
@@ -39,16 +41,19 @@ lex
         }
     | init definitions error EOF
         {
-            yyerror(`Maybe you did not correctly separate the lexer sections with a '%%' on an otherwise empty line? The lexer spec file should have this structure:
+            yyerror(rmCommonWS`
+                Maybe you did not correctly separate the lexer sections with a '%%'
+                on an otherwise empty line?
+                The lexer spec file should have this structure:
 
-        definitions
-        %%
-        rules
-        %%                  // <-- optional!
-        extra_module_code   // <-- optional!
+                        definitions
+                        %%
+                        rules
+                        %%                  // <-- optional!
+                        extra_module_code   // <-- optional!
 
-  Erroneous code:
-` + prettyPrintRange(yylexer, @error));
+                  Erroneous code:
+                ` + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -84,7 +89,7 @@ init
     ;
 
 definitions
-    : definition definitions
+    : definitions definition
         {
           $$ = $definitions;
           if ($definition != null) {
@@ -116,16 +121,8 @@ definition
         { $$ = $names_inclusive; }
     | START_EXC names_exclusive
         { $$ = $names_exclusive; }
-    | '{' action_body '}'
-        { yy.actionInclude.push($action_body); $$ = null; }
-    | '{' action_body error
-        {
-            yyerror("Seems you did not correctly bracket the lexer preparatory action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @error, @action_body));
-        }
-    | ACTION
-        { yy.actionInclude.push($ACTION); $$ = null; }
-    | include_macro_code
-        { yy.actionInclude.push($include_macro_code); $$ = null; }
+    | action
+        { yy.actionInclude.push($action); $$ = null; }
     | options
         { $$ = null; }
     | UNKNOWN_DECL
@@ -172,11 +169,25 @@ rules_collective
         }
     | start_conditions '{' error '}'
         {
-            yyerror("Seems you made a mistake while specifying one of the lexer rules inside the start condition <" + $start_conditions.join(',') + "> { rules... } block.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
+            yyerror(rmCommonWS`
+                Seems you made a mistake while specifying one of the lexer rules inside
+                the start condition
+                   <${$start_conditions.join(',')}> { rules... }
+                block.
+
+                  Erroneous area:
+                ` + prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
         }
     | start_conditions '{' error
         {
-            yyerror("Seems you did not correctly bracket a lexer rules set inside the start condition <" + $start_conditions.join(',') + "> { rules... } as a terminating curly brace '}' could not be found.\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @start_conditions));
+            yyerror(rmCommonWS`
+                Seems you did not correctly bracket a lexer rules set inside
+                the start condition
+                  <${$start_conditions.join(',')}> { rules... }
+                as a terminating curly brace '}' could not be found.
+
+                  Erroneous area:
+                ` + prettyPrintRange(yylexer, @error, @start_conditions));
         }
     ;
 
@@ -189,49 +200,87 @@ rule_block
 
 rule
     : regex action
-        { $$ = [$regex, $action]; }
+        {
+            $$ = [$regex, $action]; 
+        }
     | regex error
         {
             $$ = [$regex, $error];
+            console.log('############# DUMP:', {
+                yysp,
+                yyrulelength,
+                yyvstack,
+                yystack,
+                yysstack,
+                error: $error,
+                text: yytext
+            });
             yyerror("lexer rule regex action code declaration error?\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @regex));
         }
     ;
 
 action
-    : '{' action_body '}'
-        { $$ = $action_body; }
-    | '{' action_body error
+    : ACTION_START action_body BRACKET_MISSING
         {
-            yyerror("Seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @error, @1));
+            yyerror("Missing curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @BRACKET_MISSING, @1));
         }
-    | unbracketed_action_body
-        { $$ = $unbracketed_action_body; }
-    | include_macro_code
-        { $$ = $include_macro_code; }
-    ;
-
-unbracketed_action_body
-    : ACTION
-    | unbracketed_action_body ACTION
-        { $$ = $unbracketed_action_body + '\n' + $ACTION; }
+    | ACTION_START action_body BRACKET_SURPLUS
+        {
+            yyerror("Too many curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @BRACKET_SURPLUS, @1));
+        }
+    | ACTION_START action_body ACTION_END 
+        {
+            if (0) {
+                $$ = 'XXX' + $action_body + 'YYY';
+            } else {
+                var s = $action_body.trim();
+                // remove outermost set of braces UNLESS there's 
+                // a curly brace in there anywhere: in that case
+                // we should leave it up to the sophisticated
+                // code analyzer to simplify the code!
+                //
+                // This is a very rough check as it ill also look
+                // inside code comments, which should not have
+                // any influence.
+                //
+                // Nevertheless: this is a *safe* transform!
+                if (s[0] === '{' && s.indexOf('}') === s.length - 1) {
+                    $$ = s.substring(1, s.length - 1).trim();
+                } else {
+                    $$ = s;
+                }
+            }
+        }
     ;
 
 action_body
-    : action_comments_body
-        { $$ = $action_comments_body; }
-    | action_body '{' action_body '}' action_comments_body
-        { $$ = $1 + $2 + $3 + $4 + $5; }
-    | action_body '{' action_body error
-        {
-            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + prettyPrintRange(yylexer, @error, @action_body1));
+    : action_body ACTION
+        { $$ = $action_body + '\n\n' + $ACTION + '\n\n'; }
+    | action_body ACTION_BODY
+        { $$ = $action_body + $ACTION_BODY; }
+    | action_body ACTION_BODY_C_COMMENT
+        { $$ = $action_body + $ACTION_BODY_C_COMMENT; }
+    | action_body ACTION_BODY_CPP_COMMENT
+        { $$ = $action_body + $ACTION_BODY_CPP_COMMENT; }
+    | action_body ACTION_BODY_WHITESPACE
+        { $$ = $action_body + $ACTION_BODY_WHITESPACE; }
+    | action_body include_macro_code
+        { $$ = $action_body + '\n\n' + $include_macro_code + '\n\n'; }
+    | action_body INCLUDE_PLACEMENT_ERROR
+        { 
+            yyerror("" +
+            "    You may place the '%include' instruction only at the start/front of" +
+            "    a line. " +
+"" +
+            "    It's use is not permitted at this position:" +
+            "" + prettyPrintRange(yylexer, @INCLUDE_PLACEMENT_ERROR, @action_body));
         }
-    ;
-
-action_comments_body
-    : ε
+    | action_body error
+        {
+            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + prettyPrintRange(yylexer, @error, @action_body));
+        }
+    | ε
         { $$ = ''; }
-    | action_comments_body ACTION_BODY
-        { $$ = $action_comments_body + $ACTION_BODY; }
     ;
 
 start_conditions
@@ -321,23 +370,32 @@ regex
     ;
 
 regex_list
-    : nonempty_regex_list
+    : regex_list '|' regex_concat 
+        { $$ = $1 + '|' + $3; }
+    | regex_list '|' 
+        { $$ = $1 + '|'; }
+    | regex_concat
+        { $$ = $1; }
     | ε
         { $$ = ''; }
     ;
 
 nonempty_regex_list
-    : regex_concat '|' regex_list
+    : nonempty_regex_list '|' regex_concat 
         { $$ = $1 + '|' + $3; }
-    | '|' regex_list
+    | nonempty_regex_list '|'  
+        { $$ = $1 + '|'; }
+    | '|' regex_concat 
         { $$ = '|' + $2; }
     | regex_concat
+        { $$ = $1; }
     ;
 
 regex_concat
     : regex_concat regex_base
         { $$ = $1 + $2; }
     | regex_base
+        { $$ = $1; }
     ;
 
 regex_base
@@ -391,8 +449,8 @@ any_group_regex
     ;
 
 regex_set
-    : regex_set_atom regex_set
-        { $$ = $regex_set_atom + $regex_set; }
+    : regex_set regex_set_atom
+        { $$ = $regex_set + $regex_set_atom; }
     | regex_set_atom
     ;
 
@@ -452,23 +510,28 @@ option
     | NAME[option] '=' error
         {
             // TODO ...
-            yyerror(`internal error: option "${$option}" value assignment failure.
+            yyerror(rmCommonWS`
+                internal error: option "${$option}" value assignment failure.
 
-  Erroneous area:
-` + prettyPrintRange(yylexer, @error, @option));
+                  Erroneous area:
+                ` + prettyPrintRange(yylexer, @error, @option));
         }
     | error
         {
             // TODO ...
-            yyerror("expected a valid option name (with optional value assignment).\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error));
+            yyerror(rmCommonWS`
+                expected a valid option name (with optional value assignment).
+
+                  Erroneous area:
+                ` + prettyPrintRange(yylexer, @error));
         }
     ;
 
 extra_lexer_module_code
     : optional_module_code_chunk
         { $$ = $optional_module_code_chunk; }
-    | optional_module_code_chunk include_macro_code extra_lexer_module_code
-        { $$ = $optional_module_code_chunk + $include_macro_code + $extra_lexer_module_code; }
+    | extra_lexer_module_code include_macro_code optional_module_code_chunk
+        { $$ = $extra_lexer_module_code + $include_macro_code + $optional_module_code_chunk; }
     ;
 
 include_macro_code
@@ -481,7 +544,11 @@ include_macro_code
         }
     | INCLUDE error
         {
-            yyerror("%include MUST be followed by a valid file path.\n\n  Erroneous path:\n" + prettyPrintRange(yylexer, @error));
+            yyerror(rmCommonWS`
+                %include MUST be followed by a valid file path.
+
+                  Erroneous path:
+                ` + prettyPrintRange(yylexer, @error, @INCLUDE));
         }
     ;
 
@@ -493,7 +560,11 @@ module_code_chunk
     | error
         {
             // TODO ...
-            yyerror("module code declaration error?\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error));
+            yyerror(rmCommonWS`
+                module code declaration error?
+
+                  Erroneous area:
+                ` + prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -540,45 +611,103 @@ function parseValue(v) {
     return v;
 }
 
+// tagged template string helper which removes the indentation common to all
+// non-empty lines: that indentation was added as part of the source code
+// formatting of this lexer spec file and must be removed to produce what
+// we were aiming for.
+//
+// Each template string starts with an optional empty line, which should be
+// removed entirely, followed by a first line of error reporting content text,
+// which should not be indented at all, i.e. the indentation of the first
+// non-empty line should be treated as the 'common' indentation and thus
+// should also be removed from all subsequent lines in the same template string.
+//
+// See also: https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Template_literals
+function rmCommonWS(strings, ...values) {
+    // as `strings[]` is an array of strings, each potentially consisting
+    // of multiple lines, followed by one(1) value, we have to split each
+    // individual string into lines to keep that bit of information intact.
+    var src = strings.map(function splitIntoLines(s) {
+        return s.split('\n');
+    });
+    // fetch the first line of content which is expected to exhibit the common indent:
+    // that would be the SECOND line of input, always, as the FIRST line won't
+    // have any indentation at all!
+    var s0 = '';
+    for (var i = 0, len = src.length; i < len; i++) {
+        if (src[i].length > 1) {
+            s0 = src[i][1];
+            break;
+        }
+    }
+    var indent = s0.replace(/^(\s+)[^\s]*.*$/, '$1');
+    // we assume clean code style, hence no random mix of tabs and spaces, so every
+    // line MUST have the same indent style as all others, so `length` of indent
+    // should suffice, but the way we coded this is stricter checking when we apply
+    // a find-and-replace regex instead:
+    var indent_re = new RegExp('^' + indent);
+
+    // process template string partials now:
+    for (var i = 0, len = src.length; i < len; i++) {
+        // start-of-lines always end up at index 1 and above (for each template string partial):
+        for (var j = 1, linecnt = src[i].length; j < linecnt; j++) {
+            src[i][j] = src[i][j].replace(indent_re, '');
+        }
+    }
+
+    // now merge everything to construct the template result:
+    var rv = [];
+    for (var i = 0, len = src.length, klen = values.length; i < len; i++) {
+        rv.push(src[i].join('\n'));
+        // all but the last partial are followed by a template value:
+        if (i < klen) {
+            rv.push(values[i]);
+        }
+    }
+    var sv = rv.join('');
+    return sv;
+}
+
 // pretty-print the erroneous section of the input, with line numbers and everything...
-function prettyPrintRange(lexer, loc, context_loc) {
+function prettyPrintRange(lexer, loc, context_loc, context_loc2) {
     var error_size = loc.last_line - loc.first_line;
     const CONTEXT = 3;
-    var input = lexer.matched;
+    const CONTEXT_TAIL = 1;
+    var input = lexer.matched + lexer._input;
     var lines = input.split('\n');
     var show_context = (error_size < 5 || context_loc);
-    var l0 = (!show_context ? loc.first_line : context_loc ? context_loc.first_line : loc.first_line - CONTEXT);
-    var l1 = loc.last_line;
+    var l0 = Math.max(1, (!show_context ? loc.first_line : context_loc ? context_loc.first_line : loc.first_line - CONTEXT));
+    var l1 = Math.max(1, (!show_context ? loc.last_line : context_loc2 ? context_loc2.last_line : loc.last_line + CONTEXT_TAIL));
     var lineno_display_width = (1 + Math.log10(l1 | 1) | 0);
     var ws_prefix = new Array(lineno_display_width).join(' ');
     var rv = lines.slice(l0 - 1, l1 + 1).map(function injectLineNumber(line, index) {
         var lno = index + l0;
         var lno_pfx = (ws_prefix + lno).substr(-lineno_display_width);
-        line = lno_pfx + ': ' + line;
+        var rv = lno_pfx + ': ' + line;
         if (show_context) {
             var errpfx = (new Array(lineno_display_width + 1)).join('^');
             if (lno === loc.first_line) {
                 var offset = loc.first_column + 2;
-                var len = (lno === loc.last_line ? loc.last_column : line.length) - loc.first_column + 1;
-                var lead = (new Array(offset)).join(' ');
+                var len = Math.max(2, (lno === loc.last_line ? loc.last_column : line.length) - loc.first_column + 1);
+                var lead = (new Array(offset)).join('.');
                 var mark = (new Array(len)).join('^');
-                line += '\n' + errpfx + lead + mark;
+                rv += '\n' + errpfx + lead + mark + offset + '/D' + len + '/' + lno + '/' + loc.last_line + '/' + loc.last_column + '/' + line.length + '/' + loc.first_column;
             } else if (lno === loc.last_line) {
                 var offset = 2 + 1;
-                var len = loc.last_column + 1;
-                var lead = (new Array(offset)).join(' ');
+                var len = Math.max(2, loc.last_column + 1);
+                var lead = (new Array(offset)).join('.');
                 var mark = (new Array(len)).join('^');
-                line += '\n' + errpfx + lead + mark;
+                rv += '\n' + errpfx + lead + mark + offset + '/E' + len;
             } else if (lno > loc.first_line && lno < loc.last_line) {
                 var offset = 2 + 1;
-                var len = line.length + 1;
-                var lead = (new Array(offset)).join(' ');
+                var len = Math.max(2, line.length + 1);
+                var lead = (new Array(offset)).join('.');
                 var mark = (new Array(len)).join('^');
-                line += '\n' + errpfx + lead + mark;
+                rv += '\n' + errpfx + lead + mark + offset + '/F' + len;
             }
         }
-        line = line.replace(/\t/g, ' ');
-        return line;
+        rv = rv.replace(/\t/g, ' ');
+        return rv;
     });
     return rv.join('\n');
 }
@@ -590,5 +719,17 @@ parser.warn = function p_warn() {
 
 parser.log = function p_log() {
     console.log.apply(console, arguments);
+};
+
+parser.pre_parse = function p_lex() {
+    console.log('pre_parse:', arguments);
+};
+
+parser.yy.pre_parse = function p_lex() {
+    console.log('pre_parse YY:', arguments);
+};
+
+parser.yy.post_lex = function p_lex() {
+    console.log('post_lex:', arguments);
 };
 
