@@ -722,14 +722,14 @@ parser.log = function p_log() {
 };
 
 parser.pre_parse = function p_lex() {
-    console.log('pre_parse:', arguments);
+    if (parser.yydebug) parser.log('pre_parse:', arguments);
 };
 
 parser.yy.pre_parse = function p_lex() {
-    console.log('pre_parse YY:', arguments);
+    if (parser.yydebug) parser.log('pre_parse YY:', arguments);
 };
 
 parser.yy.post_lex = function p_lex() {
-    console.log('post_lex:', arguments);
+    if (parser.yydebug) parser.log('post_lex:', arguments);
 };
 
