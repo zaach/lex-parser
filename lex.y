@@ -53,7 +53,7 @@ lex
                         extra_module_code   // <-- optional!
 
                   Erroneous code:
-                ${prettyPrintRange(yylexer, @error)}
+                ${yylexer.prettyPrintRange(yylexer, @error)}
 
                   Technical error report:
                 ${$error.errStr}
@@ -180,7 +180,7 @@ rules_collective
                 block.
 
                   Erroneous area:
-                ` + prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
+                ` + yylexer.prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
         }
     | start_conditions '{' error
         {
@@ -191,7 +191,7 @@ rules_collective
                 as a terminating curly brace '}' could not be found.
 
                   Erroneous area:
-                ` + prettyPrintRange(yylexer, @error, @start_conditions));
+                ` + yylexer.prettyPrintRange(yylexer, @error, @start_conditions));
         }
     ;
 
@@ -219,18 +219,18 @@ rule
                 error: $error,
                 text: yytext
             });
-            yyerror("lexer rule regex action code declaration error?\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @regex));
+            yyerror("lexer rule regex action code declaration error?\n\n  Erroneous area:\n" + yylexer.prettyPrintRange(yylexer, @error, @regex));
         }
     ;
 
 action
     : ACTION_START action_body BRACKET_MISSING
         {
-            yyerror("Missing curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @BRACKET_MISSING, @1));
+            yyerror("Missing curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + yylexer.prettyPrintRange(yylexer, @BRACKET_MISSING, @1));
         }
     | ACTION_START action_body BRACKET_SURPLUS
         {
-            yyerror("Too many curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + prettyPrintRange(yylexer, @BRACKET_SURPLUS, @1));
+            yyerror("Too many curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + yylexer.prettyPrintRange(yylexer, @BRACKET_SURPLUS, @1));
         }
     | ACTION_START action_body ACTION_END 
         {
@@ -277,11 +277,11 @@ action_body
             "    a line. " +
 "" +
             "    It's use is not permitted at this position:" +
-            "" + prettyPrintRange(yylexer, @INCLUDE_PLACEMENT_ERROR, @action_body));
+            "" + yylexer.prettyPrintRange(yylexer, @INCLUDE_PLACEMENT_ERROR, @action_body));
         }
     | action_body error
         {
-            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + prettyPrintRange(yylexer, @error, @action_body));
+            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + yylexer.prettyPrintRange(yylexer, @error, @action_body));
         }
     | ε
         { $$ = ''; }
@@ -292,7 +292,7 @@ start_conditions
         { $$ = $name_list; }
     | '<' name_list error
         {
-            yyerror("Seems you did not correctly terminate the start condition set <" + $name_list.join(',') + ",???> with a terminating '>'\n\n  Erroneous area:\n" + prettyPrintRange(yylexer, @error, @1));
+            yyerror("Seems you did not correctly terminate the start condition set <" + $name_list.join(',') + ",???> with a terminating '>'\n\n  Erroneous area:\n" + yylexer.prettyPrintRange(yylexer, @error, @1));
         }
     | '<' '*' '>'
         { $$ = ['*']; }
@@ -409,11 +409,11 @@ regex_base
         { $$ = $SPECIAL_GROUP + $regex_list + ')'; }
     | '(' regex_list error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + prettyPrintRange(yylexer, @error, @1));
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + yylexer.prettyPrintRange(yylexer, @error, @1));
         }
     | SPECIAL_GROUP regex_list error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + prettyPrintRange(yylexer, @error, @SPECIAL_GROUP));
+            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + yylexer.prettyPrintRange(yylexer, @error, @SPECIAL_GROUP));
         }
     | regex_base '+'
         { $$ = $regex_base + '+'; }
@@ -448,7 +448,7 @@ any_group_regex
         { $$ = $REGEX_SET_START + $regex_set + $REGEX_SET_END; }
     | REGEX_SET_START regex_set error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets.\n\n  Unterminated regex set:\n" + prettyPrintRange(yylexer, @error, @REGEX_SET_START));
+            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets.\n\n  Unterminated regex set:\n" + yylexer.prettyPrintRange(yylexer, @error, @REGEX_SET_START));
         }
     ;
 
@@ -518,7 +518,7 @@ option
                 internal error: option "${$option}" value assignment failure.
 
                   Erroneous area:
-                ` + prettyPrintRange(yylexer, @error, @option));
+                ` + yylexer.prettyPrintRange(yylexer, @error, @option));
         }
     | error
         {
@@ -527,7 +527,7 @@ option
                 expected a valid option name (with optional value assignment).
 
                   Erroneous area:
-                ` + prettyPrintRange(yylexer, @error));
+                ` + yylexer.prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -552,7 +552,7 @@ include_macro_code
                 %include MUST be followed by a valid file path.
 
                   Erroneous path:
-                ` + prettyPrintRange(yylexer, @error, @INCLUDE));
+                ` + yylexer.prettyPrintRange(yylexer, @error, @INCLUDE));
         }
     ;
 
@@ -568,7 +568,7 @@ module_code_chunk
                 module code declaration error?
 
                   Erroneous area:
-                ` + prettyPrintRange(yylexer, @error));
+                ` + yylexer.prettyPrintRange(yylexer, @error));
         }
     ;
 
@@ -670,75 +670,6 @@ function rmCommonWS(strings, ...values) {
     }
     var sv = rv.join('');
     return sv;
-}
-
-// pretty-print the erroneous section of the input, with line numbers and everything...
-function prettyPrintRange(lexer, loc, context_loc, context_loc2) {
-    var error_size = loc.last_line - loc.first_line;
-    const CONTEXT = 3;
-    const CONTEXT_TAIL = 1;
-    const MINIMUM_VISIBLE_NONEMPTY_LINE_COUNT = 2;
-    var input = lexer.matched + lexer._input;
-    var lines = input.split('\n');
-    //var show_context = (error_size < 5 || context_loc);
-    var l0 = Math.max(1, (context_loc ? context_loc.first_line : loc.first_line - CONTEXT));
-    var l1 = Math.max(1, (context_loc2 ? context_loc2.last_line : loc.last_line + CONTEXT_TAIL));
-    var lineno_display_width = (1 + Math.log10(l1 | 1) | 0);
-    var ws_prefix = new Array(lineno_display_width).join(' ');
-    var nonempty_line_indexes = [];
-    var rv = lines.slice(l0 - 1, l1 + 1).map(function injectLineNumber(line, index) {
-        var lno = index + l0;
-        var lno_pfx = (ws_prefix + lno).substr(-lineno_display_width);
-        var rv = lno_pfx + ': ' + line;
-        var errpfx = (new Array(lineno_display_width + 1)).join('^');
-        if (lno === loc.first_line) {
-            var offset = loc.first_column + 2;
-            var len = Math.max(2, (lno === loc.last_line ? loc.last_column : line.length) - loc.first_column + 1);
-            var lead = (new Array(offset)).join('.');
-            var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark;
-            if (line.trim().length > 0) {
-                nonempty_line_indexes.push(index);
-            }
-        } else if (lno === loc.last_line) {
-            var offset = 2 + 1;
-            var len = Math.max(2, loc.last_column + 1);
-            var lead = (new Array(offset)).join('.');
-            var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark;
-            if (line.trim().length > 0) {
-                nonempty_line_indexes.push(index);
-            }
-        } else if (lno > loc.first_line && lno < loc.last_line) {
-            var offset = 2 + 1;
-            var len = Math.max(2, line.length + 1);
-            var lead = (new Array(offset)).join('.');
-            var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark;
-            if (line.trim().length > 0) {
-                nonempty_line_indexes.push(index);
-            }
-        }
-        rv = rv.replace(/\t/g, ' ');
-        return rv;
-    });
-    // now make sure we don't print an overly large amount of error area: limit it 
-    // to the top and bottom line count:
-    if (nonempty_line_indexes.length > 2 * MINIMUM_VISIBLE_NONEMPTY_LINE_COUNT) {
-        var clip_start = nonempty_line_indexes[MINIMUM_VISIBLE_NONEMPTY_LINE_COUNT - 1] + 1;
-        var clip_end = nonempty_line_indexes[nonempty_line_indexes.length - MINIMUM_VISIBLE_NONEMPTY_LINE_COUNT] - 1;
-        console.log("clip off: ", {
-            start: clip_start, 
-            end: clip_end,
-            len: clip_end - clip_start + 1,
-            arr: nonempty_line_indexes,
-            rv
-        });
-        var intermediate_line = (new Array(lineno_display_width + 1)).join(' ') +     '  (...continued...)';
-        intermediate_line += '\n' + (new Array(lineno_display_width + 1)).join('-') + '  (---------------)';
-        rv.splice(clip_start, clip_end - clip_start + 1, intermediate_line);
-    }
-    return rv.join('\n');
 }
 
 
