@@ -696,7 +696,7 @@ function prettyPrintRange(lexer, loc, context_loc, context_loc2) {
             var len = Math.max(2, (lno === loc.last_line ? loc.last_column : line.length) - loc.first_column + 1);
             var lead = (new Array(offset)).join('.');
             var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark; // + offset + '/D' + len + '/' + lno + '/' + loc.last_line + '/' + loc.last_column + '/' + line.length + '/' + loc.first_column;
+            rv += '\n' + errpfx + lead + mark;
             if (line.trim().length > 0) {
                 nonempty_line_indexes.push(index);
             }
@@ -705,7 +705,7 @@ function prettyPrintRange(lexer, loc, context_loc, context_loc2) {
             var len = Math.max(2, loc.last_column + 1);
             var lead = (new Array(offset)).join('.');
             var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark; // + offset + '/E' + len;
+            rv += '\n' + errpfx + lead + mark;
             if (line.trim().length > 0) {
                 nonempty_line_indexes.push(index);
             }
@@ -714,7 +714,7 @@ function prettyPrintRange(lexer, loc, context_loc, context_loc2) {
             var len = Math.max(2, line.length + 1);
             var lead = (new Array(offset)).join('.');
             var mark = (new Array(len)).join('^');
-            rv += '\n' + errpfx + lead + mark; // + offset + '/F' + len;
+            rv += '\n' + errpfx + lead + mark;
             if (line.trim().length > 0) {
                 nonempty_line_indexes.push(index);
             }
