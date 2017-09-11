@@ -136,9 +136,12 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
                                             return 'ACTION_BODY';
                                         %}
 // make sure to terminate on linefeed before the next rule alternative,
-// which is announced by `|`, or lexer option/command, which
-// starts with `%`, e.g. `%include`:                                        
-<action>(?:{BR}{WS}+)+/[^{WS}{BR}|%]    yy.include_command_allowed = true; 
+// which is announced by `|`.
+// Note that lexer options & commands should be at the start-of-line, i.e.
+// without leading whitespace. The only lexer command which we do accept
+// here after the last indent is `%include`, which is considered (part
+// of) the rule's action code block.
+<action>(?:{BR}{WS}+)+/[^{WS}{BR}|]     yy.include_command_allowed = true; 
                                         return 'ACTION_BODY_WHITESPACE';           // keep empty lines as-is inside action code blocks.
 <action>{BR}                            if (yy.depth > 0) {
                                             yy.include_command_allowed = true; 
