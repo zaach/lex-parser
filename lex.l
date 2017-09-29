@@ -29,7 +29,7 @@ ES2017_STRING_CONTENT                   (?:\\\`|\\[^\`]|[^\\\`])*
 ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 
 
-%s rules macro
+%s rules macro named_chunk
 %x code start_condition options conditions action path set
 
 
@@ -182,14 +182,14 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 // *except* the code/action blocks:
 <INITIAL,start_condition,macro,path,options>{WS}*"//"[^\r\n]*
                                         /* skip single-line comment */
-<INITIAL,start_condition,macro,path,options>{WS}*"/*"(.|\n|\r)*?"*/"
+<INITIAL,start_condition,macro,path,options>{WS}*"/*"[^]*?"*/"
                                         /* skip multi-line comment */
 
 <rules>{BR}+                            /* empty */
 <rules>{WS}+{BR}+                       /* empty */
 <rules>"//"[^\r\n]*
                                         /* skip single-line comment */
-<rules>"/*"(.|\n|\r)*?"*/"
+<rules>"/*"[^]*?"*/"
                                         /* skip multi-line comment */
 // ACTION code chunks follow rules and are generally indented, but
 // never start with characters special to the lex language itself:
@@ -229,8 +229,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 <start_condition>{BR}+                  this.popState();
 <start_condition>{WS}+                  /* empty */
 
+<named_chunk>{ID}                       return 'NAME';
 <INITIAL>{ID}                           this.pushState('macro'); return 'NAME';
-<macro>{BR}+                            this.popState();
+<macro,named_chunk>{BR}+                this.popState();
 
 // Accept any non-regex-special character as a direct literal without
 // the need to put quotes around it:
@@ -275,6 +276,9 @@ ANY_LITERAL_CHAR                        [^\s\r\n<>\[\](){}.*+?:!=|%\/\\^$,\'\";]
 "%options"                              this.pushState('options'); return 'OPTIONS';
 "%s"                                    this.pushState('start_condition'); return 'START_INC';
 "%x"                                    this.pushState('start_condition'); return 'START_EXC';
+
+"%code"                                 this.pushState('named_chunk'); return 'INIT_CODE';
+"%import"                               this.pushState('named_chunk'); return 'IMPORT';
 
 "%include"                              yy.depth = 0;
                                         yy.include_command_allowed = true; 

@@ -57,7 +57,7 @@ lex
 
                   Technical error report:
                 ${$error.errStr}
-                `);
+            `);
         }
     ;
 
@@ -131,6 +131,78 @@ definition
         { $$ = null; }
     | UNKNOWN_DECL
         { $$ = {type: 'unknown', body: $1}; }
+    | IMPORT import_name import_path
+        { $$ = {type: 'imports', name: $import_name, path: $import_path}; }
+    | IMPORT import_name error
+        {
+            yyerror(rmCommonWS`
+                You did not specify a legal file path for the '%import' initialization code statement, which must have the format:
+                    %import qualifier_name file_path
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @IMPORT)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
+        }
+    | IMPORT error
+        {
+            yyerror(rmCommonWS`
+                %import name or source filename missing maybe?
+
+                Note: each '%import'-ed initialization code section must be qualified by a name, e.g. 'required' before the import path itself:
+                    %import qualifier_name file_path
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @IMPORT)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
+        }
+    | INIT_CODE init_code_name action
+        {
+            $$ = {
+	    	type: 'codesection',
+                qualifier: $init_code_name,
+                include: $action
+            };
+        }
+    | INIT_CODE error action
+        {
+            yyerror(rmCommonWS`
+                Each '%code' initialization code section must be qualified by a name, e.g. 'required' before the action code itself:
+                    %code qualifier_name {action code}
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @INIT_CODE, @action)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
+        }
+    ;
+
+init_code_name
+    : NAME
+        { $$ = $NAME; }
+    | STRING_LIT
+        { $$ = $STRING_LIT; }
+    ;
+
+import_name
+    : NAME
+        { $$ = $NAME; }
+    | STRING_LIT
+        { $$ = $STRING_LIT; }
+    ;
+
+import_path
+    : NAME
+        { $$ = $NAME; }
+    | STRING_LIT
+        { $$ = $STRING_LIT; }
     ;
 
 names_inclusive
@@ -180,7 +252,11 @@ rules_collective
                 block.
 
                   Erroneous area:
-                ` + yylexer.prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions));
+                ${yylexer.prettyPrintRange(yylexer, yylexer.mergeLocationInfo(##start_conditions, ##4), @start_conditions)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | start_conditions '{' error
         {
@@ -191,7 +267,11 @@ rules_collective
                 as a terminating curly brace '}' could not be found.
 
                   Erroneous area:
-                ` + yylexer.prettyPrintRange(yylexer, @error, @start_conditions));
+                ${yylexer.prettyPrintRange(yylexer, @error, @start_conditions)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
@@ -210,49 +290,54 @@ rule
     | regex error
         {
             $$ = [$regex, $error];
-            console.log('############# DUMP:', {
-                yysp,
-                yyrulelength,
-                yyvstack,
-                yystack,
-                yysstack,
-                error: $error,
-                text: yytext
-            });
-            yyerror("lexer rule regex action code declaration error?\n\n  Erroneous area:\n" + yylexer.prettyPrintRange(yylexer, @error, @regex));
+            yyerror(rmCommonWS`
+                Lexer rule regex action code declaration error?
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @regex)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
 action
     : ACTION_START action_body BRACKET_MISSING
         {
-            yyerror("Missing curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + yylexer.prettyPrintRange(yylexer, @BRACKET_MISSING, @1));
+            yyerror(rmCommonWS`
+                Missing curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.
+
+                  Offending action body:
+                ${yylexer.prettyPrintRange(yylexer, @BRACKET_MISSING, @1)}
+            `);
         }
     | ACTION_START action_body BRACKET_SURPLUS
         {
-            yyerror("Too many curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.\n\n  Offending action body:\n" + yylexer.prettyPrintRange(yylexer, @BRACKET_SURPLUS, @1));
+            yyerror(rmCommonWS`
+                Too many curly braces: seems you did not correctly bracket a lexer rule action block in curly braces: '{ ... }'.
+
+                  Offending action body:
+                ${yylexer.prettyPrintRange(yylexer, @BRACKET_SURPLUS, @1)}
+            `);
         }
     | ACTION_START action_body ACTION_END 
         {
-            if (0) {
-                $$ = 'XXX' + $action_body + 'YYY';
+            var s = $action_body.trim();
+            // remove outermost set of braces UNLESS there's 
+            // a curly brace in there anywhere: in that case
+            // we should leave it up to the sophisticated
+            // code analyzer to simplify the code!
+            //
+            // This is a very rough check as it will also look
+            // inside code comments, which should not have
+            // any influence.
+            //
+            // Nevertheless: this is a *safe* transform!
+            if (s[0] === '{' && s.indexOf('}') === s.length - 1) {
+                $$ = s.substring(1, s.length - 1).trim();
             } else {
-                var s = $action_body.trim();
-                // remove outermost set of braces UNLESS there's 
-                // a curly brace in there anywhere: in that case
-                // we should leave it up to the sophisticated
-                // code analyzer to simplify the code!
-                //
-                // This is a very rough check as it ill also look
-                // inside code comments, which should not have
-                // any influence.
-                //
-                // Nevertheless: this is a *safe* transform!
-                if (s[0] === '{' && s.indexOf('}') === s.length - 1) {
-                    $$ = s.substring(1, s.length - 1).trim();
-                } else {
-                    $$ = s;
-                }
+                $$ = s;
             }
         }
     ;
@@ -272,16 +357,24 @@ action_body
         { $$ = $action_body + '\n\n' + $include_macro_code + '\n\n'; }
     | action_body INCLUDE_PLACEMENT_ERROR
         { 
-            yyerror("" +
-            "    You may place the '%include' instruction only at the start/front of" +
-            "    a line. " +
-"" +
-            "    It's use is not permitted at this position:" +
-            "" + yylexer.prettyPrintRange(yylexer, @INCLUDE_PLACEMENT_ERROR, @action_body));
+            yyerror(rmCommonWS`
+                You may place the '%include' instruction only at the start/front of a line.
+
+                  It's use is not permitted at this position:
+                ${yylexer.prettyPrintRange(yylexer, @INCLUDE_PLACEMENT_ERROR, @action_body)}
+            `);
         }
     | action_body error
         {
-            yyerror("Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.\n\n  Offending action body part:\n" + yylexer.prettyPrintRange(yylexer, @error, @action_body));
+            yyerror(rmCommonWS`
+                Seems you did not correctly match curly braces '{ ... }' in a lexer rule action block.
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @action_body)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | ε
         { $$ = ''; }
@@ -292,7 +385,15 @@ start_conditions
         { $$ = $name_list; }
     | '<' name_list error
         {
-            yyerror("Seems you did not correctly terminate the start condition set <" + $name_list.join(',') + ",???> with a terminating '>'\n\n  Erroneous area:\n" + yylexer.prettyPrintRange(yylexer, @error, @1));
+            yyerror(rmCommonWS`
+                Seems you did not correctly terminate the start condition set <${$name_list.join(',')},???> with a terminating '>'
+
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error, @1)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | '<' '*' '>'
         { $$ = ['*']; }
@@ -409,11 +510,27 @@ regex_base
         { $$ = $SPECIAL_GROUP + $regex_list + ')'; }
     | '(' regex_list error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + yylexer.prettyPrintRange(yylexer, @error, @1));
+            yyerror(rmCommonWS`
+                Seems you did not correctly bracket a lex rule regex part in '(...)' braces.
+
+                  Unterminated regex part:
+                ${yylexer.prettyPrintRange(yylexer, @error, @1)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | SPECIAL_GROUP regex_list error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex part in '(...)' braces.\n\n  Unterminated regex part:\n" + yylexer.prettyPrintRange(yylexer, @error, @SPECIAL_GROUP));
+            yyerror(rmCommonWS`
+                Seems you did not correctly bracket a lex rule regex part in '(...)' braces.
+
+                  Unterminated regex part:
+                ${yylexer.prettyPrintRange(yylexer, @error, @SPECIAL_GROUP)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | regex_base '+'
         { $$ = $regex_base + '+'; }
@@ -448,7 +565,15 @@ any_group_regex
         { $$ = $REGEX_SET_START + $regex_set + $REGEX_SET_END; }
     | REGEX_SET_START regex_set error
         {
-            yyerror("Seems you did not correctly bracket a lex rule regex set in '[...]' brackets.\n\n  Unterminated regex set:\n" + yylexer.prettyPrintRange(yylexer, @error, @REGEX_SET_START));
+            yyerror(rmCommonWS`
+                Seems you did not correctly bracket a lex rule regex set in '[...]' brackets.
+
+                  Unterminated regex set:
+                ${yylexer.prettyPrintRange(yylexer, @error, @REGEX_SET_START)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
@@ -515,19 +640,27 @@ option
         {
             // TODO ...
             yyerror(rmCommonWS`
-                internal error: option "${$option}" value assignment failure.
+                Internal error: option "${$option}" value assignment failure.
 
                   Erroneous area:
-                ` + yylexer.prettyPrintRange(yylexer, @error, @option));
+                ${yylexer.prettyPrintRange(yylexer, @error, @option)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     | error
         {
             // TODO ...
             yyerror(rmCommonWS`
-                expected a valid option name (with optional value assignment).
+                Expected a valid option name (with optional value assignment).
 
                   Erroneous area:
-                ` + yylexer.prettyPrintRange(yylexer, @error));
+                ${yylexer.prettyPrintRange(yylexer, @error)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
@@ -552,7 +685,11 @@ include_macro_code
                 %include MUST be followed by a valid file path.
 
                   Erroneous path:
-                ` + yylexer.prettyPrintRange(yylexer, @error, @INCLUDE));
+                ${yylexer.prettyPrintRange(yylexer, @error, @INCLUDE)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
@@ -565,10 +702,14 @@ module_code_chunk
         {
             // TODO ...
             yyerror(rmCommonWS`
-                module code declaration error?
+                Module code declaration error?
 
-                  Erroneous area:
-                ` + yylexer.prettyPrintRange(yylexer, @error));
+                  Erroneous code:
+                ${yylexer.prettyPrintRange(yylexer, @error)}
+
+                  Technical error report:
+                ${$error.errStr}
+            `);
         }
     ;
 
