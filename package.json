@@ -7,7 +7,8 @@
   "name": "@gerhobbelt/lex-parser",
   "version": "0.6.0-194",
   "description": "A parser for lexical grammars used by jison",
-  "main": "lex-parser.js",
+  "main": "dist/lex-parser-cjs-es5.js",
+  "module": "lex-parser.js",
   "scripts": {
     "test": "make test",
     "pub": "npm publish --access public"
@@ -27,11 +28,16 @@
     "node": ">=4.0"
   },
   "dependencies": {
-    "@gerhobbelt/xregexp": "3.2.0-21"
+    "@gerhobbelt/xregexp": "3.2.0-21",
+    "jison-helpers-lib": "0.1.0-194"
   },
   "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-preset-env": "1.6.0",
+    "babel-preset-modern-browsers": "9.0.2",
     "chai": "4.1.2",
     "jison-gho": "0.6.0-193",
-    "mocha": "4.0.0"
+    "mocha": "4.0.1",
+    "rollup": "0.50.0"
   }
 }
