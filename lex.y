@@ -455,7 +455,7 @@ regex
               // Convert Unicode escapes and other escapes to their literal characters
               // BEFORE we go and check whether this item is subject to the
               // `easy_keyword_rules` option.
-              $$ = eval('"' + $$ + '"');
+              $$ = JSON.parse('"' + $$ + '"');
             }
             catch (ex) {
               yyparser.warn('easy-keyword-rule FAIL on eval: ', ex);
