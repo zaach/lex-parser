@@ -10,6 +10,7 @@
 %left '('
 
 
+
 %%
 
 lex
@@ -457,7 +458,7 @@ regex
               $$ = eval('"' + $$ + '"');
             }
             catch (ex) {
-              this.warn('easy-keyword-rule FAIL on eval: ', ex);
+              yyparser.warn('easy-keyword-rule FAIL on eval: ', ex);
 
               // make the next keyword test fail:
               $$ = '.';
@@ -595,7 +596,7 @@ regex_set_atom
             } else {
                 $$ = $name_expansion;
             }
-            //this.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
+            //yyparser.log("name expansion for: ", { name: $name_expansion, redux: $name_expansion.replace(/[{}]/g, ''), output: $$ });
         }
     ;
 
