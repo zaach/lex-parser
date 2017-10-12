@@ -59,6 +59,7 @@ publish:
 
 clean:
 	-rm -f lex-parser.js
+	-rm -rf dist/
 	-rm -rf node_modules/
 	-rm -f package-lock.json
 
