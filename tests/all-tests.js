@@ -1,5 +1,5 @@
 var assert = require("chai").assert;
-var lex    = require("../lex-parser");
+var lex    = require("../dist/lex-parser-cjs-es5");
 var fs     = require('fs');
 var path   = require('path');
 
