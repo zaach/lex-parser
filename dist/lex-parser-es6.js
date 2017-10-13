@@ -1,4 +1,6 @@
+
 import fs from 'fs';
+
 import XRegExp from '@gerhobbelt/xregexp';
 import helpers from 'jison-helpers-lib';
 
@@ -3829,8 +3831,10 @@ parse: function parse(input) {
         }
 
         // - detect if an epsilon rule is being processed and act accordingly:
+        var start_with_epsilon = false;
         if (!l1 && first_index == null) {
             // epsilon rule span merger. With optional look-ahead in l2.
+            start_with_epsilon = true;
             if (!dont_look_back) {
                 for (var i = (i1 || sp) - 1; i >= 0; i--) {
                     l1 = lstack[i];
@@ -5444,6 +5448,9 @@ var lexer = function() {
      * @this {RegExpLexer}
      */
     cleanupAfterLex: function lexer_cleanupAfterLex(do_not_nuke_errorinfos) {
+      var rv;
+
+      // prevent lingering circular references from causing memory leaks:
       this.setInput('', {});
 
       // nuke the error hash info instances created during this run.
@@ -5943,6 +5950,7 @@ var lexer = function() {
      * @this {RegExpLexer}
      */
     prettyPrintRange: function lexer_prettyPrintRange(loc, context_loc, context_loc2) {
+      var error_size = loc.last_line - loc.first_line;
       const CONTEXT = 3;
       const CONTEXT_TAIL = 1;
       const MINIMUM_VISIBLE_NONEMPTY_LINE_COUNT = 2;
@@ -6459,6 +6467,8 @@ var lexer = function() {
 
     performAction: function lexer__performAction(yy, yyrulenumber, YY_START) {
       var yy_ = this;
+      var YYSTATE = YY_START;
+
       switch (yyrulenumber) {
       case 0:
         /*! Conditions:: rules macro named_chunk INITIAL */
@@ -7756,6 +7766,13 @@ var lexer = function() {
   var rmCommonWS = helpers.rmCommonWS;
   var dquote = helpers.dquote;
 
+  function indent(s, i) {
+    var a = s.split('\n');
+    var pf = new Array(i + 1).join(' ');
+    return pf + a.join('\n' + pf);
+  }
+
+  // unescape a string value which is wrapped in quotes/doublequotes
   function unescQuote(str) {
     str = '' + str;
     var a = str.split('\\\\');
@@ -7798,4 +7815,9 @@ function yyparse() {
     return parser.parse.apply(parser, arguments);
 }
 
-export { parser, Parser, yyparse as parse };
+export default {
+    parser,
+    Parser,
+    parse: yyparse,
+};
+
