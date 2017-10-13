@@ -1,6 +1,6 @@
 'use strict';
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _templateObject = _taggedTemplateLiteral(['\n        Maybe you did not correctly separate the lexer sections with a \'%%\'\n        on an otherwise empty line?\n        The lexer spec file should have this structure:\n    \n                definitions\n                %%\n                rules\n                %%                  // <-- optional!\n                extra_module_code   // <-- optional!\n    \n          Erroneous code:\n        ', '\n    \n          Technical error report:\n        ', '\n    '], ['\n        Maybe you did not correctly separate the lexer sections with a \'%%\'\n        on an otherwise empty line?\n        The lexer spec file should have this structure:\n    \n                definitions\n                %%\n                rules\n                %%                  // <-- optional!\n                extra_module_code   // <-- optional!\n    \n          Erroneous code:\n        ', '\n    \n          Technical error report:\n        ', '\n    ']),
     _templateObject2 = _taggedTemplateLiteral(['\n        You did not specify a legal file path for the \'%import\' initialization code statement, which must have the format:\n            %import qualifier_name file_path\n    \n          Erroneous code:\n        ', '\n    \n          Technical error report:\n        ', '\n    '], ['\n        You did not specify a legal file path for the \'%import\' initialization code statement, which must have the format:\n            %import qualifier_name file_path\n    \n          Erroneous code:\n        ', '\n    \n          Technical error report:\n        ', '\n    ']),
@@ -34,7 +34,7 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 Object.defineProperty(exports, '__esModule', { value: true });
 
 function _interopDefault(ex) {
-    return ex && (typeof ex === 'undefined' ? 'undefined' : _typeof(ex)) === 'object' && 'default' in ex ? ex['default'] : ex;
+    return ex && (typeof ex === 'undefined' ? 'undefined' : _typeof2(ex)) === 'object' && 'default' in ex ? ex['default'] : ex;
 }
 
 var fs = _interopDefault(require('fs'));
@@ -2027,15 +2027,18 @@ var parser = {
             pre_parse: undefined,
             post_parse: undefined,
             pre_lex: undefined,
-            post_lex: undefined
+            post_lex: undefined // WARNING: must be written this way for the code expanders to work correctly in both ES5 and ES6 modes!
         };
 
+        var ASSERT;
         if (typeof assert !== 'function') {
-            assert = function JisonAssert(cond, msg) {
+            ASSERT = function JisonAssert(cond, msg) {
                 if (!cond) {
                     throw new Error('assertion failed: ' + (msg || '***'));
                 }
             };
+        } else {
+            ASSERT = assert;
         }
 
         this.yyGetSharedState = function yyGetSharedState() {
@@ -2050,7 +2053,7 @@ var parser = {
         // e.g. `lexer.yytext` MAY be a complex value object, 
         // rather than a simple string/value.
         function shallow_copy(src) {
-            if ((typeof src === 'undefined' ? 'undefined' : _typeof(src)) === 'object') {
+            if ((typeof src === 'undefined' ? 'undefined' : _typeof2(src)) === 'object') {
                 var dst = {};
                 for (var k in src) {
                     if (Object.prototype.hasOwnProperty.call(src, k)) {
@@ -2409,7 +2412,7 @@ var parser = {
                     // ...
                     var rec = !!this.recoverable;
                     for (var key in this) {
-                        if (this.hasOwnProperty(key) && (typeof key === 'undefined' ? 'undefined' : _typeof(key)) === 'object') {
+                        if (this.hasOwnProperty(key) && (typeof key === 'undefined' ? 'undefined' : _typeof2(key)) === 'object') {
                             this[key] = undefined;
                         }
                     }
@@ -2710,7 +2713,7 @@ var parser = {
 
                         // try to recover from error
                         if (error_rule_depth < 0) {
-                            assert(recovering > 0);
+                            ASSERT(recovering > 0);
                             recoveringErrorInfo.info_stack_pointer = esp;
 
                             // barf a fatal hairball when we're out of look-ahead symbols and none hit a match
@@ -2809,8 +2812,8 @@ var parser = {
                         // *or* we execute a `reduce` action which outputs a final parse
                         // result (yes, that MAY happen!)...
 
-                        assert(recoveringErrorInfo);
-                        assert(symbol === TERROR);
+                        ASSERT(recoveringErrorInfo);
+                        ASSERT(symbol === TERROR);
                         while (symbol) {
                             // retrieve state number from top of stack
                             state = newState; // sstack[sp - 1];
@@ -2856,7 +2859,7 @@ var parser = {
                                 case 1:
                                     stack[sp] = symbol;
                                     //vstack[sp] = lexer.yytext;
-                                    assert(recoveringErrorInfo);
+                                    ASSERT(recoveringErrorInfo);
                                     vstack[sp] = recoveringErrorInfo;
                                     //lstack[sp] = copy_yylloc(lexer.yylloc);
                                     lstack[sp] = this.yyMergeLocationInfo(null, null, recoveringErrorInfo.loc, lexer.yylloc, true);
@@ -3009,7 +3012,7 @@ var parser = {
 
                         ++sp;
                         symbol = 0;
-                        assert(preErrorSymbol === 0);
+                        ASSERT(preErrorSymbol === 0);
                         if (!preErrorSymbol) {
                             // normal execution / no error
                             // Pick up the lexer details for the current symbol as that one is not 'look-ahead' any more:
@@ -3220,7 +3223,7 @@ parser.yy.pre_parse = function p_lex() {
 parser.yy.post_lex = function p_lex() {
     if (parser.yydebug) parser.log('post_lex:', arguments);
 };
-/* lexer generated by jison-lex 0.6.0-194*/
+/* lexer generated by jison-lex 0.6.0-196*/
 
 /*
  * Returns a Lexer object of the following structure:
@@ -3679,6 +3682,7 @@ var lexer = function () {
          * @this {RegExpLexer}
          */
         cleanupAfterLex: function lexer_cleanupAfterLex(do_not_nuke_errorinfos) {
+            // prevent lingering circular references from causing memory leaks:
             this.setInput('', {});
 
             // nuke the error hash info instances created during this run.
