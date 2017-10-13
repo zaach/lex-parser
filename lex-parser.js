@@ -7814,10 +7814,9 @@ function yyparse() {
     return parser.parse.apply(parser, arguments);
 }
 
-export {
+export default {
     parser,
     Parser,
-    yyparse as parse,
-    
+    parse: yyparse
 };
 
