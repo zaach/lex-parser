@@ -29,27 +29,17 @@ A parser for lexical grammars used by [jison](http://jison.org) and jison-lex.
 
 ## install
 
-    npm install lex-parser
+    npm install @gerhobbelt/lex-parser
 
 
 ## build
 
-To build the parser yourself, clone the git repo then run:
-
-    make prep
-    
-to install required packages and then run:
-
-    make
-    
-to run the unit tests.
-
-This will generate `lex-parser.js`.
+To build the parser yourself, follow the install & build directions of the [monorepo](https://github.com/GerHobbelt/jison).
 
 
 ## usage
 
-    var lexParser = require("lex-parser");
+    var lexParser = require("@gerhobbelt/lex-parser");
 
     // parse a lexical grammar and return JSON
     lexParser.parse("%% ... ");
