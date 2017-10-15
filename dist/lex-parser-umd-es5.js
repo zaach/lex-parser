@@ -32,13 +32,15 @@ var _templateObject = _taggedTemplateLiteral(['\n        Maybe you did not corre
 function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
 
 (function (global, factory) {
-    (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@gerhobbelt/xregexp'), require('@gerhobbelt/recast'), require('fs')) : typeof define === 'function' && define.amd ? define(['@gerhobbelt/xregexp', '@gerhobbelt/recast', 'fs'], factory) : global['lex-parser'] = factory(global.XRegExp, global.recast, global.fs);
-})(undefined, function (XRegExp, recast, fs) {
+    (typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('@gerhobbelt/xregexp'), require('fs'), require('path'), require('@gerhobbelt/recast'), require('assert')) : typeof define === 'function' && define.amd ? define(['@gerhobbelt/xregexp', 'fs', 'path', '@gerhobbelt/recast', 'assert'], factory) : global['lex-parser'] = factory(global.XRegExp, global.fs, global.path, global.recast, global.assert);
+})(undefined, function (XRegExp, fs, path, recast, assert) {
     'use strict';
 
     XRegExp = XRegExp && XRegExp.hasOwnProperty('default') ? XRegExp['default'] : XRegExp;
-    recast = recast && recast.hasOwnProperty('default') ? recast['default'] : recast;
     fs = fs && fs.hasOwnProperty('default') ? fs['default'] : fs;
+    path = path && path.hasOwnProperty('default') ? path['default'] : path;
+    recast = recast && recast.hasOwnProperty('default') ? recast['default'] : recast;
+    assert = assert && assert.hasOwnProperty('default') ? assert['default'] : assert;
 
     // Return TRUE if `src` starts with `searchString`. 
     function startsWith(src, searchString) {
@@ -70,14 +72,17 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
         var src = strings.map(function splitIntoLines(s) {
             var a = s.split('\n');
 
-            indent_str = a.reduce(function analyzeLine(indent_str, line) {
-                var m = /^(\s*)\S/gm.exec(line);
-                // only non-empty ~ content-carrying lines matter re common indent calculus:
-                if (m) {
-                    if (!indent_str) {
-                        indent_str = m[1];
-                    } else if (m[1].length < indent_str.length) {
-                        indent_str = m[1];
+            indent_str = a.reduce(function analyzeLine(indent_str, line, index) {
+                // only check indentation of parts which follow a NEWLINE:
+                if (index !== 0) {
+                    var m = /^(\s*)\S/.exec(line);
+                    // only non-empty ~ content-carrying lines matter re common indent calculus:
+                    if (m) {
+                        if (!indent_str) {
+                            indent_str = m[1];
+                        } else if (m[1].length < indent_str.length) {
+                            indent_str = m[1];
+                        }
                     }
                 }
                 return indent_str;
@@ -94,12 +99,17 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
         // Done removing common indentation.
         // 
-        // Process template string partials now:
-        for (var i = 0, len = src.length; i < len; i++) {
-            var a = src[i];
-            for (var j = 0, linecnt = a.length; j < linecnt; j++) {
-                if (startsWith(a[j], indent_str)) {
-                    a[j] = a[j].substr(indent_str.length);
+        // Process template string partials now, but only when there's
+        // some actual UNindenting to do:
+        if (indent_str) {
+            for (var i = 0, len = src.length; i < len; i++) {
+                var a = src[i];
+                // only correct indentation at start of line, i.e. only check for
+                // the indent after every NEWLINE ==> start at j=1 rather than j=0
+                for (var j = 1, linecnt = a.length; j < linecnt; j++) {
+                    if (startsWith(a[j], indent_str)) {
+                        a[j] = a[j].substr(indent_str.length);
+                    }
                 }
             }
         }
@@ -164,9 +174,6 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
     // 
 
 
-    var fs$1 = require('fs');
-    var path = require('path');
-
     // Helper function: pad number with leading zeroes
     function pad(n, p) {
         p = p || 2;
@@ -199,7 +206,7 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
                 try {
                     dumpfile = path.normalize(dumpPaths[i] + '/' + dumpName);
-                    fs$1.writeFileSync(dumpfile, sourcecode, 'utf8');
+                    fs.writeFileSync(dumpfile, sourcecode, 'utf8');
                     console.error("****** offending generated " + errname + " source code dumped into file: ", dumpfile);
                     break; // abort loop once a dump action was successful!
                 } catch (ex3) {
@@ -278,6 +285,11 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
         return p;
     }
 
+    var code_exec = {
+        exec: exec_and_diagnose_this_stuff,
+        dump: dumpSourceToFile
+    };
+
     //
     // Parse a given chunk of code to an AST.
     //
@@ -291,58 +303,81 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
 
 
     //import astUtils from '@gerhobbelt/ast-util';
-    //import prettier from '@gerhobbelt/prettier-miscellaneous';
-    //import assert from 'assert';
-
-    // assert(recast);
-    // var types = recast.types;
-    // assert(types);
-    // var namedTypes = types.namedTypes;
-    // assert(namedTypes);
-    // var b = types.builders;
-    // assert(b);
+    assert(recast);
+    var types = recast.types;
+    assert(types);
+    var namedTypes = types.namedTypes;
+    assert(namedTypes);
+    var b = types.builders;
+    assert(b);
     // //assert(astUtils);
 
 
     function parseCodeChunkToAST(src, options) {
+        src = src.replace(/@/g, '\uFFDA').replace(/#/g, '\uFFDB');
         var ast = recast.parse(src);
         return ast;
     }
 
     function prettyPrintAST(ast, options) {
         var new_src;
+        var s = recast.prettyPrint(ast, {
+            tabWidth: 2,
+            quote: 'single',
+            arrowParensAlways: true,
 
-        {
-            var s = recast.prettyPrint(ast, {
-                tabWidth: 2,
-                quote: 'single',
-                arrowParensAlways: true,
+            // Do not reuse whitespace (or anything else, for that matter)
+            // when printing generically.
+            reuseWhitespace: false
+        });
+        new_src = s.code;
 
-                // Do not reuse whitespace (or anything else, for that matter)
-                // when printing generically.
-                reuseWhitespace: false
-            });
-            new_src = s.code;
-        }
+        new_src = new_src.replace(/\r\n|\n|\r/g, '\n') // platform dependent EOL fixup
+        // backpatch possible jison variables extant in the prettified code:
+        .replace(/\uFFDA/g, '@').replace(/\uFFDB/g, '#');
 
-        new_src = new_src.replace(/\r\n|\n|\r/g, '\n'); // platform dependent EOL fixup
         return new_src;
     }
+
+    var parse2AST = {
+        parseCodeChunkToAST: parseCodeChunkToAST,
+        prettyPrintAST: prettyPrintAST
+    };
+
+    /// HELPER FUNCTION: print the function in source code form, properly indented.
+    /** @public */
+    function printFunctionSourceCode(f) {
+        return String(f);
+    }
+
+    /// HELPER FUNCTION: print the function **content** in source code form, properly indented.
+    /** @public */
+    function printFunctionSourceCodeContainer(f) {
+        return String(f).replace(/^[\s\r\n]*function\b[^\{]+\{/, '').replace(/\}[\s\r\n]*$/, '');
+    }
+
+    var stringifier = {
+        printFunctionSourceCode: printFunctionSourceCode,
+        printFunctionSourceCodeContainer: printFunctionSourceCodeContainer
+    };
 
     var helpers = {
         rmCommonWS: rmCommonWS$1,
         camelCase: camelCase,
         dquote: dquote,
 
-        exec: exec_and_diagnose_this_stuff,
-        dump: dumpSourceToFile,
+        exec: code_exec.exec,
+        dump: code_exec.dump,
 
-        parseCodeChunkToAST: parseCodeChunkToAST,
-        prettyPrintAST: prettyPrintAST
+        parseCodeChunkToAST: parse2AST.parseCodeChunkToAST,
+        prettyPrintAST: parse2AST.prettyPrintAST,
+
+        printFunctionSourceCode: stringifier.printFunctionSourceCode,
+        printFunctionSourceCodeContainer: stringifier.printFunctionSourceCodeContainer
     };
 
     // hack:
-    var assert;
+    var assert$1;
 
     /* parser generated by jison 0.6.1-200 */
 
@@ -2329,14 +2364,14 @@ function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defi
             };
 
             var ASSERT;
-            if (typeof assert !== 'function') {
+            if (typeof assert$1 !== 'function') {
                 ASSERT = function JisonAssert(cond, msg) {
                     if (!cond) {
                         throw new Error('assertion failed: ' + (msg || '***'));
                     }
                 };
             } else {
-                ASSERT = assert;
+                ASSERT = assert$1;
             }
 
             this.yyGetSharedState = function yyGetSharedState() {
