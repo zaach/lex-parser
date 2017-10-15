@@ -7,6 +7,26 @@
 A parser for lexical grammars used by [jison](http://jison.org) and jison-lex.
 
 
+> 
+> # deprecation ~ secondary-source notice
+>
+> From today (2017/oct/15) the lex-parser repository is only a **secondary source** 
+> for the `lex-parser` package/codebase: the **primary source** is the 
+> [jison](https://github.com/GerHobbelt/jison) 
+> [monorepo](https://medium.com/netscape/the-case-for-monorepos-907c1361708a)'s `packages/lex-parser/` 
+> directory.
+>
+> (For a comparable argument, see also ["Why is Babel a monorepo?"](https://github.com/babel/babel/blob/master/doc/design/monorepo.md))
+>
+> Issues, pull requests, etc. for `lex-parser` should be filed there; hence 
+> we do not accept issue reports in this secondary repository any more.
+>
+> This repository will track the primary source for a while still, but be 
+> *very aware* that this particular repository will always be lagging behind!
+>
+
+
+
 ## install
 
     npm install lex-parser
